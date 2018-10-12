@@ -1,0 +1,12 @@
+C:\Users\USER\Documents\Project\CDT_Noti_Bot\CDT_Noti_Bot\bin\Release\CDT_Noti_Bot.exe.config
+C:\Users\USER\Documents\Project\CDT_Noti_Bot\CDT_Noti_Bot\bin\Release\CDT_Noti_Bot.exe
+C:\Users\USER\Documents\Project\CDT_Noti_Bot\CDT_Noti_Bot\bin\Release\CDT_Noti_Bot.pdb
+C:\Users\USER\Documents\Project\CDT_Noti_Bot\CDT_Noti_Bot\bin\Release\Newtonsoft.Json.dll
+C:\Users\USER\Documents\Project\CDT_Noti_Bot\CDT_Noti_Bot\bin\Release\Telegram.Bot.dll
+C:\Users\USER\Documents\Project\CDT_Noti_Bot\CDT_Noti_Bot\bin\Release\Newtonsoft.Json.xml
+C:\Users\USER\Documents\Project\CDT_Noti_Bot\CDT_Noti_Bot\bin\Release\Telegram.Bot.xml
+C:\Users\USER\Documents\Project\CDT_Noti_Bot\CDT_Noti_Bot\obj\Release\CDT_Noti_Bot.Properties.Resources.resources
+C:\Users\USER\Documents\Project\CDT_Noti_Bot\CDT_Noti_Bot\obj\Release\CDT_Noti_Bot.csproj.GenerateResource.Cache
+C:\Users\USER\Documents\Project\CDT_Noti_Bot\CDT_Noti_Bot\obj\Release\CDT_Noti_Bot.exe
+C:\Users\USER\Documents\Project\CDT_Noti_Bot\CDT_Noti_Bot\obj\Release\CDT_Noti_Bot.pdb
+C:\Users\USER\Documents\Project\CDT_Noti_Bot\CDT_Noti_Bot\obj\Release\CDT_Noti_Bot.Form1.resources
