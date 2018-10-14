@@ -25,7 +25,9 @@ namespace CDT_Noti_Bot
             InitializeComponent();
         }
 
-        private Telegram.Bot.TelegramBotClient Bot = new Telegram.Bot.TelegramBotClient("648012085:AAHxJwmDWlznWTFMNQ92hJyVwsB_ggJ9ED8");
+        const string strBotToken = "624245556:AAHJQ3bwdUB6IRf1KhQ2eAg4UDWB5RTiXzI";
+
+        private Telegram.Bot.TelegramBotClient Bot = new Telegram.Bot.TelegramBotClient(strBotToken);
 
         private void Form1_Load(object sender, EventArgs e)
         {
