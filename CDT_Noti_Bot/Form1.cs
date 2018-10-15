@@ -103,7 +103,7 @@ namespace CDT_Noti_Bot
                 Notice.SetNotice(NewNotice.GetNotice());
 
                 Bot.SendTextMessageAsync(-1001312491933, strPrint);  // 운영진방
-                //Bot.SendTextMessageAsync(-1001312491933, strPrint);  // 클랜방
+                Bot.SendTextMessageAsync(-1001202203239, strPrint);  // 클랜방
             }
         }
 
@@ -191,39 +191,39 @@ namespace CDT_Noti_Bot
 
                 await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
             }
-            else if (strOutput[0] == "/공지등록")
-            {
-                strMassage = strMassage.Replace(strOutput[0], "");
+            //else if (strOutput[0] == "/공지등록")
+            //{
+            //    strMassage = strMassage.Replace(strOutput[0], "");
 
-                if (strOutput[1] == "")
-                {
-                    strPrint += "[ERROR] 공지 내용이 없습니다.";
-                }
-                else
-                {
-                    System.IO.File.WriteAllText(@"_Notice.txt", strOutput[1], Encoding.Unicode);
-                    strPrint += "[SUCCESS] 공지 등록완료.";
-                }
+            //    if (strOutput[1] == "")
+            //    {
+            //        strPrint += "[ERROR] 공지 내용이 없습니다.";
+            //    }
+            //    else
+            //    {
+            //        System.IO.File.WriteAllText(@"_Notice.txt", strOutput[1], Encoding.Unicode);
+            //        strPrint += "[SUCCESS] 공지 등록완료.";
+            //    }
 
-                await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
-            }
-            else if (strOutput[0] == "/공지삭제")
-            {
-                strMassage = strMassage.Replace(strOutput[0], "");
-                string strNoticeValue = System.IO.File.ReadAllText(@"_Notice.txt");
+            //    await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
+            //}
+            //else if (strOutput[0] == "/공지삭제")
+            //{
+            //    strMassage = strMassage.Replace(strOutput[0], "");
+            //    string strNoticeValue = System.IO.File.ReadAllText(@"_Notice.txt");
 
-                if (strNoticeValue == "")
-                {
-                    strPrint += "[ERROR] 현재 공지가 등록되지 않았습니다.";
-                }
-                else
-                {
-                    System.IO.File.WriteAllText(@"_Notice.txt", "", Encoding.Unicode);
-                    strPrint += "[SUCCESS] 공지 삭제완료.";
-                }
+            //    if (strNoticeValue == "")
+            //    {
+            //        strPrint += "[ERROR] 현재 공지가 등록되지 않았습니다.";
+            //    }
+            //    else
+            //    {
+            //        System.IO.File.WriteAllText(@"_Notice.txt", "", Encoding.Unicode);
+            //        strPrint += "[SUCCESS] 공지 삭제완료.";
+            //    }
 
-                await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
-            }
+            //    await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
+            //}
             //========================================================================================
             // 정모 관련 명령어
             //========================================================================================
