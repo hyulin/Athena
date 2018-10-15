@@ -9,25 +9,103 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
+using System.Net;
+using System.Timers;
+using System.Threading;
 
-//Telegram using
+//Telegram API
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 
+// Google Sheet API
+using Google.Apis.Auth.OAuth2;
+using Google.Apis.Sheets.v4;
+using Google.Apis.Sheets.v4.Data;
+using Google.Apis.Services;
+using Google.Apis.Util.Store;
+
 namespace CDT_Noti_Bot
 {
     public partial class Form1 : Form
     {
+        // If modifying these scopes, delete your previously saved credentials
+        // at ~/.credentials/sheets.googleapis.com-dotnet-quickstart.json
+        static string[] Scopes = { SheetsService.Scope.Spreadsheets };
+        static string ApplicationName = "Clien Delicious Team Bot";
+        UserCredential credential;
+        SheetsService service;
+        CNotice Notice = new CNotice();
+        CNotice NewNotice = new CNotice();
+
+        const string strBotToken = "624245556:AAHJQ3bwdUB6IRf1KhQ2eAg4UDWB5RTiXzI";
+        private Telegram.Bot.TelegramBotClient Bot = new Telegram.Bot.TelegramBotClient(strBotToken);
+
         public Form1()
         {
+            using (var stream =
+                new FileStream("credentials.json", FileMode.Open, FileAccess.Read))
+                {
+                    string credPath = "token.json";
+                    credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
+                        GoogleClientSecrets.Load(stream).Secrets,
+                        Scopes,
+                        "user",
+                        CancellationToken.None,
+                        new FileDataStore(credPath, true)).Result;
+                    Console.WriteLine("Credential file saved to: " + credPath);
+                }
+
+            // Create Google Sheets API service.
+            service = new SheetsService(new BaseClientService.Initializer()
+            {
+                HttpClientInitializer = credential,
+                ApplicationName = ApplicationName,
+            });
+
+            // 타이머 생성 및 시작
+            System.Timers.Timer timer = new System.Timers.Timer();
+            timer.Interval = 1000; // 1초
+            timer.Elapsed += new ElapsedEventHandler(timer_Elapsed);
+            timer.Start();
+
             InitializeComponent();
         }
 
-        const string strBotToken = "624245556:AAHJQ3bwdUB6IRf1KhQ2eAg4UDWB5RTiXzI";
+        // 쓰레드풀의 작업쓰레드가 지정된 시간 간격으로
+        // 아래 이벤트 핸들러 실행
+        public void timer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            string strPrint = "";
 
-        private Telegram.Bot.TelegramBotClient Bot = new Telegram.Bot.TelegramBotClient(strBotToken);
+            // Define request parameters.
+            String spreadsheetId = "624245556:AAHJQ3bwdUB6IRf1KhQ2eAg4UDWB5RTiXzI";
+            String range = "클랜 공지!C15:C23";
+            SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+
+            ValueRange response = request.Execute();
+            IList<IList<Object>> values = response.Values;
+            if (values != null && values.Count > 0)
+            {
+                strPrint += "#공지사항\n\n";
+
+                foreach (var row in values)
+                {
+                    strPrint += "* " + row[0] + "\n\n";
+                }
+            }
+
+            NewNotice.SetNotice(strPrint);
+
+            if (Notice.GetNotice() != NewNotice.GetNotice())
+            {
+                Notice.SetNotice(NewNotice.GetNotice());
+
+                Bot.SendTextMessageAsync(-1001312491933, strPrint);  // 운영진방
+                //Bot.SendTextMessageAsync(-1001312491933, strPrint);  // 클랜방
+            }
+        }
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -107,19 +185,9 @@ namespace CDT_Noti_Bot
             //========================================================================================
             // 공지사항 관련 명령어
             //========================================================================================
-            else if (strOutput[0] == "/공지")
+            else if (strOutput[0] == "/뉴공지")
             {
-                strMassage = strMassage.Replace(strOutput[0], "");
-                string strNoticeValue = System.IO.File.ReadAllText(@"_Notice.txt");
-
-                if (strNoticeValue == "")
-                {
-                    strPrint += "[ERROR] 현재 공지가 등록되지 않았습니다.";
-                }
-                else
-                {
-                    strPrint += strNoticeValue;
-                }
+                strPrint = Notice.GetNotice();
 
                 await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
             }
