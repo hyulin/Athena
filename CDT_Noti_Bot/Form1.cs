@@ -127,10 +127,24 @@ namespace CDT_Noti_Bot
         {
             var varMessage = e.Message;
 
-            if (varMessage == null || varMessage.Type != MessageType.Text)
+            if (varMessage == null || (varMessage.Type != MessageType.Text && varMessage.Type != MessageType.ChatMembersAdded))
             {
                 return;
             }
+
+            // 입장 메시지 일 경우
+            if (varMessage.Type == MessageType.ChatMembersAdded)
+            {
+                varMessage.Text = "/안내";
+            }
+
+            //if ( (varMessage.Chat.Id == -1001312491933) || (varMessage.Chat.Id == -1001202203239) )
+            //{
+            //    if (varMessage.Text.Contains("#공지사항"))
+            //    {
+            //        await Bot.PinChatMessageAsync(varMessage.Chat.Id, varMessage.MessageId);
+            //    }
+            //}
 
             string strMassage = varMessage.Text;
             string strUserName = varMessage.Chat.FirstName + varMessage.Chat.LastName;
