@@ -39,7 +39,7 @@ namespace CDT_Noti_Bot
         CNotice Notice = new CNotice();
         CNotice NewNotice = new CNotice();
 
-        const string strBotToken = "624245556:AAHJQ3bwdUB6IRf1KhQ2eAg4UDWB5RTiXzI";
+        const string strBotToken = "648012085:AAHxJwmDWlznWTFMNQ92hJyVwsB_ggJ9ED8";
         private Telegram.Bot.TelegramBotClient Bot = new Telegram.Bot.TelegramBotClient(strBotToken);
 
         public Form1()
@@ -66,7 +66,7 @@ namespace CDT_Noti_Bot
 
             // 타이머 생성 및 시작
             System.Timers.Timer timer = new System.Timers.Timer();
-            timer.Interval = 1000; // 1초
+            timer.Interval = 1000 * 60 * 5; // 5분
             timer.Elapsed += new ElapsedEventHandler(timer_Elapsed);
             timer.Start();
 
@@ -80,7 +80,7 @@ namespace CDT_Noti_Bot
             string strPrint = "";
 
             // Define request parameters.
-            String spreadsheetId = "648012085:AAHxJwmDWlznWTFMNQ92hJyVwsB_ggJ9ED8";
+            String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
             String range = "클랜 공지!C15:C23";
             SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
@@ -185,9 +185,24 @@ namespace CDT_Noti_Bot
             //========================================================================================
             // 공지사항 관련 명령어
             //========================================================================================
-            else if (strOutput[0] == "/뉴공지")
+            else if (strOutput[0] == "/공지")
             {
-                strPrint = Notice.GetNotice();
+                // Define request parameters.
+                String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                String range = "클랜 공지!C15:C23";
+                SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+
+                ValueRange response = request.Execute();
+                IList<IList<Object>> values = response.Values;
+                if (values != null && values.Count > 0)
+                {
+                    strPrint += "#공지사항\n\n";
+
+                    foreach (var row in values)
+                    {
+                        strPrint += "* " + row[0] + "\n\n";
+                    }
+                }
 
                 await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
             }
