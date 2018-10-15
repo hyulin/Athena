@@ -64,6 +64,26 @@ namespace CDT_Noti_Bot
                 ApplicationName = ApplicationName,
             });
 
+            // Define request parameters.
+            String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+            String range = "클랜 공지!C15:C23";
+            SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+
+            ValueRange response = request.Execute();
+            IList<IList<Object>> values = response.Values;
+            string strNotice = "";
+            if (values != null && values.Count > 0)
+            {
+                strNotice += "#공지사항\n\n";
+
+                foreach (var row in values)
+                {
+                    strNotice += "* " + row[0] + "\n\n";
+                }
+            };
+
+            System.IO.File.WriteAllText(@"_Notice.txt", strNotice, Encoding.Unicode);
+
             // 타이머 생성 및 시작
             System.Timers.Timer timer = new System.Timers.Timer();
             timer.Interval = 1000 * 60 * 5; // 5분
