@@ -38,7 +38,9 @@ namespace CDT_Noti_Bot
         SheetsService service;
         CNotice Notice = new CNotice();
         CNotice NewNotice = new CNotice();
+        bool bFirstRun = true;
 
+        // Bot Token
         const string strBotToken = "648012085:AAHxJwmDWlznWTFMNQ92hJyVwsB_ggJ9ED8";
         private Telegram.Bot.TelegramBotClient Bot = new Telegram.Bot.TelegramBotClient(strBotToken);
 
@@ -100,11 +102,17 @@ namespace CDT_Noti_Bot
 
             if (Notice.GetNotice() != NewNotice.GetNotice())
             {
-                System.IO.File.WriteAllText(@"_Notice.txt", NewNotice.GetNotice(), Encoding.Unicode);
                 Notice.SetNotice(NewNotice.GetNotice());
 
-                Bot.SendTextMessageAsync(-1001312491933, strPrint);  // 운영진방
-                Bot.SendTextMessageAsync(-1001202203239, strPrint);  // 클랜방
+                if (bFirstRun == true)
+                {
+                    bFirstRun = false;
+                }
+                else
+                {
+                    Bot.SendTextMessageAsync(-1001312491933, strPrint);  // 운영진방
+                    Bot.SendTextMessageAsync(-1001202203239, strPrint);  // 클랜방
+                }
             }
         }
 
@@ -112,7 +120,7 @@ namespace CDT_Noti_Bot
         {
             telegramAPIAsync();
 
-            setTelegramEvent();      //위에 만든 소스에 이어서 추가해주세요.
+            setTelegramEvent();
         }
 
         private void setTelegramEvent()
@@ -136,7 +144,14 @@ namespace CDT_Noti_Bot
             // 입장 메시지 일 경우
             if (varMessage.Type == MessageType.ChatMembersAdded)
             {
-                varMessage.Text = "/안내";
+                if (varMessage.Chat.Title == "CDT 사전 활동안내")
+                {
+                    varMessage.Text = "/안내";
+                }
+                else
+                {
+                    return;
+                }
             }
 
             //if ( (varMessage.Chat.Id == -1001312491933) || (varMessage.Chat.Id == -1001202203239) )
@@ -161,8 +176,6 @@ namespace CDT_Noti_Bot
                 strPrint += "[ Clien Delicious Team Notice Bot v1.0 ]\n\n";
                 strPrint += "/공지 : 팀 공지사항을 출력합니다.\n";
                 strPrint += "/모임 : 모임 공지와 참가자를 출력합니다.\n";
-                strPrint += "      - /참가|대화명 : 모임에 참가신청합니다.\n";
-                strPrint += "      - /취소|대화명 : 모임에 참가신청을 취소합니다.\n";
                 strPrint += "/안내 : 팀 안내 메시지를 출력합니다.\n";
                 strPrint += "/리포트 : 업데이트 내역, 개발 예정 항목을 출력합니다.\n";
                 strPrint += "/상태 : 현재 봇 상태를 출력합니다. 대답이 없으면 이상.\n";
@@ -179,15 +192,9 @@ namespace CDT_Noti_Bot
                 strPrint += "========================================\n";
                 strPrint += "[ Clien Delicious Team Notice Bot v1.0 입니다. ]\n\n";
                 strPrint += "/공지 : 팀 공지사항을 출력합니다.\n";
-                strPrint += "      - /공지등록|내용 : 팀 공지사항을 등록합니다.\n";
-                strPrint += "      - /공지삭제 : 팀 공지사항을 삭제합니다.\n";
                 strPrint += "/모임 : 모임 공지와 참가자를 출력합니다.\n";
                 strPrint += "      - /모임등록|내용 : 모임 공지를 등록합니다.\n";
-                strPrint += "      - /삭제 : 모임 공지를 삭제합니다.\n";
-                strPrint += "      - /참가|대화명 : 모임에 참가신청합니다.\n";
-                strPrint += "      - /취소|대화명 : 모임에 참가신청을 취소합니다.\n";
-                //strPrint += "      - /강제참가 : 모임 참가자를 입력합니다.\n";
-                //strPrint += "      - /강제취소 : 모임 참가자를 강제로 참가취소합니다.\n";
+                strPrint += "      - /모임삭제 : 모임 공지를 삭제합니다.\n";
                 strPrint += "/안내 : 팀 안내 메시지를 출력합니다.\n";
                 strPrint += "/리포트 : 봇 업데이트 내역, 개발 예정인 항목\n";
                 strPrint += "/상태 : 현재 봇 상태를 출력합니다. 대답이 없으면 이상.\n";
@@ -223,39 +230,6 @@ namespace CDT_Noti_Bot
 
                 await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
             }
-            //else if (strOutput[0] == "/공지등록")
-            //{
-            //    strMassage = strMassage.Replace(strOutput[0], "");
-
-            //    if (strOutput[1] == "")
-            //    {
-            //        strPrint += "[ERROR] 공지 내용이 없습니다.";
-            //    }
-            //    else
-            //    {
-            //        System.IO.File.WriteAllText(@"_Notice.txt", strOutput[1], Encoding.Unicode);
-            //        strPrint += "[SUCCESS] 공지 등록완료.";
-            //    }
-
-            //    await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
-            //}
-            //else if (strOutput[0] == "/공지삭제")
-            //{
-            //    strMassage = strMassage.Replace(strOutput[0], "");
-            //    string strNoticeValue = System.IO.File.ReadAllText(@"_Notice.txt");
-
-            //    if (strNoticeValue == "")
-            //    {
-            //        strPrint += "[ERROR] 현재 공지가 등록되지 않았습니다.";
-            //    }
-            //    else
-            //    {
-            //        System.IO.File.WriteAllText(@"_Notice.txt", "", Encoding.Unicode);
-            //        strPrint += "[SUCCESS] 공지 삭제완료.";
-            //    }
-
-            //    await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
-            //}
             //========================================================================================
             // 정모 관련 명령어
             //========================================================================================
@@ -270,20 +244,24 @@ namespace CDT_Noti_Bot
                 }
                 else
                 {
-                    System.IO.StreamReader file = new System.IO.StreamReader(@"_MeetingMember.txt");
-                    string line = "";
-
-                    strPrint += strMeetingValue;
+                    strPrint += strMeetingValue + "\n";
                     strPrint += "\n----------------------------------------\n";
                     strPrint += "★ 참가자 : ";
-                    strPrint += file.ReadLine();
 
-                    while ((line = file.ReadLine()) != null)
+                    // Define request parameters.
+                    String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                    String range = "10월 정모추진 (모집중)!C12:C";
+                    SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+
+                    ValueRange response = request.Execute();
+                    IList<IList<Object>> values = response.Values;
+                    if (values != null && values.Count > 0)
                     {
-                        strPrint += " , " + line;
+                        foreach (var row in values)
+                        {
+                            strPrint += row[0] + " , ";
+                        }
                     }
-
-                    file.Close();
 
                     strPrint += "\n----------------------------------------";
                 }
@@ -319,186 +297,6 @@ namespace CDT_Noti_Bot
                 {
                     System.IO.File.WriteAllText(@"_Meeting.txt", "", Encoding.Unicode);
                     strPrint += "[SUCCESS] 모임 삭제완료.";
-                }
-
-                await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
-            }
-            //else if (strOutput[0] == "/참가")
-            //{
-            //    strMassage = strMassage.Replace(strOutput[0], "");
-            //    string strMeetingValue = System.IO.File.ReadAllText(@"_Meeting.txt");
-
-            //    if (strMeetingValue == "")
-            //    {
-            //        strPrint += "[ERROR] 현재 모임이 등록되지 않았습니다.";
-            //    }
-            //    else
-            //    {
-            //        System.IO.StreamReader file = new System.IO.StreamReader(@"_MeetingMember.txt");
-            //        string line;
-            //        bool IsReduplication = false;
-
-            //        while ((line = file.ReadLine()) != null)
-            //        {
-            //            System.Console.WriteLine(line);
-
-            //            if (line == strUserName)
-            //            {
-            //                IsReduplication = true;
-            //                break;
-            //            }
-            //        }
-
-            //        file.Close();
-
-            //        if (IsReduplication)
-            //        {
-            //            strPrint += "[ERROR] 이미 신청되어있습니다. : " + strUserName;
-            //        }
-            //        else
-            //        {
-            //            string strNoticeValue = System.IO.File.ReadAllText(@"_MeetingMember.txt");
-            //            System.IO.File.AppendAllText(@"_MeetingMember.txt", strUserName + "\n", Encoding.Unicode);
-
-            //            strPrint += "[SUCCESS] 모임 신청완료. : " + strUserName;
-            //        }
-            //    }
-
-            //    await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
-            //}
-            else if (strOutput[0] == "/참가")
-            {
-                strMassage = strMassage.Replace(strOutput[0], "");
-                string strMeetingValue = System.IO.File.ReadAllText(@"_Meeting.txt");
-                strUserName = strOutput[1];
-
-                if (strMeetingValue == "")
-                {
-                    strPrint += "[ERROR] 현재 모임이 등록되지 않았습니다.";
-                }
-                else
-                {
-                    System.IO.StreamReader file = new System.IO.StreamReader(@"_MeetingMember.txt");
-                    string line;
-                    bool IsReduplication = false;
-
-                    while ((line = file.ReadLine()) != null)
-                    {
-                        System.Console.WriteLine(line);
-
-                        if (line == strUserName)
-                        {
-                            IsReduplication = true;
-                            break;
-                        }
-                    }
-
-                    file.Close();
-
-                    if (IsReduplication)
-                    {
-                        strPrint += "[ERROR] 이미 신청되어있습니다. (" + strUserName + ")";
-                    }
-                    else
-                    {
-                        string strNoticeValue = System.IO.File.ReadAllText(@"_MeetingMember.txt");
-                        System.IO.File.AppendAllText(@"_MeetingMember.txt", strUserName + "\n", Encoding.Unicode);
-
-                        strPrint += "[SUCCESS] 모임 신청완료. (" + strUserName + ")";
-                    }
-                }
-
-                await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
-            }
-            //else if (strOutput[0] == "/취소")
-            //{
-            //    strMassage = strMassage.Replace(strOutput[0], "");
-            //    string strMeetingValue = System.IO.File.ReadAllText(@"_Meeting.txt");
-
-            //    if (strMeetingValue == "")
-            //    {
-            //        strPrint += "[ERROR] 현재 모임이 등록되지 않았습니다.";
-            //    }
-            //    else
-            //    {
-            //        strMassage = strMassage.Replace(strOutput[0], "");
-            //        System.IO.StreamReader file = new System.IO.StreamReader(@"_MeetingMember.txt");
-            //        string line;
-            //        string strNewMember = "";
-            //        bool IsAttend = true;
-
-            //        while ((line = file.ReadLine()) != null)
-            //        {
-            //            System.Console.WriteLine(line);
-
-            //            if (line != strUserName)
-            //            {
-            //                strNewMember += line + "\n";
-            //            }
-            //            else
-            //            {
-            //                IsAttend = false;
-            //            }
-            //        }
-
-            //        file.Close();
-
-            //        if (IsAttend)
-            //        {
-            //            strPrint += "[ERROR] 모임에 신청하지 않았습니다. : " + strUserName;
-            //        }
-            //        else
-            //        {
-            //            System.IO.File.WriteAllText(@"_MeetingMember.txt", strNewMember, Encoding.Unicode);
-            //            strPrint += "[SUCCESS] 모임 취소완료. : " + strUserName;
-            //        }
-            //    }
-
-            //    await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
-            //}
-            else if (strOutput[0] == "/취소")
-            {
-                strMassage = strMassage.Replace(strOutput[0], "");
-                string strMeetingValue = System.IO.File.ReadAllText(@"_Meeting.txt");
-                strUserName = strOutput[1];
-
-                if (strMeetingValue == "")
-                {
-                    strPrint += "[ERROR] 현재 모임이 등록되지 않았습니다.";
-                }
-                else
-                {
-                    strMassage = strMassage.Replace(strOutput[0], "");
-                    System.IO.StreamReader file = new System.IO.StreamReader(@"_MeetingMember.txt");
-                    string line;
-                    string strNewMember = "";
-                    bool IsAttend = true;
-
-                    while ((line = file.ReadLine()) != null)
-                    {
-                        System.Console.WriteLine(line);
-
-                        if (line != strUserName)
-                        {
-                            strNewMember += line + "\n";
-                        }
-                        else
-                        {
-                            IsAttend = false;
-                        }
-                    }
-
-                    file.Close();
-
-                    if (IsAttend)
-                    {
-                        strPrint += "[ERROR] 모임에 신청하지 않았습니다. (" + strUserName + ")";
-                    }
-                    else
-                    {
-                        System.IO.File.WriteAllText(@"_MeetingMember.txt", strNewMember, Encoding.Unicode);
-                        strPrint += "[SUCCESS] 모임 취소완료. (" + strUserName + ")";
-                    }
                 }
 
                 await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
