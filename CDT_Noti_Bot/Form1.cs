@@ -80,7 +80,7 @@ namespace CDT_Noti_Bot
             string strPrint = "";
 
             // Define request parameters.
-            String spreadsheetId = "624245556:AAHJQ3bwdUB6IRf1KhQ2eAg4UDWB5RTiXzI";
+            String spreadsheetId = "648012085:AAHxJwmDWlznWTFMNQ92hJyVwsB_ggJ9ED8";
             String range = "클랜 공지!C15:C23";
             SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
