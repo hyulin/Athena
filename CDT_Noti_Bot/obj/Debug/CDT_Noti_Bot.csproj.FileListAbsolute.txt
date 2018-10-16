@@ -54,3 +54,4 @@ C:\Users\USER\Documents\Project\CDT_Noti_Bot\CDT_Noti_Bot\bin\Debug\Google.Apis.
 C:\Users\USER\Documents\Project\CDT_Noti_Bot\CDT_Noti_Bot\bin\Debug\Google.Apis.Sheets.v4.pdb
 C:\Users\USER\Documents\Project\CDT_Noti_Bot\CDT_Noti_Bot\bin\Debug\Google.Apis.Sheets.v4.xml
 C:\Users\USER\Documents\Project\CDT_Noti_Bot\CDT_Noti_Bot\bin\Debug\credentials.json
+C:\Project\CDT_Bot\CDT_Noti_Bot\bin\Debug\credentials.json

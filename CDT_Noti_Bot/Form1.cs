@@ -175,6 +175,7 @@ namespace CDT_Noti_Bot
                 strPrint += "========================================\n";
                 strPrint += "[ Clien Delicious Team Notice Bot v1.0 ]\n\n";
                 strPrint += "/공지 : 팀 공지사항을 출력합니다.\n";
+                strPrint += "/조회|검색어 : 클랜원을 조회합니다. (검색범위 : 대화명, 배틀태그)\n";
                 strPrint += "/모임 : 모임 공지와 참가자를 출력합니다.\n";
                 strPrint += "/안내 : 팀 안내 메시지를 출력합니다.\n";
                 strPrint += "/리포트 : 업데이트 내역, 개발 예정 항목을 출력합니다.\n";
@@ -192,6 +193,7 @@ namespace CDT_Noti_Bot
                 strPrint += "========================================\n";
                 strPrint += "[ Clien Delicious Team Notice Bot v1.0 입니다. ]\n\n";
                 strPrint += "/공지 : 팀 공지사항을 출력합니다.\n";
+                strPrint += "/조회|검색어 : 클랜원을 조회합니다. (검색범위 : 대화명, 배틀태그)\n";
                 strPrint += "/모임 : 모임 공지와 참가자를 출력합니다.\n";
                 strPrint += "      - /모임등록|내용 : 모임 공지를 등록합니다.\n";
                 strPrint += "      - /모임삭제 : 모임 공지를 삭제합니다.\n";
@@ -229,6 +231,61 @@ namespace CDT_Noti_Bot
                 System.IO.File.WriteAllText(@"_Notice.txt", strPrint, Encoding.Unicode);
 
                 await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
+            }
+            //========================================================================================
+            // 조회 관련 명령어
+            //========================================================================================
+            else if (strOutput[0] == "/조회")
+            {
+                if (strOutput[1] == "")
+                {
+                    strPrint += "[ERROR] 대화명이 없습니다.";
+                }
+                else
+                {
+                    // Define request parameters.
+                    String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                    String range = "클랜원 목록!C7:L";
+                    SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+
+                    ValueRange response = request.Execute();
+                    IList<IList<Object>> values = response.Values;
+                    if (values != null && values.Count > 0)
+                    {
+                        foreach (var row in values)
+                        {
+                            if (row[0].ToString().Contains(strOutput[1]) || (row[1].ToString().Contains(strOutput[1])))
+                            {
+                                strPrint += "========================================\n";
+                                strPrint += "1. 클랜방 대화명\n";
+                                strPrint += "\t" + row[0] + "\n\n";
+                                strPrint += "2. 배틀태그\n";
+                                strPrint += "\t" + row[1] + "\n\n";
+                                strPrint += "3. 포지션\n";
+                                strPrint += "\t" + row[2] + "\n\n";
+                                strPrint += "4. 모스트\n";
+                                strPrint += "\t" + row[3].ToString() + " / " + row[4].ToString() + " / " + row[5].ToString() + "\n\n";
+                                strPrint += "5. 이외 가능 픽\n";
+                                strPrint += "\t" + row[6] + "\n\n";
+                                strPrint += "6. 접속 시간대\n";
+                                strPrint += "\t" + row[7] + "\n\n";
+                                strPrint += "7. 부계정 배틀태그\n";
+                                strPrint += "\t" + row[8] + "\n\n";
+                                strPrint += "8. 소개\n";
+                                strPrint += "\t" + row[9] + "\n\n";
+                            }
+                        }
+                    }
+
+                    if (strPrint != "")
+                    {
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
+                    }
+                    else
+                    {
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 클랜원을 찾을 수 없습니다.");
+                    }
+                }
             }
             //========================================================================================
             // 정모 관련 명령어
