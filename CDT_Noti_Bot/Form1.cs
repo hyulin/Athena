@@ -281,7 +281,9 @@ namespace CDT_Noti_Bot
                         {
                             foreach (var row in values)
                             {
-                                if (row[0].ToString().Contains(strOutput[1]) || row[1].ToString().Contains(strOutput[1]) || row[2].ToString().Contains(strOutput[1]))
+                                if (row[0].ToString().ToUpper().Contains(strOutput[1].ToUpper()) ||
+                                    row[1].ToString().ToUpper().Contains(strOutput[1].ToUpper()) ||
+                                    row[2].ToString().ToUpper().Contains(strOutput[1].ToUpper()))
                                 {
                                     strPrint += "==================================\n";
                                     strPrint += "1. 클랜방 대화명 : " + row[0] + "\n";
