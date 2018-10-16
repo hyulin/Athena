@@ -30,6 +30,8 @@ namespace CDT_Noti_Bot
 {
     public partial class Form1 : Form
     {
+        CSystemInfo systemInfo = new CSystemInfo();     // 시스템 정보
+
         // If modifying these scopes, delete your previously saved credentials
         // at ~/.credentials/sheets.googleapis.com-dotnet-quickstart.json
         static string[] Scopes = { SheetsService.Scope.Spreadsheets };
@@ -41,11 +43,15 @@ namespace CDT_Noti_Bot
         bool bRun = false;
 
         // Bot Token
-        const string strBotToken = "648012085:AAHxJwmDWlznWTFMNQ92hJyVwsB_ggJ9ED8";
+        const string strBotToken = "648012085:AAHxJwmDWlznWTFMNQ92hJyVwsB_ggJ9ED8";     // 봇 토큰
+        //const string strBotToken = "624245556:AAHJQ3bwdUB6IRf1KhQ2eAg4UDWB5RTiXzI";     // 테스트 봇 토큰
+
         private Telegram.Bot.TelegramBotClient Bot = new Telegram.Bot.TelegramBotClient(strBotToken);
 
         public Form1()
         {
+            systemInfo.SetStartTime();
+
             using (var stream =
                 new FileStream("credentials.json", FileMode.Open, FileAccess.Read))
                 {
@@ -89,10 +95,12 @@ namespace CDT_Noti_Bot
             SpreadsheetsResource.ValuesResource.GetRequest updateRequest = service.Spreadsheets.Values.Get(spreadsheetId, updateRange);
 
             ValueRange response = request.Execute();
+            systemInfo.AppendGoogleSheetCount();
 
             if (bRun == true)
             {
                 ValueRange updateResponse = updateRequest.Execute();
+                systemInfo.AppendGoogleSheetCount();
                 bRun = false;
 
                 if (response != null && updateResponse != null)
@@ -149,6 +157,7 @@ namespace CDT_Noti_Bot
         private async void Bot_OnMessage(object sender, Telegram.Bot.Args.MessageEventArgs e)
         {
             var varMessage = e.Message;
+            systemInfo.AppendMessageReqCount();
 
             if (varMessage == null || (varMessage.Type != MessageType.Text && varMessage.Type != MessageType.ChatMembersAdded))
             {
@@ -180,7 +189,7 @@ namespace CDT_Noti_Bot
             string strUserName = varMessage.Chat.FirstName + varMessage.Chat.LastName;
             string[] strOutput = strMassage.Split('|');
             string strPrint = "";
-
+            
             //========================================================================================
             // 공지사항 관련 명령어
             //========================================================================================
@@ -191,6 +200,8 @@ namespace CDT_Noti_Bot
                 strPrint += "/공지 : 팀 공지사항을 출력합니다.\n";
                 strPrint += "/조회|검색어 : 클랜원을 조회합니다.\n";
                 strPrint += "               (검색범위 : 대화명, 배틀태그, 부계정)\n";
+                strPrint += "/영상 : 영상이 있던 날짜를 조회합니다.\n";
+                strPrint += "       - /영상|날짜 : 플레이 영상을 조회합니다. (/영상|181006)\n";
                 strPrint += "/모임 : 모임 공지와 참가자를 출력합니다.\n";
                 strPrint += "/안내 : 팀 안내 메시지를 출력합니다.\n";
                 strPrint += "/리포트 : 업데이트 내역, 개발 예정 항목을 출력합니다.\n";
@@ -209,9 +220,11 @@ namespace CDT_Noti_Bot
                 strPrint += "[ 아테나 v1.1 ]\n[ (Clien Delicious Team Notice Bot) ]\n\n";
                 strPrint += "/공지 : 팀 공지사항을 출력합니다.\n";
                 strPrint += "/조회|검색어 : 클랜원을 조회합니다. (검색범위 : 대화명, 배틀태그)\n";
+                strPrint += "/영상 : 영상이 있던 날짜를 조회합니다.\n";
+                strPrint += "       - /영상|날짜 : 플레이 영상을 조회합니다. (/영상|181006)\n";
                 strPrint += "/모임 : 모임 공지와 참가자를 출력합니다.\n";
-                strPrint += "      - /모임등록|내용 : 모임 공지를 등록합니다.\n";
-                strPrint += "      - /모임삭제 : 모임 공지를 삭제합니다.\n";
+                strPrint += "       - /모임등록|내용 : 모임 공지를 등록합니다.\n";
+                strPrint += "       - /모임삭제 : 모임 공지를 삭제합니다.\n";
                 strPrint += "/안내 : 팀 안내 메시지를 출력합니다.\n";
                 strPrint += "/리포트 : 봇 업데이트 내역, 개발 예정인 항목\n";
                 strPrint += "/상태 : 현재 봇 상태를 출력합니다. 대답이 없으면 이상.\n";
@@ -262,7 +275,7 @@ namespace CDT_Noti_Bot
             //========================================================================================
             else if (strOutput[0] == "/조회")
             {
-                if (strOutput[1] == "")
+                if (strOutput.Count() == 1)
                 {
                     strPrint += "[ERROR] 대화명이 없습니다.";
                 }
@@ -308,6 +321,96 @@ namespace CDT_Noti_Bot
                     {
                         await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 클랜원을 찾을 수 없습니다.");
                     }
+                }
+            }
+            else if (strOutput[0] == "/영상")
+            {
+                // Define request parameters.
+                String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                String range = "경기 URL (18/4분기)!B5:G";
+                SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+
+                if (strOutput.Count() == 1)
+                {
+                    ValueRange response = request.Execute();
+                    if (response != null)
+                    {
+                        IList<IList<Object>> values = response.Values;
+                        if (values != null && values.Count > 0)
+                        {
+                            foreach (var row in values)
+                            {
+                                if (row.Count > 0 && row[0].ToString() != "")
+                                {
+                                    strPrint += "[" + row[0].ToString() + "] " + row[1].ToString() + "\n";
+                                }
+                            }
+                        }
+                    }
+
+                    strPrint += "\n/영상|날짜로 영상 주소를 조회하실 수 있습니다.\n";
+                    strPrint += "(ex: /영상|181006)";
+                }
+                else
+                {
+                    string year = "20" + strOutput[1].Substring(0, 2);
+                    string month = strOutput[1].Substring(2, 2);
+                    string day = strOutput[1].Substring(4, 2);
+                    string date = year + "." + month + "." + day;
+                    bool bContinue = false;
+                    string user = "";
+
+                    ValueRange response = request.Execute();
+                    if (response != null)
+                    {
+                        IList<IList<Object>> values = response.Values;
+                        if (values != null && values.Count > 0)
+                        {
+                            foreach (var row in values)
+                            {
+                                if (row.Count > 0)
+                                {
+                                    if (row[0].ToString() == date)
+                                    {
+                                        bContinue = true;
+                                    }
+                                    else if (row[0].ToString() != "" && bContinue == true)
+                                    {
+                                        bContinue = false;
+                                    }
+                                    
+                                    if (bContinue == true)
+                                    {
+                                        bContinue = true;
+
+                                        if (row[1].ToString() != "")
+                                        {
+                                            strPrint += "[ " + row[1].ToString() + " ]" + "\n";
+                                        }
+
+                                        if (row[3].ToString() == "")
+                                        {
+                                            strPrint += user + "(" + row[4].ToString() + ")" + " : " + row[5].ToString() + "\n";
+                                        }
+                                        else
+                                        {
+                                            strPrint += row[3].ToString() + "(" + row[4].ToString() + ")" + " : " + row[5].ToString() + "\n";
+                                            user = row[3].ToString();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (strPrint != "")
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
+                }
+                else
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 영상을 찾을 수 없습니다.");
                 }
             }
             //========================================================================================
@@ -362,7 +465,7 @@ namespace CDT_Noti_Bot
             {
                 strMassage = strMassage.Replace(strOutput[0], "");
 
-                if (strOutput[1] == "")
+                if (strOutput.Count() == 1)
                 {
                     strPrint += "[ERROR] 모임 내용이 없습니다.";
                 }
@@ -438,8 +541,12 @@ namespace CDT_Noti_Bot
             else if (strOutput[0] == "/상태")
             {
                 strMassage = strMassage.Replace(strOutput[0], "");
-
-                strPrint += "정상";
+                
+                strPrint += "Running.......\n";
+                strPrint += "[System Time] " + systemInfo.GetNowTime() + "\n";
+                strPrint += "[Running Time] " + systemInfo.GetRunningTime() + "\n";
+                strPrint += "[Message Request Count] " + systemInfo.GetMessageReqCount() + "\n";
+                strPrint += "[Google Sheetp API Request Count] " + systemInfo.GetGoogleSheetReqCount() + "\n";
 
                 await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
             }
