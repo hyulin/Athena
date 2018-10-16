@@ -390,11 +390,28 @@ namespace CDT_Noti_Bot
 
                                         if (row[3].ToString() == "")
                                         {
-                                            strPrint += user + "(" + row[4].ToString() + ")" + " : " + row[5].ToString() + "\n";
+                                            if (row[4].ToString() != "")
+                                            {
+                                                strPrint += user + "(" + row[4].ToString() + ")" + " : " + row[5].ToString() + "\n";
+                                            }
+                                            else
+                                            {
+                                                strPrint += user + " : " + row[5].ToString() + "\n";
+                                            }
+                                            
                                         }
                                         else
                                         {
-                                            strPrint += row[3].ToString() + "(" + row[4].ToString() + ")" + " : " + row[5].ToString() + "\n";
+                                            if (row[4].ToString() != "")
+                                            {
+                                                strPrint += row[3].ToString() + "(" + row[4].ToString() + ")" + " : " + row[5].ToString() + "\n";
+                                            }
+                                            else
+                                            {
+                                                strPrint += row[3].ToString() + " : " + row[5].ToString() + "\n";
+                                            }
+
+                                            //strPrint += row[3].ToString() + "(" + row[4].ToString() + ")" + " : " + row[5].ToString() + "\n";
                                             user = row[3].ToString();
                                         }
                                     }
