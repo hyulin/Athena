@@ -54,3 +54,4 @@ C:\Project\CDT_Bot\CDT_Noti_Bot\obj\x64\Debug\CDT_Noti_Bot.csproj.CoreCompileInp
 C:\Project\CDT_Bot\CDT_Noti_Bot\obj\x64\Debug\CDT_Noti_Bot.csproj.CopyComplete
 C:\Project\CDT_Bot\CDT_Noti_Bot\obj\x64\Debug\CDT_Noti_Bot.exe
 C:\Project\CDT_Bot\CDT_Noti_Bot\obj\x64\Debug\CDT_Noti_Bot.pdb
+C:\Project\CDT_Bot\CDT_Noti_Bot\obj\x64\Debug\CDT_Noti_Bot.csprojAssemblyReference.cache

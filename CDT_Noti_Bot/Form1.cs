@@ -187,9 +187,10 @@ namespace CDT_Noti_Bot
             if (strOutput[0] == "/도움말")
             {
                 strPrint += "========================================\n";
-                strPrint += "[ Clien Delicious Team Notice Bot v1.0 ]\n\n";
+                strPrint += "[ 아테나 v1.1 (Clien Delicious Team Notice Bot) ]\n\n";
                 strPrint += "/공지 : 팀 공지사항을 출력합니다.\n";
-                strPrint += "/조회|검색어 : 클랜원을 조회합니다. (검색범위 : 대화명, 배틀태그)\n";
+                strPrint += "/조회|검색어 : 클랜원을 조회합니다.\n";
+                strPrint += "               (검색범위 : 대화명, 배틀태그, 부계정)\n";
                 strPrint += "/모임 : 모임 공지와 참가자를 출력합니다.\n";
                 strPrint += "/안내 : 팀 안내 메시지를 출력합니다.\n";
                 strPrint += "/리포트 : 업데이트 내역, 개발 예정 항목을 출력합니다.\n";
@@ -205,7 +206,7 @@ namespace CDT_Noti_Bot
             else if (strOutput[0] == "/운영자도움말")
             {
                 strPrint += "========================================\n";
-                strPrint += "[ Clien Delicious Team Notice Bot v1.0 입니다. ]\n\n";
+                strPrint += "[ 아테나 v1.1 (Clien Delicious Team Notice Bot) ]\n\n";
                 strPrint += "/공지 : 팀 공지사항을 출력합니다.\n";
                 strPrint += "/조회|검색어 : 클랜원을 조회합니다. (검색범위 : 대화명, 배틀태그)\n";
                 strPrint += "/모임 : 모임 공지와 참가자를 출력합니다.\n";
@@ -269,7 +270,7 @@ namespace CDT_Noti_Bot
                 {
                     // Define request parameters.
                     String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
-                    String range = "클랜원 목록!C7:L";
+                    String range = "클랜원 목록!C7:M";
                     SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
                     ValueRange response = request.Execute();
@@ -280,16 +281,16 @@ namespace CDT_Noti_Bot
                         {
                             foreach (var row in values)
                             {
-                                if (row[0].ToString().Contains(strOutput[1]) || (row[1].ToString().Contains(strOutput[1])))
+                                if (row[0].ToString().Contains(strOutput[1]) || row[1].ToString().Contains(strOutput[1]) || row[2].ToString().Contains(strOutput[1]))
                                 {
                                     strPrint += "========================================\n";
                                     strPrint += "1. 클랜방 대화명 : " + row[0] + "\n";
                                     strPrint += "2. 배틀태그 : " + row[1] + "\n";
-                                    strPrint += "3. 포지션 : " + row[2] + "\n";
-                                    strPrint += "4. 모스트 : " + row[3].ToString() + " / " + row[4].ToString() + " / " + row[5].ToString() + "\n";
-                                    strPrint += "5. 이외 가능 픽 : " + row[6] + "\n";
-                                    strPrint += "6. 접속 시간대 : " + row[7] + "\n";
-                                    strPrint += "7. 부계정 배틀태그 : " + row[8] + "\n";
+                                    strPrint += "3. 부계정 배틀태그 : " + row[2] + "\n";
+                                    strPrint += "4. 포지션 : " + row[3] + "\n";
+                                    strPrint += "5. 모스트 : " + row[4].ToString() + " / " + row[5].ToString() + " / " + row[6].ToString() + "\n";
+                                    strPrint += "6. 이외 가능 픽 : " + row[7] + "\n";
+                                    strPrint += "7. 접속 시간대 : " + row[8] + "\n";
                                     strPrint += "8. 소개\n";
                                     strPrint += "\t- " + row[9] + "\n";
                                 }
