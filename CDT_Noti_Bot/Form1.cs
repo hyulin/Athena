@@ -38,7 +38,7 @@ namespace CDT_Noti_Bot
         SheetsService service;
         CNotice Notice = new CNotice();
         CNotice NewNotice = new CNotice();
-        bool bFirstRun = true;
+        bool bRun = false;
 
         // Bot Token
         const string strBotToken = "648012085:AAHxJwmDWlznWTFMNQ92hJyVwsB_ggJ9ED8";
@@ -68,7 +68,7 @@ namespace CDT_Noti_Bot
 
             // 타이머 생성 및 시작
             System.Timers.Timer timer = new System.Timers.Timer();
-            timer.Interval = 1000 * 60 * 5; // 5분
+            timer.Interval = 5000; // 5초
             timer.Elapsed += new ElapsedEventHandler(timer_Elapsed);
             timer.Start();
 
@@ -84,35 +84,49 @@ namespace CDT_Noti_Bot
             // Define request parameters.
             String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
             String range = "클랜 공지!C15:C23";
+            String updateRange = "클랜 공지!H14";
             SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+            SpreadsheetsResource.ValuesResource.GetRequest updateRequest = service.Spreadsheets.Values.Get(spreadsheetId, updateRange);
 
             ValueRange response = request.Execute();
-            IList<IList<Object>> values = response.Values;
-            if (values != null && values.Count > 0)
-            {
-                strPrint += "#공지사항\n\n";
 
-                foreach (var row in values)
+            if (bRun == true)
+            {
+                ValueRange updateResponse = updateRequest.Execute();
+                bRun = false;
+
+                if (response != null && updateResponse != null)
                 {
-                    strPrint += "* " + row[0] + "\n\n";
+                    IList<IList<Object>> values = response.Values;
+                    IList<IList<Object>> updateValues = updateResponse.Values;
+
+                    if (updateValues != null && updateValues.ToString() != "")
+                    {
+                        if (values != null && values.Count > 0)
+                        {
+                            strPrint += "#공지사항\n\n";
+
+                            foreach (var row in values)
+                            {
+                                strPrint += "* " + row[0] + "\n\n";
+                            }
+                        }
+
+                        NewNotice.SetNotice(strPrint);
+
+                        if (Notice.GetNotice() != NewNotice.GetNotice())
+                        {
+                            Notice.SetNotice(NewNotice.GetNotice());
+
+                            Bot.SendTextMessageAsync(-1001312491933, strPrint);  // 운영진방
+                            Bot.SendTextMessageAsync(-1001202203239, strPrint);  // 클랜방
+                        }
+                    }
                 }
             }
-
-            NewNotice.SetNotice(strPrint);
-
-            if (Notice.GetNotice() != NewNotice.GetNotice())
+            else
             {
-                Notice.SetNotice(NewNotice.GetNotice());
-
-                if (bFirstRun == true)
-                {
-                    bFirstRun = false;
-                }
-                else
-                {
-                    Bot.SendTextMessageAsync(-1001312491933, strPrint);  // 운영진방
-                    Bot.SendTextMessageAsync(-1001202203239, strPrint);  // 클랜방
-                }
+                bRun = true;
             }
         }
 
@@ -217,20 +231,30 @@ namespace CDT_Noti_Bot
                 SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
                 ValueRange response = request.Execute();
-                IList<IList<Object>> values = response.Values;
-                if (values != null && values.Count > 0)
+                if (response != null)
                 {
-                    strPrint += "#공지사항\n\n";
-
-                    foreach (var row in values)
+                    IList<IList<Object>> values = response.Values;
+                    if (values != null && values.Count > 0)
                     {
-                        strPrint += "* " + row[0] + "\n\n";
+                        strPrint += "#공지사항\n\n";
+
+                        foreach (var row in values)
+                        {
+                            strPrint += "* " + row[0] + "\n\n";
+                        }
                     }
                 }
 
                 System.IO.File.WriteAllText(@"_Notice.txt", strPrint, Encoding.Unicode);
 
-                await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
+                if (strPrint != "")
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
+                }
+                else
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 공지가 등록되지 않았습니다.");
+                }
             }
             //========================================================================================
             // 조회 관련 명령어
@@ -249,30 +273,26 @@ namespace CDT_Noti_Bot
                     SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
                     ValueRange response = request.Execute();
-                    IList<IList<Object>> values = response.Values;
-                    if (values != null && values.Count > 0)
+                    if (response != null)
                     {
-                        foreach (var row in values)
+                        IList<IList<Object>> values = response.Values;
+                        if (values != null && values.Count > 0)
                         {
-                            if (row[0].ToString().Contains(strOutput[1]) || (row[1].ToString().Contains(strOutput[1])))
+                            foreach (var row in values)
                             {
-                                strPrint += "========================================\n";
-                                strPrint += "1. 클랜방 대화명\n";
-                                strPrint += "\t" + row[0] + "\n\n";
-                                strPrint += "2. 배틀태그\n";
-                                strPrint += "\t" + row[1] + "\n\n";
-                                strPrint += "3. 포지션\n";
-                                strPrint += "\t" + row[2] + "\n\n";
-                                strPrint += "4. 모스트\n";
-                                strPrint += "\t" + row[3].ToString() + " / " + row[4].ToString() + " / " + row[5].ToString() + "\n\n";
-                                strPrint += "5. 이외 가능 픽\n";
-                                strPrint += "\t" + row[6] + "\n\n";
-                                strPrint += "6. 접속 시간대\n";
-                                strPrint += "\t" + row[7] + "\n\n";
-                                strPrint += "7. 부계정 배틀태그\n";
-                                strPrint += "\t" + row[8] + "\n\n";
-                                strPrint += "8. 소개\n";
-                                strPrint += "\t" + row[9] + "\n\n";
+                                if (row[0].ToString().Contains(strOutput[1]) || (row[1].ToString().Contains(strOutput[1])))
+                                {
+                                    strPrint += "========================================\n";
+                                    strPrint += "1. 클랜방 대화명 : " + row[0] + "\n";
+                                    strPrint += "2. 배틀태그 : " + row[1] + "\n";
+                                    strPrint += "3. 포지션 : " + row[2] + "\n";
+                                    strPrint += "4. 모스트 : " + row[3].ToString() + " / " + row[4].ToString() + " / " + row[5].ToString() + "\n";
+                                    strPrint += "5. 이외 가능 픽 : " + row[6] + "\n";
+                                    strPrint += "6. 접속 시간대 : " + row[7] + "\n";
+                                    strPrint += "7. 부계정 배틀태그 : " + row[8] + "\n";
+                                    strPrint += "8. 소개\n";
+                                    strPrint += "\t- " + row[9] + "\n";
+                                }
                             }
                         }
                     }
@@ -311,19 +331,29 @@ namespace CDT_Noti_Bot
                     SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
                     ValueRange response = request.Execute();
-                    IList<IList<Object>> values = response.Values;
-                    if (values != null && values.Count > 0)
+                    if (response != null)
                     {
-                        foreach (var row in values)
+                        IList<IList<Object>> values = response.Values;
+                        if (values != null && values.Count > 0)
                         {
-                            strPrint += row[0] + " , ";
+                            foreach (var row in values)
+                            {
+                                strPrint += row[0] + " , ";
+                            }
                         }
-                    }
 
-                    strPrint += "\n----------------------------------------";
+                        strPrint += "\n----------------------------------------";
+                    }
                 }
 
-                await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
+                if (strPrint != "")
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
+                }
+                else
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 모임이 등록되지 않았습니다.");
+                }
             }
             else if (strOutput[0] == "/모임등록")
             {
