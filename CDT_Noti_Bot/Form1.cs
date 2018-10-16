@@ -95,12 +95,10 @@ namespace CDT_Noti_Bot
             SpreadsheetsResource.ValuesResource.GetRequest updateRequest = service.Spreadsheets.Values.Get(spreadsheetId, updateRange);
 
             ValueRange response = request.Execute();
-            systemInfo.AppendGoogleSheetCount();
 
             if (bRun == true)
             {
                 ValueRange updateResponse = updateRequest.Execute();
-                systemInfo.AppendGoogleSheetCount();
                 bRun = false;
 
                 if (response != null && updateResponse != null)
@@ -157,8 +155,7 @@ namespace CDT_Noti_Bot
         private async void Bot_OnMessage(object sender, Telegram.Bot.Args.MessageEventArgs e)
         {
             var varMessage = e.Message;
-            systemInfo.AppendMessageReqCount();
-
+            
             if (varMessage == null || (varMessage.Type != MessageType.Text && varMessage.Type != MessageType.ChatMembersAdded))
             {
                 return;
@@ -562,8 +559,8 @@ namespace CDT_Noti_Bot
                 strPrint += "Running.......\n";
                 strPrint += "[System Time] " + systemInfo.GetNowTime() + "\n";
                 strPrint += "[Running Time] " + systemInfo.GetRunningTime() + "\n";
-                strPrint += "[Message Request Count] " + systemInfo.GetMessageReqCount() + "\n";
-                strPrint += "[Google Sheetp API Request Count] " + systemInfo.GetGoogleSheetReqCount() + "\n";
+                //strPrint += "[Message Request Count] " + systemInfo.GetMessageReqCount() + "\n";
+                //strPrint += "[Google Sheetp API Request Count] " + systemInfo.GetGoogleSheetReqCount() + "\n";
 
                 await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
             }
