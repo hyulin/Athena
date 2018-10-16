@@ -186,8 +186,8 @@ namespace CDT_Noti_Bot
             //========================================================================================
             if (strOutput[0] == "/도움말")
             {
-                strPrint += "========================================\n";
-                strPrint += "[ 아테나 v1.1 (Clien Delicious Team Notice Bot) ]\n\n";
+                strPrint += "==================================\n";
+                strPrint += "[ 아테나 v1.1 ]\n[ (Clien Delicious Team Notice Bot) ]\n\n";
                 strPrint += "/공지 : 팀 공지사항을 출력합니다.\n";
                 strPrint += "/조회|검색어 : 클랜원을 조회합니다.\n";
                 strPrint += "               (검색범위 : 대화명, 배틀태그, 부계정)\n";
@@ -195,18 +195,18 @@ namespace CDT_Noti_Bot
                 strPrint += "/안내 : 팀 안내 메시지를 출력합니다.\n";
                 strPrint += "/리포트 : 업데이트 내역, 개발 예정 항목을 출력합니다.\n";
                 strPrint += "/상태 : 현재 봇 상태를 출력합니다. 대답이 없으면 이상.\n";
-                strPrint += "----------------------------------------\n";
+                strPrint += "----------------------------------\n";
                 strPrint += "CDT 1대 운영자 : 냉각콜라, 휴린, 청포도, 만슬\n";
-                strPrint += "========================================\n";
+                strPrint += "==================================\n";
                 strPrint += "버그 및 문의사항이 있으시면 '휴린'에게 문의해주세요. :)\n";
-                strPrint += "========================================\n";
+                strPrint += "==================================\n";
 
                 await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
             }
             else if (strOutput[0] == "/운영자도움말")
             {
-                strPrint += "========================================\n";
-                strPrint += "[ 아테나 v1.1 (Clien Delicious Team Notice Bot) ]\n\n";
+                strPrint += "==================================\n";
+                strPrint += "[ 아테나 v1.1 ]\n[ (Clien Delicious Team Notice Bot) ]\n\n";
                 strPrint += "/공지 : 팀 공지사항을 출력합니다.\n";
                 strPrint += "/조회|검색어 : 클랜원을 조회합니다. (검색범위 : 대화명, 배틀태그)\n";
                 strPrint += "/모임 : 모임 공지와 참가자를 출력합니다.\n";
@@ -215,9 +215,9 @@ namespace CDT_Noti_Bot
                 strPrint += "/안내 : 팀 안내 메시지를 출력합니다.\n";
                 strPrint += "/리포트 : 봇 업데이트 내역, 개발 예정인 항목\n";
                 strPrint += "/상태 : 현재 봇 상태를 출력합니다. 대답이 없으면 이상.\n";
-                strPrint += "----------------------------------------\n";
+                strPrint += "----------------------------------\n";
                 strPrint += "버그 및 문의사항이 있으시면 '휴린'에게 문의해주세요. :)\n";
-                strPrint += "========================================\n";
+                strPrint += "==================================\n";
 
                 await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
             }
@@ -283,7 +283,7 @@ namespace CDT_Noti_Bot
                             {
                                 if (row[0].ToString().Contains(strOutput[1]) || row[1].ToString().Contains(strOutput[1]) || row[2].ToString().Contains(strOutput[1]))
                                 {
-                                    strPrint += "========================================\n";
+                                    strPrint += "==================================\n";
                                     strPrint += "1. 클랜방 대화명 : " + row[0] + "\n";
                                     strPrint += "2. 배틀태그 : " + row[1] + "\n";
                                     strPrint += "3. 부계정 배틀태그 : " + row[2] + "\n";
