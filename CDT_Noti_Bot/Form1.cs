@@ -312,13 +312,19 @@ namespace CDT_Noti_Bot
                         IList<IList<Object>> values = response.Values;
                         if (values != null && values.Count > 0)
                         {
+                            bool bContinue = false;
+
                             foreach (var row in values)
                             {
                                 if (row[0].ToString().ToUpper().Contains(strContents.ToUpper()) ||
                                     row[1].ToString().ToUpper().Contains(strContents.ToUpper()) ||
                                     row[2].ToString().ToUpper().Contains(strContents.ToUpper()))
                                 {
-                                    strPrint += "==================================\n";
+                                    if (bContinue == true)
+                                    {
+                                        strPrint += "==================================\n";
+                                    }
+
                                     strPrint += "1. 클랜방 대화명 : " + row[0] + "\n";
                                     strPrint += "2. 배틀태그 : " + row[1] + "\n";
                                     strPrint += "3. 부계정 배틀태그 : " + row[2] + "\n";
@@ -328,6 +334,8 @@ namespace CDT_Noti_Bot
                                     strPrint += "7. 접속 시간대 : " + row[8] + "\n";
                                     strPrint += "8. 소개\n";
                                     strPrint += "\t- " + row[9] + "\n";
+
+                                    bContinue = true;   // 한 명만 출력된다면 이 부분은 무시됨.
                                 }
                             }
                         }
