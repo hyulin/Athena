@@ -283,6 +283,13 @@ namespace CDT_Noti_Bot
                 }
                 else
                 {
+                    if (strOutput[1] == "")
+                    {
+                        strPrint += "[ERROR] 검색 조건이 없습니다.";
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
+                        return;
+                    }
+
                     // Define request parameters.
                     String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
                     String range = "클랜원 목록!C7:M";
@@ -355,6 +362,13 @@ namespace CDT_Noti_Bot
                 }
                 else
                 {
+                    if (strOutput[1] == "")
+                    {
+                        strPrint += "[ERROR] 검색 조건이 없습니다.";
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
+                        return;
+                    }
+
                     string year = "20" + strOutput[1].Substring(0, 2);
                     string month = strOutput[1].Substring(2, 2);
                     string day = strOutput[1].Substring(4, 2);
@@ -437,6 +451,13 @@ namespace CDT_Noti_Bot
                 }
                 else
                 {
+                    if (strOutput[1] == "")
+                    {
+                        strPrint += "[ERROR] 검색 조건이 없습니다.";
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
+                        return;
+                    }
+
                     // Define request parameters.
                     String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
                     String range = "클랜원 목록!C7:M";
