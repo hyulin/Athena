@@ -43,8 +43,11 @@ namespace CDT_Noti_Bot
         bool bRun = false;
 
         // Bot Token
+#if DEBUG
+        const string strBotToken = "624245556:AAHJQ3bwdUB6IRf1KhQ2eAg4UDWB5RTiXzI";     // 테스트 봇 토큰
+#else
         const string strBotToken = "648012085:AAHxJwmDWlznWTFMNQ92hJyVwsB_ggJ9ED8";     // 봇 토큰
-        //const string strBotToken = "624245556:AAHJQ3bwdUB6IRf1KhQ2eAg4UDWB5RTiXzI";     // 테스트 봇 토큰
+#endif
 
         private Telegram.Bot.TelegramBotClient Bot = new Telegram.Bot.TelegramBotClient(strBotToken);
 
@@ -365,7 +368,7 @@ namespace CDT_Noti_Bot
                         {
                             foreach (var row in values)
                             {
-                                if (row.Count > 0)
+                                if (row.Count >= 6)
                                 {
                                     if (row[0].ToString() == date)
                                     {
@@ -378,8 +381,6 @@ namespace CDT_Noti_Bot
                                     
                                     if (bContinue == true)
                                     {
-                                        bContinue = true;
-
                                         if (row[1].ToString() != "")
                                         {
                                             strPrint += "[ " + row[1].ToString() + " ]" + "\n";
@@ -407,8 +408,7 @@ namespace CDT_Noti_Bot
                                             {
                                                 strPrint += row[3].ToString() + " : " + row[5].ToString() + "\n";
                                             }
-
-                                            //strPrint += row[3].ToString() + "(" + row[4].ToString() + ")" + " : " + row[5].ToString() + "\n";
+                                            
                                             user = row[3].ToString();
                                         }
                                     }
