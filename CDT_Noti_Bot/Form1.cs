@@ -196,7 +196,7 @@ namespace CDT_Noti_Bot
             if (strOutput[0] == "/도움말")
             {
                 strPrint += "==================================\n";
-                strPrint += "[ 아테나 v1.1 ]\n[ (Clien Delicious Team Notice Bot) ]\n\n";
+                strPrint += "[ 아테나 v1.1 ]\n[ Clien Delicious Team Notice Bot ]\n\n";
                 strPrint += "/공지 : 팀 공지사항을 출력합니다.\n";
                 strPrint += "/조회|검색어 : 클랜원을 조회합니다.\n";
                 strPrint += "               (검색범위 : 대화명, 배틀태그, 부계정)\n";
@@ -217,7 +217,7 @@ namespace CDT_Noti_Bot
             else if (strOutput[0] == "/운영자도움말")
             {
                 strPrint += "==================================\n";
-                strPrint += "[ 아테나 v1.1 ]\n[ (Clien Delicious Team Notice Bot) ]\n\n";
+                strPrint += "[ 아테나 v1.1 ]\n[ Clien Delicious Team Notice Bot ]\n\n";
                 strPrint += "/공지 : 팀 공지사항을 출력합니다.\n";
                 strPrint += "/조회|검색어 : 클랜원을 조회합니다. (검색범위 : 대화명, 배틀태그)\n";
                 strPrint += "/영상 : 영상이 있던 날짜를 조회합니다.\n";
