@@ -187,22 +187,39 @@ namespace CDT_Noti_Bot
 
             string strMassage = varMessage.Text;
             string strUserName = varMessage.Chat.FirstName + varMessage.Chat.LastName;
-            string[] strOutput = strMassage.Split('|');
+            string strCommend = "";
+            string strContents = "";
+
+            if (strMassage.Substring(0, 1) != "/")
+            {
+                return;
+            }
+
+            if (strMassage.IndexOf(" ") == -1)
+            {
+                strCommend = strMassage;
+            }
+            else
+            {
+                strCommend = strMassage.Substring(0, strMassage.IndexOf(" "));
+                strContents = strMassage.Substring(strMassage.IndexOf(" ") + 1, strMassage.Count() - strMassage.IndexOf(" ") - 1);
+            }
+            
             string strPrint = "";
 
             //========================================================================================
             // 공지사항 관련 명령어
             //========================================================================================
-            if (strOutput[0] == "/도움말")
+            if (strCommend == "/도움말")
             {
                 strPrint += "==================================\n";
                 strPrint += "[ 아테나 v1.1 ]\n[ Clien Delicious Team Notice Bot ]\n\n";
                 strPrint += "/공지 : 팀 공지사항을 출력합니다.\n";
-                strPrint += "/조회|검색어 : 클랜원을 조회합니다.\n";
+                strPrint += "/조회 검색어 : 클랜원을 조회합니다.\n";
                 strPrint += "               (검색범위 : 대화명, 배틀태그, 부계정)\n";
                 strPrint += "/영상 : 영상이 있던 날짜를 조회합니다.\n";
-                strPrint += "       - /영상|날짜 : 플레이 영상을 조회합니다. (/영상|181006)\n";
-                strPrint += "/검색|검색어 : 포지션, 모스트별로 클랜원을 검색합니다.\n";
+                strPrint += "       - /영상 날짜 : 플레이 영상을 조회합니다. (/영상 181006)\n";
+                strPrint += "/검색 검색어 : 포지션, 모스트별로 클랜원을 검색합니다.\n";
                 strPrint += "/모임 : 모임 공지와 참가자를 출력합니다.\n";
                 strPrint += "/안내 : 팀 안내 메시지를 출력합니다.\n";
                 strPrint += "/리포트 : 업데이트 내역, 개발 예정 항목을 출력합니다.\n";
@@ -215,17 +232,17 @@ namespace CDT_Noti_Bot
 
                 await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
             }
-            else if (strOutput[0] == "/운영자도움말")
+            else if (strCommend == "/운영자도움말")
             {
                 strPrint += "==================================\n";
                 strPrint += "[ 아테나 v1.1 ]\n[ Clien Delicious Team Notice Bot ]\n\n";
                 strPrint += "/공지 : 팀 공지사항을 출력합니다.\n";
-                strPrint += "/조회|검색어 : 클랜원을 조회합니다. (검색범위 : 대화명, 배틀태그)\n";
+                strPrint += "/조회 검색어 : 클랜원을 조회합니다. (검색범위 : 대화명, 배틀태그)\n";
                 strPrint += "/영상 : 영상이 있던 날짜를 조회합니다.\n";
-                strPrint += "       - /영상|날짜 : 플레이 영상을 조회합니다. (/영상|181006)\n";
-                strPrint += "/검색|검색어 : 포지션, 모스트별로 클랜원을 검색합니다.\n";
+                strPrint += "       - /영상 날짜 : 플레이 영상을 조회합니다. (/영상 181006)\n";
+                strPrint += "/검색 검색어 : 포지션, 모스트별로 클랜원을 검색합니다.\n";
                 strPrint += "/모임 : 모임 공지와 참가자를 출력합니다.\n";
-                strPrint += "       - /모임등록|내용 : 모임 공지를 등록합니다.\n";
+                strPrint += "       - /모임등록 내용 : 모임 공지를 등록합니다.\n";
                 strPrint += "       - /모임삭제 : 모임 공지를 삭제합니다.\n";
                 strPrint += "/안내 : 팀 안내 메시지를 출력합니다.\n";
                 strPrint += "/리포트 : 봇 업데이트 내역, 개발 예정인 항목\n";
@@ -239,7 +256,7 @@ namespace CDT_Noti_Bot
             //========================================================================================
             // 공지사항 관련 명령어
             //========================================================================================
-            else if (strOutput[0] == "/공지")
+            else if (strCommend == "/공지")
             {
                 // Define request parameters.
                 String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
@@ -275,22 +292,15 @@ namespace CDT_Noti_Bot
             //========================================================================================
             // 조회 관련 명령어
             //========================================================================================
-            else if (strOutput[0] == "/조회")
+            else if (strCommend == "/조회")
             {
-                if (strOutput.Count() == 1)
+                if (strContents == "")
                 {
                     strPrint += "[ERROR] 대화명이 없습니다.";
                     await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
                 }
                 else
                 {
-                    if (strOutput[1] == "")
-                    {
-                        strPrint += "[ERROR] 검색 조건이 없습니다.";
-                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
-                        return;
-                    }
-
                     // Define request parameters.
                     String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
                     String range = "클랜원 목록!C7:M";
@@ -304,9 +314,9 @@ namespace CDT_Noti_Bot
                         {
                             foreach (var row in values)
                             {
-                                if (row[0].ToString().ToUpper().Contains(strOutput[1].ToUpper()) ||
-                                    row[1].ToString().ToUpper().Contains(strOutput[1].ToUpper()) ||
-                                    row[2].ToString().ToUpper().Contains(strOutput[1].ToUpper()))
+                                if (row[0].ToString().ToUpper().Contains(strContents.ToUpper()) ||
+                                    row[1].ToString().ToUpper().Contains(strContents.ToUpper()) ||
+                                    row[2].ToString().ToUpper().Contains(strContents.ToUpper()))
                                 {
                                     strPrint += "==================================\n";
                                     strPrint += "1. 클랜방 대화명 : " + row[0] + "\n";
@@ -333,14 +343,14 @@ namespace CDT_Noti_Bot
                     }
                 }
             }
-            else if (strOutput[0] == "/영상")
+            else if (strCommend == "/영상")
             {
                 // Define request parameters.
                 String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
                 String range = "경기 URL (18/4분기)!B5:G";
                 SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
-                if (strOutput.Count() == 1)
+                if (strContents == "")
                 {
                     ValueRange response = request.Execute();
                     if (response != null)
@@ -350,7 +360,7 @@ namespace CDT_Noti_Bot
                         {
                             foreach (var row in values)
                             {
-                                if (row.Count > 0 && row[0].ToString() != "")
+                                if (row.Count() == 6 && row[0].ToString() != "")
                                 {
                                     strPrint += "[" + row[0].ToString() + "] " + row[1].ToString() + "\n";
                                 }
@@ -363,16 +373,9 @@ namespace CDT_Noti_Bot
                 }
                 else
                 {
-                    if (strOutput[1] == "")
-                    {
-                        strPrint += "[ERROR] 검색 조건이 없습니다.";
-                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
-                        return;
-                    }
-
-                    string year = "20" + strOutput[1].Substring(0, 2);
-                    string month = strOutput[1].Substring(2, 2);
-                    string day = strOutput[1].Substring(4, 2);
+                    string year = "20" + strContents.Substring(0, 2);
+                    string month = strContents.Substring(2, 2);
+                    string day = strContents.Substring(4, 2);
                     string date = year + "." + month + "." + day;
                     bool bContinue = false;
                     string user = "";
@@ -444,9 +447,9 @@ namespace CDT_Noti_Bot
                     await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 영상을 찾을 수 없습니다.");
                 }
             }
-            else if (strOutput[0] == "/검색")
+            else if (strCommend == "/검색")
             {
-                if (strOutput.Count() == 1)
+                if (strContents == "")
                 {
                     strPrint += "[ERROR] 검색 조건이 없습니다.";
                     await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
@@ -454,13 +457,6 @@ namespace CDT_Noti_Bot
                 }
                 else
                 {
-                    if (strOutput[1] == "")
-                    {
-                        strPrint += "[ERROR] 검색 조건이 없습니다.";
-                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
-                        return;
-                    }
-
                     // Define request parameters.
                     String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
                     String range = "클랜원 목록!C7:M";
@@ -473,16 +469,16 @@ namespace CDT_Noti_Bot
                         IList<IList<Object>> values = response.Values;
                         if (values != null && values.Count > 0)
                         {
-                            strPrint += "[ '" + strOutput[1] + "' 검색 결과 ]\n";
+                            strPrint += "[ '" + strContents + "' 검색 결과 ]\n";
 
                             foreach (var row in values)
                             {
-                                if (strOutput[1] == "힐" || strOutput[1] == "딜" || strOutput[1] == "탱" || strOutput[1] == "플렉스")
+                                if (strContents == "힐" || strContents == "딜" || strContents == "탱" || strContents == "플렉스")
                                 {
-                                    if (row[3].ToString().ToUpper().Contains(strOutput[1].ToUpper()) ||
-                                    row[4].ToString().ToUpper().Contains(strOutput[1].ToUpper()) ||
-                                    row[5].ToString().ToUpper().Contains(strOutput[1].ToUpper()) ||
-                                    row[6].ToString().ToUpper().Contains(strOutput[1].ToUpper()) ||
+                                    if (row[3].ToString().ToUpper().Contains(strContents.ToUpper()) ||
+                                    row[4].ToString().ToUpper().Contains(strContents.ToUpper()) ||
+                                    row[5].ToString().ToUpper().Contains(strContents.ToUpper()) ||
+                                    row[6].ToString().ToUpper().Contains(strContents.ToUpper()) ||
                                     row[3].ToString() == "플렉스")
                                     {
                                         strPrint += row[0] + "(" + row[1] + ") : ";
@@ -492,10 +488,10 @@ namespace CDT_Noti_Bot
                                 }
                                 else
                                 {
-                                    if (row[3].ToString().ToUpper().Contains(strOutput[1].ToUpper()) ||
-                                    row[4].ToString().ToUpper().Contains(strOutput[1].ToUpper()) ||
-                                    row[5].ToString().ToUpper().Contains(strOutput[1].ToUpper()) ||
-                                    row[6].ToString().ToUpper().Contains(strOutput[1].ToUpper()))
+                                    if (row[3].ToString().ToUpper().Contains(strContents.ToUpper()) ||
+                                    row[4].ToString().ToUpper().Contains(strContents.ToUpper()) ||
+                                    row[5].ToString().ToUpper().Contains(strContents.ToUpper()) ||
+                                    row[6].ToString().ToUpper().Contains(strContents.ToUpper()))
                                     {
                                         strPrint += row[0] + "(" + row[1] + ") : ";
                                         strPrint += row[3] + " (" + row[4].ToString() + "/" + row[5].ToString() + "/" + row[6].ToString() + ")\n";
@@ -519,9 +515,8 @@ namespace CDT_Noti_Bot
             //========================================================================================
             // 정모 관련 명령어
             //========================================================================================
-            else if (strOutput[0] == "/모임")
+            else if (strCommend == "/모임")
             {
-                strMassage = strMassage.Replace(strOutput[0], "");
                 string strMeetingValue = System.IO.File.ReadAllText(@"_Meeting.txt");
 
                 if (strMeetingValue == "")
@@ -564,25 +559,22 @@ namespace CDT_Noti_Bot
                     await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 모임이 등록되지 않았습니다.");
                 }
             }
-            else if (strOutput[0] == "/모임등록")
+            else if (strCommend == "/모임등록")
             {
-                strMassage = strMassage.Replace(strOutput[0], "");
-
-                if (strOutput.Count() == 1)
+                if (strContents == "")
                 {
                     strPrint += "[ERROR] 모임 내용이 없습니다.";
                 }
                 else
                 {
-                    System.IO.File.WriteAllText(@"_Meeting.txt", strOutput[1], Encoding.Unicode);
+                    System.IO.File.WriteAllText(@"_Meeting.txt", strContents, Encoding.Unicode);
                     strPrint += "[SUCCESS] 모임 등록완료.";
                 }
 
                 await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
             }
-            else if (strOutput[0] == "/모임삭제")
+            else if (strCommend == "/모임삭제")
             {
-                strMassage = strMassage.Replace(strOutput[0], "");
                 string strMeetingValue = System.IO.File.ReadAllText(@"_Meeting.txt");
 
                 if (strMeetingValue == "")
@@ -600,9 +592,8 @@ namespace CDT_Noti_Bot
             //========================================================================================
             // 안내 관련 명령어
             //========================================================================================
-            else if (strOutput[0] == "/안내")
+            else if (strCommend == "/안내")
             {
-                strMassage = strMassage.Replace(strOutput[0], "");
                 await Bot.SendChatActionAsync(varMessage.Chat.Id, ChatAction.UploadPhoto);
 
                 const string strCDTInfo01 = @"CDT_Info/01.jpg";
@@ -625,9 +616,8 @@ namespace CDT_Noti_Bot
                 await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream03, "");
                 await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream04, "");
             }
-            else if (strOutput[0] == "/리포트")
+            else if (strCommend == "/리포트")
             {
-                strMassage = strMassage.Replace(strOutput[0], "");
                 string strReportValue = System.IO.File.ReadAllText(@"_Report.txt");
 
                 if (strReportValue == "")
@@ -641,10 +631,8 @@ namespace CDT_Noti_Bot
 
                 await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
             }
-            else if (strOutput[0] == "/상태")
+            else if (strCommend == "/상태")
             {
-                strMassage = strMassage.Replace(strOutput[0], "");
-
                 strPrint += "Running.......\n";
                 strPrint += "[System Time] " + systemInfo.GetNowTime() + "\n";
                 strPrint += "[Running Time] " + systemInfo.GetRunningTime() + "\n";
