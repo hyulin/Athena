@@ -189,7 +189,7 @@ namespace CDT_Noti_Bot
             string strUserName = varMessage.Chat.FirstName + varMessage.Chat.LastName;
             string[] strOutput = strMassage.Split('|');
             string strPrint = "";
-            
+
             //========================================================================================
             // 공지사항 관련 명령어
             //========================================================================================
@@ -378,7 +378,7 @@ namespace CDT_Noti_Bot
                                     {
                                         bContinue = false;
                                     }
-                                    
+
                                     if (bContinue == true)
                                     {
                                         if (row[1].ToString() != "")
@@ -396,7 +396,7 @@ namespace CDT_Noti_Bot
                                             {
                                                 strPrint += user + " : " + row[5].ToString() + "\n";
                                             }
-                                            
+
                                         }
                                         else
                                         {
@@ -408,7 +408,7 @@ namespace CDT_Noti_Bot
                                             {
                                                 strPrint += row[3].ToString() + " : " + row[5].ToString() + "\n";
                                             }
-                                            
+
                                             user = row[3].ToString();
                                         }
                                     }
@@ -425,6 +425,69 @@ namespace CDT_Noti_Bot
                 else
                 {
                     await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 영상을 찾을 수 없습니다.");
+                }
+            }
+            else if (strOutput[0] == "/검색")
+            {
+                if (strOutput.Count() == 1)
+                {
+                    strPrint += "[ERROR] 검색 조건이 없습니다.";
+                }
+                else
+                {
+                    // Define request parameters.
+                    String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                    String range = "클랜원 목록!C7:M";
+                    SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+                    bool bResult = false;
+
+                    ValueRange response = request.Execute();
+                    if (response != null)
+                    {
+                        IList<IList<Object>> values = response.Values;
+                        if (values != null && values.Count > 0)
+                        {
+                            strPrint += "[ '" + strOutput[1] + "' 검색 결과 ]\n";
+
+                            foreach (var row in values)
+                            {
+                                if (strOutput[1] == "힐" || strOutput[1] == "딜" || strOutput[1] == "탱" || strOutput[1] == "플렉스")
+                                {
+                                    if (row[3].ToString().ToUpper().Contains(strOutput[1].ToUpper()) ||
+                                    row[4].ToString().ToUpper().Contains(strOutput[1].ToUpper()) ||
+                                    row[5].ToString().ToUpper().Contains(strOutput[1].ToUpper()) ||
+                                    row[6].ToString().ToUpper().Contains(strOutput[1].ToUpper()) ||
+                                    row[3].ToString() == "플렉스")
+                                    {
+                                        strPrint += row[0] + "(" + row[1] + ") : ";
+                                        strPrint += row[3] + "(" + row[4].ToString() + "/" + row[5].ToString() + "/" + row[6].ToString() + ")\n";
+                                        bResult = true;
+                                    }
+                                }
+                                else
+                                {
+                                    if (row[3].ToString().ToUpper().Contains(strOutput[1].ToUpper()) ||
+                                    row[4].ToString().ToUpper().Contains(strOutput[1].ToUpper()) ||
+                                    row[5].ToString().ToUpper().Contains(strOutput[1].ToUpper()) ||
+                                    row[6].ToString().ToUpper().Contains(strOutput[1].ToUpper()))
+                                    {
+                                        strPrint += row[0] + "(" + row[1] + ") : ";
+                                        strPrint += row[3] + " (" + row[4].ToString() + "/" + row[5].ToString() + "/" + row[6].ToString() + ")\n";
+                                        bResult = true;
+                                    }
+                                }                                
+                            }
+                        }
+                    }
+
+                    if (bResult == true)
+                    {
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
+                    }
+                    else
+                    {
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 찾을 수 없습니다.");
+                    }
                 }
             }
             //========================================================================================
@@ -555,7 +618,7 @@ namespace CDT_Noti_Bot
             else if (strOutput[0] == "/상태")
             {
                 strMassage = strMassage.Replace(strOutput[0], "");
-                
+
                 strPrint += "Running.......\n";
                 strPrint += "[System Time] " + systemInfo.GetNowTime() + "\n";
                 strPrint += "[Running Time] " + systemInfo.GetRunningTime() + "\n";
