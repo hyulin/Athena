@@ -280,6 +280,7 @@ namespace CDT_Noti_Bot
                 if (strOutput.Count() == 1)
                 {
                     strPrint += "[ERROR] 대화명이 없습니다.";
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
                 }
                 else
                 {
@@ -448,6 +449,8 @@ namespace CDT_Noti_Bot
                 if (strOutput.Count() == 1)
                 {
                     strPrint += "[ERROR] 검색 조건이 없습니다.";
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
+
                 }
                 else
                 {
