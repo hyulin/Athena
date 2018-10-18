@@ -494,8 +494,8 @@ namespace CDT_Noti_Bot
                         }
                     }
 
-                    strPrint += "\n/영상|날짜로 영상 주소를 조회하실 수 있습니다.\n";
-                    strPrint += "(ex: /영상|181006)";
+                    strPrint += "\n/영상 날짜로 영상 주소를 조회하실 수 있습니다.\n";
+                    strPrint += "(ex: /영상 181006)";
                 }
                 else
                 {
