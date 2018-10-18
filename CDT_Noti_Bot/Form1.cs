@@ -233,6 +233,7 @@ namespace CDT_Noti_Bot
             string strUserName = varMessage.Chat.FirstName + varMessage.Chat.LastName;
             string strCommend = "";
             string strContents = "";
+            int iMessageID = varMessage.MessageId;
 
             if (strMassage.Substring(0, 1) != "/")
             {
@@ -274,7 +275,7 @@ namespace CDT_Noti_Bot
                 strPrint += "버그 및 문의사항이 있으시면 '휴린'에게 문의해주세요. :)\n";
                 strPrint += "==================================\n";
 
-                await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
+                await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
             }
             else if (strCommend == "/운영자도움말")
             {
@@ -295,7 +296,7 @@ namespace CDT_Noti_Bot
                 strPrint += "버그 및 문의사항이 있으시면 '휴린'에게 문의해주세요. :)\n";
                 strPrint += "==================================\n";
 
-                await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
+                await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
             }
             //========================================================================================
             // 공지사항 관련 명령어
@@ -326,11 +327,11 @@ namespace CDT_Noti_Bot
 
                 if (strPrint != "")
                 {
-                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
                 }
                 else
                 {
-                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 공지가 등록되지 않았습니다.");
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 공지가 등록되지 않았습니다.", ParseMode.Default, false, false, iMessageID);
                 }
             }
             //========================================================================================
@@ -341,7 +342,7 @@ namespace CDT_Noti_Bot
                 if (strContents == "")
                 {
                     strPrint += "[ERROR] 대화명이 없습니다.";
-                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
                 }
                 else
                 {
@@ -368,7 +369,7 @@ namespace CDT_Noti_Bot
                                 {
                                     if (iIndex++ > 2)
                                     {
-                                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 검색 결과가 너무 많습니다. (3건 초과)\n검색어를 다시 입력해주세요.");
+                                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 검색 결과가 너무 많습니다. (3건 초과)\n검색어를 다시 입력해주세요.", ParseMode.Default, false, false, iMessageID);
                                         return;
                                     }
                                 }
@@ -432,7 +433,7 @@ namespace CDT_Noti_Bot
                                     }
                                     catch
                                     {
-                                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "'" + strBattleTag[0] + "#" + strBattleTag[1] + "'의 전적을 조회 할 수 없습니다.");
+                                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "'" + strBattleTag[0] + "#" + strBattleTag[1] + "'의 전적을 조회할 수 없습니다.");
                                     }
 
                                     if (bContinue == true)
@@ -461,11 +462,11 @@ namespace CDT_Noti_Bot
 
                     if (strPrint != "")
                     {
-                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
                     }
                     else
                     {
-                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 클랜원을 찾을 수 없습니다.");
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 클랜원을 찾을 수 없습니다.", ParseMode.Default, false, false, iMessageID);
                     }
                 }
             }
@@ -566,11 +567,11 @@ namespace CDT_Noti_Bot
 
                 if (strPrint != "")
                 {
-                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
                 }
                 else
                 {
-                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 영상을 찾을 수 없습니다.");
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 영상을 찾을 수 없습니다.", ParseMode.Default, false, false, iMessageID);
                 }
             }
             else if (strCommend == "/검색")
@@ -578,8 +579,7 @@ namespace CDT_Noti_Bot
                 if (strContents == "")
                 {
                     strPrint += "[ERROR] 검색 조건이 없습니다.";
-                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
-
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
                 }
                 else
                 {
@@ -630,11 +630,11 @@ namespace CDT_Noti_Bot
 
                     if (bResult == true)
                     {
-                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
                     }
                     else
                     {
-                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 찾을 수 없습니다.");
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 검색 결과가 없습니다.", ParseMode.Default, false, false, iMessageID);
                     }
                 }
             }
@@ -678,11 +678,11 @@ namespace CDT_Noti_Bot
 
                 if (strPrint != "")
                 {
-                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
                 }
                 else
                 {
-                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 모임이 등록되지 않았습니다.");
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 모임이 등록되지 않았습니다.", ParseMode.Default, false, false, iMessageID);
                 }
             }
             else if (strCommend == "/모임등록")
@@ -697,7 +697,7 @@ namespace CDT_Noti_Bot
                     strPrint += "[SUCCESS] 모임 등록완료.";
                 }
 
-                await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
+                await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
             }
             else if (strCommend == "/모임삭제")
             {
@@ -713,7 +713,7 @@ namespace CDT_Noti_Bot
                     strPrint += "[SUCCESS] 모임 삭제완료.";
                 }
 
-                await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
+                await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
             }
             //========================================================================================
             // 안내 관련 명령어
@@ -755,7 +755,7 @@ namespace CDT_Noti_Bot
                     strPrint += strReportValue;
                 }
 
-                await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
+                await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
             }
             else if (strCommend == "/상태")
             {
@@ -765,7 +765,7 @@ namespace CDT_Noti_Bot
                 //strPrint += "[Message Request Count] " + systemInfo.GetMessageReqCount() + "\n";
                 //strPrint += "[Google Sheetp API Request Count] " + systemInfo.GetGoogleSheetReqCount() + "\n";
 
-                await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
+                await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
             }
 
             strPrint = "";
