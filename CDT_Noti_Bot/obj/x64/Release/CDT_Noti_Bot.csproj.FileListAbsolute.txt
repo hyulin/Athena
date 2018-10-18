@@ -58,3 +58,6 @@ C:\Project\CDT_Bot\CDT_Noti_Bot\obj\x64\Release\CDT_Noti_Bot.csproj.CoreCompileI
 C:\Project\CDT_Bot\CDT_Noti_Bot\obj\x64\Release\CDT_Noti_Bot.csproj.CopyComplete
 C:\Project\CDT_Bot\CDT_Noti_Bot\obj\x64\Release\CDT_Noti_Bot.exe
 C:\Project\CDT_Bot\CDT_Noti_Bot\obj\x64\Release\CDT_Noti_Bot.pdb
+C:\Users\USER\Documents\Project\CDT_Noti_Bot\CDT_Noti_Bot\bin\x64\Release\HtmlAgilityPack.dll
+C:\Users\USER\Documents\Project\CDT_Noti_Bot\CDT_Noti_Bot\bin\x64\Release\HtmlAgilityPack.pdb
+C:\Users\USER\Documents\Project\CDT_Noti_Bot\CDT_Noti_Bot\bin\x64\Release\HtmlAgilityPack.xml

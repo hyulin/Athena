@@ -168,12 +168,52 @@ namespace CDT_Noti_Bot
                 return;
             }
 
+            string strFirstName = varMessage.From.FirstName;
+            string strLastName = varMessage.From.LastName;
+
             // 입장 메시지 일 경우
             if (varMessage.Type == MessageType.ChatMembersAdded)
             {
                 if (varMessage.Chat.Title == "CDT 사전 활동안내")
                 {
                     varMessage.Text = "/안내";
+                }
+                else if (varMessage.Chat.Title == "클리앙 딜리셔스 팀 (CDT)")
+                {
+                    string strInfo = "";
+
+                    strInfo += "\n안녕하세요.\n";
+                    strInfo += "서로의 삶에 힘이 되는 오버워치 클랜,\n";
+                    strInfo += "'클리앙 딜리셔스 팀'에 오신 것을 환영합니다.\n\n";
+                    strInfo += "저는 팀의 운영 봇인 아테나입니다.\n";
+                    strInfo += "\n";
+                    strInfo += "클랜 생활에 불편하신 점이 있으시거나\n";
+                    strInfo += "건의사항, 문의사항이 있으실 때는\n";
+                    strInfo += "운영자 냉각콜라(@Seungman),\n";
+                    strInfo += "운영자 만슬(@mans3ul)에게 문의해주세요.\n";
+                    strInfo += "\n";
+                    strInfo += "우리 클랜의 모든 일정관리 및 운영은\n";
+                    strInfo += "통합문서를 통해 확인 하실 수 있습니다.\n";
+                    strInfo += "(https://goo.gl/nurbLT [딜리셔스.kr])\n";
+                    strInfo += "통합 문서에 대해 문의사항이 있으실 때는\n";
+                    strInfo += "운영자 청포도(@leetk321)에게 문의해주세요.\n";
+                    strInfo += "\n";
+                    strInfo += "클랜원들의 편의를 위한\n";
+                    strInfo += "저, 아테나의 기능을 확인하시려면\n";
+                    strInfo += "/도움말 을 입력해주세요.\n";
+                    strInfo += "편리한 기능들이 많이 있으며,\n";
+                    strInfo += "앞으로 더 추가될 예정입니다.\n";
+                    strInfo += "아테나에 대해 문의사항이 있으실 때는\n";
+                    strInfo += "운영자 휴린(@hyulin)에게 문의해주세요.\n";
+                    strInfo += "\n";
+                    strInfo += "저희 CDT에서 즐거운 오버워치 생활,\n";
+                    strInfo += "그리고 더 나아가 즐거운 라이프를\n";
+                    strInfo += "즐기셨으면 합니다.\n\n";
+                    strInfo += "잘 부탁드립니다 :)\n";
+
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, strInfo);
+
+                    return;
                 }
                 else
                 {

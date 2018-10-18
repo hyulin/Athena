@@ -57,3 +57,7 @@ C:\Project\CDT_Bot\CDT_Noti_Bot\obj\x64\Debug\CDT_Noti_Bot.pdb
 C:\Project\CDT_Bot\CDT_Noti_Bot\bin\x64\Debug\HtmlAgilityPack.dll
 C:\Project\CDT_Bot\CDT_Noti_Bot\bin\x64\Debug\HtmlAgilityPack.pdb
 C:\Project\CDT_Bot\CDT_Noti_Bot\bin\x64\Debug\HtmlAgilityPack.xml
+C:\Users\USER\Documents\Project\CDT_Noti_Bot\CDT_Noti_Bot\obj\x64\Debug\CDT_Noti_Bot.csprojResolveAssemblyReference.cache
+C:\Users\USER\Documents\Project\CDT_Noti_Bot\CDT_Noti_Bot\bin\x64\Debug\HtmlAgilityPack.dll
+C:\Users\USER\Documents\Project\CDT_Noti_Bot\CDT_Noti_Bot\bin\x64\Debug\HtmlAgilityPack.pdb
+C:\Users\USER\Documents\Project\CDT_Noti_Bot\CDT_Noti_Bot\bin\x64\Debug\HtmlAgilityPack.xml
