@@ -317,6 +317,22 @@ namespace CDT_Noti_Bot
                         if (values != null && values.Count > 0)
                         {
                             bool bContinue = false;
+                            string[] strList = new string[5];
+                            int iIndex = 0;
+
+                            foreach (var row in values)
+                            {
+                                if (row[0].ToString().ToUpper().Contains(strContents.ToUpper()) ||
+                                    row[1].ToString().ToUpper().Contains(strContents.ToUpper()) ||
+                                    row[2].ToString().ToUpper().Contains(strContents.ToUpper()))
+                                {
+                                    if (iIndex++ > 2)
+                                    {
+                                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 검색 결과가 너무 많습니다. (3건 초과)\n검색어를 다시 입력해주세요.");
+                                        return;
+                                    }
+                                }
+                            }
 
                             foreach (var row in values)
                             {
