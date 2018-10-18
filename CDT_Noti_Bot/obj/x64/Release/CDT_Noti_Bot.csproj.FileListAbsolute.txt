@@ -25,6 +25,7 @@ C:\Users\USER\Documents\Project\CDT_Noti_Bot\CDT_Noti_Bot\obj\x64\Release\CDT_No
 C:\Users\USER\Documents\Project\CDT_Noti_Bot\CDT_Noti_Bot\obj\x64\Release\CDT_Noti_Bot.csproj.GenerateResource.Cache
 C:\Users\USER\Documents\Project\CDT_Noti_Bot\CDT_Noti_Bot\obj\x64\Release\CDT_Noti_Bot.exe
 C:\Users\USER\Documents\Project\CDT_Noti_Bot\CDT_Noti_Bot\obj\x64\Release\CDT_Noti_Bot.pdb
+C:\Users\USER\Documents\Project\CDT_Noti_Bot\CDT_Noti_Bot\obj\x64\Release\CDT_Noti_Bot.csprojResolveAssemblyReference.cache
 C:\Project\CDT_Bot\CDT_Noti_Bot\bin\x64\Release\credentials.json
 C:\Project\CDT_Bot\CDT_Noti_Bot\bin\x64\Release\CDT_Noti_Bot.exe.config
 C:\Project\CDT_Bot\CDT_Noti_Bot\bin\x64\Release\CDT_Noti_Bot.exe
@@ -35,6 +36,7 @@ C:\Project\CDT_Bot\CDT_Noti_Bot\bin\x64\Release\Google.Apis.Core.dll
 C:\Project\CDT_Bot\CDT_Noti_Bot\bin\x64\Release\Google.Apis.dll
 C:\Project\CDT_Bot\CDT_Noti_Bot\bin\x64\Release\Google.Apis.PlatformServices.dll
 C:\Project\CDT_Bot\CDT_Noti_Bot\bin\x64\Release\Google.Apis.Sheets.v4.dll
+C:\Project\CDT_Bot\CDT_Noti_Bot\bin\x64\Release\HtmlAgilityPack.dll
 C:\Project\CDT_Bot\CDT_Noti_Bot\bin\x64\Release\Newtonsoft.Json.dll
 C:\Project\CDT_Bot\CDT_Noti_Bot\bin\x64\Release\Telegram.Bot.dll
 C:\Project\CDT_Bot\CDT_Noti_Bot\bin\x64\Release\Google.Apis.pdb
@@ -45,6 +47,8 @@ C:\Project\CDT_Bot\CDT_Noti_Bot\bin\x64\Release\Google.Apis.Core.pdb
 C:\Project\CDT_Bot\CDT_Noti_Bot\bin\x64\Release\Google.Apis.Core.xml
 C:\Project\CDT_Bot\CDT_Noti_Bot\bin\x64\Release\Google.Apis.Sheets.v4.pdb
 C:\Project\CDT_Bot\CDT_Noti_Bot\bin\x64\Release\Google.Apis.Sheets.v4.xml
+C:\Project\CDT_Bot\CDT_Noti_Bot\bin\x64\Release\HtmlAgilityPack.pdb
+C:\Project\CDT_Bot\CDT_Noti_Bot\bin\x64\Release\HtmlAgilityPack.xml
 C:\Project\CDT_Bot\CDT_Noti_Bot\bin\x64\Release\Newtonsoft.Json.xml
 C:\Project\CDT_Bot\CDT_Noti_Bot\bin\x64\Release\Telegram.Bot.xml
 C:\Project\CDT_Bot\CDT_Noti_Bot\obj\x64\Release\CDT_Noti_Bot.Form1.resources
@@ -55,4 +59,3 @@ C:\Project\CDT_Bot\CDT_Noti_Bot\obj\x64\Release\CDT_Noti_Bot.csproj.CopyComplete
 C:\Project\CDT_Bot\CDT_Noti_Bot\obj\x64\Release\CDT_Noti_Bot.exe
 C:\Project\CDT_Bot\CDT_Noti_Bot\obj\x64\Release\CDT_Noti_Bot.pdb
 C:\Project\CDT_Bot\CDT_Noti_Bot\obj\x64\Release\CDT_Noti_Bot.csprojAssemblyReference.cache
-C:\Users\USER\Documents\Project\CDT_Noti_Bot\CDT_Noti_Bot\obj\x64\Release\CDT_Noti_Bot.csprojResolveAssemblyReference.cache
