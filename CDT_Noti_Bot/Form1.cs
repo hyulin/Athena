@@ -44,6 +44,7 @@ namespace CDT_Noti_Bot
         SheetsService service;
         CNotice Notice = new CNotice();
         CNotice NewNotice = new CNotice();
+        CEasterEgg EasterEgg = new CEasterEgg();
         bool bRun = false;
 
         // Bot Token
@@ -170,6 +171,13 @@ namespace CDT_Noti_Bot
 
             string strFirstName = varMessage.From.FirstName;
             string strLastName = varMessage.From.LastName;
+            int iMessageID = varMessage.MessageId;
+
+            if (varMessage.ReplyToMessage != null && varMessage.ReplyToMessage.From.FirstName.Contains("아테나") == true)
+            {
+                await Bot.SendTextMessageAsync(varMessage.Chat.Id, EasterEgg.GetEasterEgg(), ParseMode.Default, false, false, iMessageID);
+                return;
+            }
 
             // 입장 메시지 일 경우
             if (varMessage.Type == MessageType.ChatMembersAdded)
@@ -233,7 +241,6 @@ namespace CDT_Noti_Bot
             string strUserName = varMessage.Chat.FirstName + varMessage.Chat.LastName;
             string strCommend = "";
             string strContents = "";
-            int iMessageID = varMessage.MessageId;
 
             if (strMassage.Substring(0, 1) != "/")
             {
