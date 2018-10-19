@@ -61,3 +61,4 @@ C:\Project\CDT_Bot\CDT_Noti_Bot\obj\x64\Release\CDT_Noti_Bot.pdb
 C:\Users\USER\Documents\Project\CDT_Noti_Bot\CDT_Noti_Bot\bin\x64\Release\HtmlAgilityPack.dll
 C:\Users\USER\Documents\Project\CDT_Noti_Bot\CDT_Noti_Bot\bin\x64\Release\HtmlAgilityPack.pdb
 C:\Users\USER\Documents\Project\CDT_Noti_Bot\CDT_Noti_Bot\bin\x64\Release\HtmlAgilityPack.xml
+C:\Project\CDT_Bot\CDT_Noti_Bot\obj\x64\Release\CDT_Noti_Bot.csprojAssemblyReference.cache

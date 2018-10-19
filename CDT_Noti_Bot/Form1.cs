@@ -273,6 +273,8 @@ namespace CDT_Noti_Bot
                 strPrint += "       - /영상 날짜 : 플레이 영상을 조회합니다. (/영상 181006)\n";
                 strPrint += "/검색 검색어 : 포지션, 모스트별로 클랜원을 검색합니다.\n";
                 strPrint += "/모임 : 모임 공지와 참가자를 출력합니다.\n";
+                strPrint += "/참가 : 모임에 참가 신청합니다.\n";
+                strPrint += "/불참 : 모임에 참가 신청을 취소합니다.\n";
                 strPrint += "/안내 : 팀 안내 메시지를 출력합니다.\n";
                 strPrint += "/리포트 : 업데이트 내역, 개발 예정 항목을 출력합니다.\n";
                 strPrint += "/상태 : 현재 봇 상태를 출력합니다. 대답이 없으면 이상.\n";
@@ -296,6 +298,8 @@ namespace CDT_Noti_Bot
                 strPrint += "/모임 : 모임 공지와 참가자를 출력합니다.\n";
                 strPrint += "       - /모임등록 내용 : 모임 공지를 등록합니다.\n";
                 strPrint += "       - /모임삭제 : 모임 공지를 삭제합니다.\n";
+                strPrint += "/참가 : 모임에 참가 신청합니다.\n";
+                strPrint += "/불참 : 모임에 참가 신청을 취소합니다.\n";
                 strPrint += "/안내 : 팀 안내 메시지를 출력합니다.\n";
                 strPrint += "/리포트 : 봇 업데이트 내역, 개발 예정인 항목\n";
                 strPrint += "/상태 : 현재 봇 상태를 출력합니다. 대답이 없으면 이상.\n";
@@ -675,7 +679,10 @@ namespace CDT_Noti_Bot
                         {
                             foreach (var row in values)
                             {
-                                strPrint += row[0] + " , ";
+                                if (row.Count != 0)
+                                {
+                                    strPrint += row[0] + " , ";
+                                }
                             }
                         }
 
@@ -690,6 +697,148 @@ namespace CDT_Noti_Bot
                 else
                 {
                     await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 모임이 등록되지 않았습니다.", ParseMode.Default, false, false, iMessageID);
+                }
+            }
+            else if (strCommend == "/참가")
+            {
+                string strNickName = strFirstName + strLastName;
+                int iCellIndex = 12;
+                int iTempCount = 0;
+
+                // Define request parameters.
+                String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                String range = "10월 정모추진 (모집중)!C" + iCellIndex + ":C";
+                SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+
+                ValueRange response = request.Execute();
+                if (response != null)
+                {
+                    IList<IList<Object>> values = response.Values;
+                    if (values != null && values.Count > 0)
+                    {
+                        foreach (var row in values)
+                        {
+                            if (row.Count == 0)
+                            {
+                                iCellIndex += iTempCount;
+                            }
+                            else
+                            {
+                                iTempCount++;
+
+                                if (row[0].ToString() == strNickName)
+                                {
+                                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 이미 모임에 참가신청을 했습니다.", ParseMode.Default, false, false, iMessageID);
+                                    return;
+                                }
+                            }
+                        }
+                    }
+
+                    //iCellIndex += values.Count;
+                    range = "10월 정모추진 (모집중)!C" + iCellIndex + ":C";
+                    
+                    // Define request parameters.
+                    ValueRange valueRange = new ValueRange();
+                    valueRange.MajorDimension = "COLUMNS"; //"ROWS";//COLUMNS 
+
+                    var oblist = new List<object>() { strNickName };
+                    valueRange.Values = new List<IList<object>> { oblist };
+
+                    SpreadsheetsResource.ValuesResource.UpdateRequest updateRequest = service.Spreadsheets.Values.Update(valueRange, spreadsheetId, range);
+
+                    updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.RAW;
+                    UpdateValuesResponse updateResponse = updateRequest.Execute();
+                    if (updateResponse == null)
+                    {
+                        strPrint += "[ERROR] 시트를 업데이트 할 수 없습니다.";
+                    }
+                    else
+                    {
+                        strPrint += "[SUCCESS] 참가 신청을 완료 했습니다.";
+                    }
+                }
+
+                if (strPrint != "")
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
+                }
+                else
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 시트를 업데이트 할 수 없습니다.", ParseMode.Default, false, false, iMessageID);
+                }
+            }
+            else if (strCommend == "/불참")
+            {
+                string strNickName = strFirstName + strLastName;
+                int iCellIndex = 12;
+                int iTempCount = 0;
+                bool isJoin = false;
+
+                // Define request parameters.
+                String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                String range = "10월 정모추진 (모집중)!C" + iCellIndex + ":C";
+                SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+
+                ValueRange response = request.Execute();
+                if (response != null)
+                {
+                    IList<IList<Object>> values = response.Values;
+                    if (values != null && values.Count > 0)
+                    {
+                        foreach (var row in values)
+                        {
+                            if (row.Count != 0)
+                            {
+                                if (row[0].ToString() == strNickName)
+                                {
+                                    iCellIndex += iTempCount;
+                                    isJoin = true;
+                                }
+                            }
+
+                            iTempCount++;
+                        }
+                    }
+
+                    if (isJoin == true)
+                    {
+                        //iCellIndex += values.Count;
+                        range = "10월 정모추진 (모집중)!C" + iCellIndex + ":C";
+
+                        // Define request parameters.
+                        ValueRange valueRange = new ValueRange();
+                        valueRange.MajorDimension = "COLUMNS"; //"ROWS";//COLUMNS 
+
+                        var oblist = new List<object>() { "" };
+                        valueRange.Values = new List<IList<object>> { oblist };
+
+                        SpreadsheetsResource.ValuesResource.UpdateRequest updateRequest = service.Spreadsheets.Values.Update(valueRange, spreadsheetId, range);
+
+                        updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.RAW;
+                        UpdateValuesResponse updateResponse = updateRequest.Execute();
+                        if (updateResponse == null)
+                        {
+                            strPrint += "[ERROR] 시트를 업데이트 할 수 없습니다.";
+                        }
+                        else
+                        {
+                            strPrint += "[SUCCESS] 참가 신청을 취소 했습니다.";
+                        }
+                    }
+                    else
+                    {
+                        strPrint += "[ERROR] 참가 신청을 하지 않았습니다.";
+                    }
+                }
+
+                if (strPrint != "")
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
+                }
+                else
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 시트를 업데이트 할 수 없습니다.", ParseMode.Default, false, false, iMessageID);
                 }
             }
             else if (strCommend == "/모임등록")
