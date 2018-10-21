@@ -43,7 +43,6 @@ namespace CDT_Noti_Bot
         UserCredential credential;
         SheetsService service;
         CNotice Notice = new CNotice();
-        CNotice NewNotice = new CNotice();
         CEasterEgg EasterEgg = new CEasterEgg();
         bool bRun = false;
 
@@ -103,44 +102,49 @@ namespace CDT_Noti_Bot
             SpreadsheetsResource.ValuesResource.GetRequest updateRequest = service.Spreadsheets.Values.Get(spreadsheetId, updateRange);
 
             ValueRange response = request.Execute();
+            ValueRange updateResponse = updateRequest.Execute();
 
-            if (bRun == true)
+            if (response != null && updateResponse != null)
             {
-                ValueRange updateResponse = updateRequest.Execute();
-                bRun = false;
+                IList<IList<Object>> values = response.Values;
+                IList<IList<Object>> updateValues = updateResponse.Values;
 
-                if (response != null && updateResponse != null)
+                if (updateValues != null && updateValues.ToString() != "")
                 {
-                    IList<IList<Object>> values = response.Values;
-                    IList<IList<Object>> updateValues = updateResponse.Values;
-
-                    if (updateValues != null && updateValues.ToString() != "")
+                    if (values != null && values.Count > 0)
                     {
-                        if (values != null && values.Count > 0)
+                        strPrint += "#공지사항\n\n";
+
+                        foreach (var row in values)
                         {
-                            strPrint += "#공지사항\n\n";
-
-                            foreach (var row in values)
-                            {
-                                strPrint += "* " + row[0] + "\n\n";
-                            }
-                        }
-
-                        NewNotice.SetNotice(strPrint);
-
-                        if (Notice.GetNotice() != NewNotice.GetNotice())
-                        {
-                            Notice.SetNotice(NewNotice.GetNotice());
-
-                            Bot.SendTextMessageAsync(-1001312491933, strPrint);  // 운영진방
-                            Bot.SendTextMessageAsync(-1001202203239, strPrint);  // 클랜방
+                            strPrint += "* " + row[0] + "\n\n";
                         }
                     }
+                        
+                    Notice.SetNotice(strPrint);
+
+                    // Define request parameters.
+                    ValueRange valueRange = new ValueRange();
+                    valueRange.MajorDimension = "COLUMNS"; //"ROWS";//COLUMNS 
+
+                    var oblist = new List<object>() { "" };
+                    valueRange.Values = new List<IList<object>> { oblist };
+
+                    SpreadsheetsResource.ValuesResource.UpdateRequest releaseRequest = service.Spreadsheets.Values.Update(valueRange, spreadsheetId, updateRange);
+
+                    releaseRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.RAW;
+                    UpdateValuesResponse releaseResponse = releaseRequest.Execute();
+                    if (releaseResponse == null)
+                    {
+                        strPrint = "[ERROR] 시트를 업데이트 할 수 없습니다.";
+                    }
+
+#if DEBUG
+                    Bot.SendTextMessageAsync(-1001312491933, strPrint);  // 운영진방
+#else
+                    Bot.SendTextMessageAsync(-1001202203239, strPrint);  // 클랜방
+#endif
                 }
-            }
-            else
-            {
-                bRun = true;
             }
         }
 
@@ -548,7 +552,7 @@ namespace CDT_Noti_Bot
                                         {
                                             if (row[4].ToString() != "")
                                             {
-                                                strPrint += user + "(" + row[4].ToString() + ")" + " : " + row[5].ToString() + "\n";
+                                                strPrint += user + " (" + row[4].ToString() + ")" + " : " + row[5].ToString() + "\n";
                                             }
                                             else
                                             {
@@ -560,7 +564,7 @@ namespace CDT_Noti_Bot
                                         {
                                             if (row[4].ToString() != "")
                                             {
-                                                strPrint += row[3].ToString() + "(" + row[4].ToString() + ")" + " : " + row[5].ToString() + "\n";
+                                                strPrint += row[3].ToString() + " (" + row[4].ToString() + ")" + " : " + row[5].ToString() + "\n";
                                             }
                                             else
                                             {
