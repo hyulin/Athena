@@ -44,7 +44,6 @@ namespace CDT_Noti_Bot
         SheetsService service;
         CNotice Notice = new CNotice();
         CEasterEgg EasterEgg = new CEasterEgg();
-        bool bRun = false;
 
         // Bot Token
 #if DEBUG
@@ -92,6 +91,15 @@ namespace CDT_Noti_Bot
         // 아래 이벤트 핸들러 실행
         public void timer_Elapsed(object sender, ElapsedEventArgs e)
         {
+            // 공지 업데이트 스케쥴러
+            NoticeUpdate();
+
+            // 새글 업데이트 스케쥴러
+            NewUpdate();
+        }
+
+        public void NoticeUpdate()
+        {
             string strPrint = "";
 
             // Define request parameters.
@@ -120,7 +128,7 @@ namespace CDT_Noti_Bot
                             strPrint += "* " + row[0] + "\n\n";
                         }
                     }
-                        
+
                     Notice.SetNotice(strPrint);
 
                     // Define request parameters.
@@ -146,6 +154,26 @@ namespace CDT_Noti_Bot
 #endif
                 }
             }
+        }
+
+        public void NewUpdate()
+        {
+            string strUrl = "https://www.youtube.com/channel/UC-2wa6jvprl7hfCpvw0ULzg/videos";
+
+            WebClient wc = new WebClient();
+            wc.Encoding = Encoding.UTF8;
+
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+            ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+
+            string html = wc.DownloadString(strUrl);
+            HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
+            doc.LoadHtml(html);
+
+            //string strTitle = doc.DocumentNode.SelectSingleNode("//div[@class='yt-simple-endpoint.style-scope.ytd-grid-video-renderer']").InnerText;
+            var strTitle = doc.DocumentNode.SelectSingleNode("//*[@id='video-title']");
+
+            return;
         }
 
         private void Form1_Load(object sender, EventArgs e)
