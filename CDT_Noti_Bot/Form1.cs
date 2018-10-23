@@ -739,7 +739,11 @@ namespace CDT_Noti_Bot
                                     if (row[12].ToString().ToUpper().Contains('O'))
                                     {
                                         string strConfirm = row[0].ToString();
-                                        lstConfirm.Add(strConfirm);
+
+                                        if (strConfirm != "")
+                                        {
+                                            lstConfirm.Add(strConfirm);
+                                        }
                                     }
                                     else if (row[12].ToString().ToUpper().Contains('X'))
                                     {
@@ -748,13 +752,19 @@ namespace CDT_Noti_Bot
                                     else
                                     {
                                         string strUndefine = row[0].ToString();
-                                        lstUndefine.Add(strUndefine);
+                                        if (strUndefine != "")
+                                        {
+                                            lstUndefine.Add(strUndefine);
+                                        }
                                     }
                                 }
                                 else
                                 {
                                     string strUndefine = row[0].ToString();
-                                    lstUndefine.Add(strUndefine);
+                                    if (strUndefine != "")
+                                    {
+                                        lstUndefine.Add(strUndefine);
+                                    }
                                 }
                             }
                         }
