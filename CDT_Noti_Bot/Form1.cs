@@ -657,40 +657,160 @@ namespace CDT_Noti_Bot
             //========================================================================================
             else if (strCommend == "/모임")
             {
-                string strMeetingValue = System.IO.File.ReadAllText(@"_Meeting.txt");
+                // Define request parameters.
+                String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                String range = "CDT 모임!C4:R12";
+                SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
-                if (strMeetingValue == "")
+                ValueRange response = request.Execute();
+                if (response != null)
                 {
-                    strPrint += "[ERROR] 현재 모임이 등록되지 않았습니다.";
-                }
-                else
-                {
-                    strPrint += strMeetingValue + "\n";
-                    strPrint += "\n----------------------------------------\n";
-                    strPrint += "★ 참가자 : ";
-
-                    // Define request parameters.
-                    String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
-                    String range = "10월 정모추진 (모집중)!C12:C";
-                    SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
-
-                    ValueRange response = request.Execute();
-                    if (response != null)
+                    IList<IList<Object>> values = response.Values;
+                    if (values != null && values.Count > 0)
                     {
-                        IList<IList<Object>> values = response.Values;
-                        if (values != null && values.Count > 0)
+                        // 모임이름 ~ 문의
+                        foreach (var row in values)
                         {
-                            foreach (var row in values)
+                            if (row.Count > 0)
                             {
-                                if (row.Count != 0)
+                                if (row[0].ToString() == "프로그램" && row[1].ToString() != "")
                                 {
-                                    strPrint += row[0] + " , ";
+                                    strPrint += "* " + row[0].ToString() + "\n";
+                                    strPrint += "          - [" + row[1].ToString() + "] " + row[2].ToString() + " / " + row[3].ToString() + " / " + row[5].ToString() + "\n";
+                                }
+                                else if (row[0].ToString() == "" && row[1].ToString() != "")
+                                {
+                                    strPrint += "          - [" + row[1].ToString() + "] " + row[2].ToString() + " / " + row[3].ToString() + " / " + row[5].ToString() + "\n";
+                                }
+                                else if (row[0].ToString() != "" && row[1].ToString() != "")
+                                {
+                                    strPrint += "* " + row[0].ToString() + " : " + row[1].ToString() + "\n";
                                 }
                             }
                         }
 
-                        strPrint += "\n----------------------------------------";
+                        // 공지, 회비
+                        foreach (var row in values)
+                        {
+                            if (row.Count > 0)
+                            {
+                                if (row[6].ToString() == "공지" && row[7].ToString() != "")
+                                {
+                                    strPrint += "* " + row[6].ToString() + "\n";
+                                    strPrint += row[7].ToString() + "\n";
+                                }
+                                else if (row[6].ToString() == "회비" && row[7].ToString() != "")
+                                {
+                                    strPrint += "* " + row[6].ToString() + "\n";
+                                    strPrint += "          - [" + row[7].ToString() + "] " + row[8].ToString() + "\n";
+                                }
+                                else if (row[6].ToString() == "" && row[7].ToString() != "")
+                                {
+                                    strPrint += "          - [" + row[7].ToString() + "] " + row[8].ToString() + "\n";
+                                }
+                                else if (row[6].ToString() != "" && row[7].ToString() != "")
+                                {
+                                    strPrint += "* " + row[6].ToString() + " : " + row[7].ToString() + "\n";
+                                }
+                            }
+                        }
                     }
+                }
+
+                List<string> lstConfirm = new List<string>();
+                List<string> lstUndefine = new List<string>();
+
+                // Define request parameters.
+                range = "CDT 모임!C16:O";
+                request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+
+                response = request.Execute();
+                if (response != null)
+                {
+                    IList<IList<Object>> values = response.Values;
+                    if (values != null && values.Count > 0)
+                    {
+                        foreach (var row in values)
+                        {
+                            if (row.Count != 0)
+                            {
+                                if (row.Count >= 13)
+                                {
+                                    if (row[12].ToString().ToUpper().Contains('O'))
+                                    {
+                                        string strConfirm = row[0].ToString();
+                                        lstConfirm.Add(strConfirm);
+                                    }
+                                    else if (row[12].ToString().ToUpper().Contains('X'))
+                                    {
+                                        continue;
+                                    }
+                                    else
+                                    {
+                                        string strUndefine = row[0].ToString();
+                                        lstUndefine.Add(strUndefine);
+                                    }
+                                }
+                                else
+                                {
+                                    string strUndefine = row[0].ToString();
+                                    lstUndefine.Add(strUndefine);
+                                }
+                            }
+                        }
+                    }
+
+                    strPrint += "----------------------------------------\n";
+                    strPrint += "★ 참가자\n";
+                    strPrint += "- 확정 : ";
+                    bool bFirst = true;
+
+                    if (lstConfirm.Count == 0)
+                    {
+                        strPrint += "없음";
+                    }
+                    else
+                    {
+                        foreach (string confirm in lstConfirm)
+                        {
+                            if (bFirst == true)
+                            {
+                                strPrint += confirm;
+                                bFirst = false;
+                            }
+                            else
+                            {
+                                strPrint += " , " + confirm;
+                            }
+                        }
+                    }
+                    
+                    strPrint += "\n- 미정 : ";
+                    bFirst = true;
+
+                    if (lstUndefine.Count == 0)
+                    {
+                        strPrint += "없음";
+                    }
+                    else
+                    {
+                        foreach (string undefine in lstUndefine)
+                        {
+                            if (bFirst == true)
+                            {
+                                strPrint += undefine;
+                                bFirst = false;
+                            }
+                            else
+                            {
+                                strPrint += " , " + undefine;
+                            }
+                        }
+                    }
+
+                    strPrint += "\n----------------------------------------\n";
+                    strPrint += "- 확정 : " + lstConfirm.Count + "명 / 미정 : " + lstUndefine.Count + "명 / 총 " + (lstConfirm.Count + lstUndefine.Count) + "명\n";
+                    strPrint += "----------------------------------------";
                 }
 
                 if (strPrint != "")
@@ -705,12 +825,12 @@ namespace CDT_Noti_Bot
             else if (strCommend == "/참가")
             {
                 string strNickName = strFirstName + strLastName;
-                int iCellIndex = 12;
+                int iCellIndex = 16;
                 int iTempCount = 0;
 
                 // Define request parameters.
                 String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
-                String range = "10월 정모추진 (모집중)!C" + iCellIndex + ":C";
+                String range = "CDT 모임!C" + iCellIndex + ":C";
                 SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
                 ValueRange response = request.Execute();
@@ -739,7 +859,7 @@ namespace CDT_Noti_Bot
                     }
 
                     //iCellIndex += values.Count;
-                    range = "10월 정모추진 (모집중)!C" + (iCellIndex + iTempCount) + ":C";
+                    range = "CDT 모임!C" + (iCellIndex + iTempCount) + ":C";
                     
                     // Define request parameters.
                     ValueRange valueRange = new ValueRange();
@@ -774,13 +894,13 @@ namespace CDT_Noti_Bot
             else if (strCommend == "/불참")
             {
                 string strNickName = strFirstName + strLastName;
-                int iCellIndex = 12;
+                int iCellIndex = 16;
                 int iTempCount = 0;
                 bool isJoin = false;
 
                 // Define request parameters.
                 String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
-                String range = "10월 정모추진 (모집중)!C" + iCellIndex + ":C";
+                String range = "CDT 모임!C" + iCellIndex + ":C";
                 SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
                 ValueRange response = request.Execute();
@@ -807,7 +927,7 @@ namespace CDT_Noti_Bot
                     if (isJoin == true)
                     {
                         //iCellIndex += values.Count;
-                        range = "10월 정모추진 (모집중)!C" + (iCellIndex + iTempCount) + ":C";
+                        range = "CDT 모임!C" + (iCellIndex + iTempCount) + ":C";
 
                         // Define request parameters.
                         ValueRange valueRange = new ValueRange();
