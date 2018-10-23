@@ -273,10 +273,12 @@ namespace CDT_Noti_Bot
                 strPrint += "/조회 검색어 : 클랜원을 조회합니다.\n";
                 strPrint += "               (검색범위 : 대화명, 배틀태그, 부계정)\n";
                 strPrint += "/영상 : 영상이 있던 날짜를 조회합니다.\n";
-                strPrint += "       - /영상 날짜 : 플레이 영상을 조회합니다. (/영상 181006)\n";
+                strPrint += "/영상 날짜 : 플레이 영상을 조회합니다. (/영상 181006)\n";
                 strPrint += "/검색 검색어 : 포지션, 모스트별로 클랜원을 검색합니다.\n";
                 strPrint += "/모임 : 모임 공지와 참가자를 출력합니다.\n";
                 strPrint += "/참가 : 모임에 참가 신청합니다.\n";
+                strPrint += "/참가 확정 : 모임에 참가 확정합니다.\n";
+                strPrint += "       (이미 참가일 경우 확정만 체크)\n";
                 strPrint += "/불참 : 모임에 참가 신청을 취소합니다.\n";
                 strPrint += "/안내 : 팀 안내 메시지를 출력합니다.\n";
                 strPrint += "/리포트 : 업데이트 내역, 개발 예정 항목을 출력합니다.\n";
@@ -284,29 +286,6 @@ namespace CDT_Noti_Bot
                 strPrint += "----------------------------------\n";
                 strPrint += "CDT 1대 운영자 : 냉각콜라, 휴린, 청포도, 만슬\n";
                 strPrint += "==================================\n";
-                strPrint += "버그 및 문의사항이 있으시면 '휴린'에게 문의해주세요. :)\n";
-                strPrint += "==================================\n";
-
-                await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
-            }
-            else if (strCommend == "/운영자도움말")
-            {
-                strPrint += "==================================\n";
-                strPrint += "[ 아테나 v1.2 ]\n[ Clien Delicious Team Notice Bot ]\n\n";
-                strPrint += "/공지 : 팀 공지사항을 출력합니다.\n";
-                strPrint += "/조회 검색어 : 클랜원을 조회합니다. (검색범위 : 대화명, 배틀태그)\n";
-                strPrint += "/영상 : 영상이 있던 날짜를 조회합니다.\n";
-                strPrint += "       - /영상 날짜 : 플레이 영상을 조회합니다. (/영상 181006)\n";
-                strPrint += "/검색 검색어 : 포지션, 모스트별로 클랜원을 검색합니다.\n";
-                strPrint += "/모임 : 모임 공지와 참가자를 출력합니다.\n";
-                strPrint += "       - /모임등록 내용 : 모임 공지를 등록합니다.\n";
-                strPrint += "       - /모임삭제 : 모임 공지를 삭제합니다.\n";
-                strPrint += "/참가 : 모임에 참가 신청합니다.\n";
-                strPrint += "/불참 : 모임에 참가 신청을 취소합니다.\n";
-                strPrint += "/안내 : 팀 안내 메시지를 출력합니다.\n";
-                strPrint += "/리포트 : 봇 업데이트 내역, 개발 예정인 항목\n";
-                strPrint += "/상태 : 현재 봇 상태를 출력합니다. 대답이 없으면 이상.\n";
-                strPrint += "----------------------------------\n";
                 strPrint += "버그 및 문의사항이 있으시면 '휴린'에게 문의해주세요. :)\n";
                 strPrint += "==================================\n";
 
@@ -837,6 +816,7 @@ namespace CDT_Noti_Bot
                 string strNickName = strFirstName + strLastName;
                 int iCellIndex = 16;
                 int iTempCount = 0;
+                bool isConfirm = false;
 
                 // Define request parameters.
                 String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
@@ -857,38 +837,79 @@ namespace CDT_Noti_Bot
                             }
                             else
                             {
-                                iTempCount++;
-
                                 if (row[0].ToString() == strNickName)
                                 {
-                                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 이미 모임에 참가신청을 했습니다.", ParseMode.Default, false, false, iMessageID);
-                                    return;
+                                    if (strContents == "확정")
+                                    {
+                                        isConfirm = true;
+                                    }
+                                    else
+                                    {
+                                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 이미 모임에 참가신청을 했습니다.", ParseMode.Default, false, false, iMessageID);
+                                    }
+
+                                    break;
                                 }
+
+                                iTempCount++;
                             }
                         }
                     }
 
-                    //iCellIndex += values.Count;
-                    range = "CDT 모임!C" + (iCellIndex + iTempCount) + ":C";
-                    
-                    // Define request parameters.
-                    ValueRange valueRange = new ValueRange();
-                    valueRange.MajorDimension = "COLUMNS"; //"ROWS";//COLUMNS 
-
-                    var oblist = new List<object>() { strNickName };
-                    valueRange.Values = new List<IList<object>> { oblist };
-
-                    SpreadsheetsResource.ValuesResource.UpdateRequest updateRequest = service.Spreadsheets.Values.Update(valueRange, spreadsheetId, range);
-
-                    updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.RAW;
-                    UpdateValuesResponse updateResponse = updateRequest.Execute();
-                    if (updateResponse == null)
+                    if (isConfirm == false)
                     {
-                        strPrint += "[ERROR] 시트를 업데이트 할 수 없습니다.";
+                        //iCellIndex += values.Count;
+                        range = "CDT 모임!C" + (iCellIndex + iTempCount) + ":C";
+
+                        // Define request parameters.
+                        ValueRange valueRange = new ValueRange();
+                        valueRange.MajorDimension = "COLUMNS"; //"ROWS";//COLUMNS 
+
+                        var oblist = new List<object>() { strNickName };
+                        valueRange.Values = new List<IList<object>> { oblist };
+
+                        SpreadsheetsResource.ValuesResource.UpdateRequest updateRequest = service.Spreadsheets.Values.Update(valueRange, spreadsheetId, range);
+
+                        updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.RAW;
+                        UpdateValuesResponse updateResponse = updateRequest.Execute();
+
+                        if (updateResponse == null)
+                        {
+                            strPrint += "[ERROR] 시트를 업데이트 할 수 없습니다.";
+                        }
+                        else
+                        {
+                            if (strContents != "확정")
+                            {
+                                strPrint += "[SUCCESS] 참가 신청을 완료 했습니다.";
+                            }
+                        }
                     }
-                    else
+
+                    if (strContents == "확정")
                     {
-                        strPrint += "[SUCCESS] 참가 신청을 완료 했습니다.";
+                        range = "CDT 모임!O" + (iCellIndex + iTempCount) + ":O";
+
+                        // Define request parameters.
+                        ValueRange valueRange = new ValueRange();
+                        valueRange.MajorDimension = "COLUMNS"; //"ROWS";//COLUMNS 
+
+                        var oblist = new List<object>() { "O" };
+                        valueRange.Values = new List<IList<object>> { oblist };
+
+                        SpreadsheetsResource.ValuesResource.UpdateRequest updateRequest = service.Spreadsheets.Values.Update(valueRange, spreadsheetId, range);
+
+                        updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.RAW;
+                        UpdateValuesResponse updateResponse = updateRequest.Execute();
+
+                        if (updateResponse == null)
+                        {
+                            strPrint += "\n[ERROR] 참가 확정을 할 수 없습니다.";
+                        }
+                        else
+                        {
+                            strPrint += "\n[SUCCESS] 참가 확정을 완료 했습니다.";
+                        }
                     }
                 }
 
@@ -937,13 +958,13 @@ namespace CDT_Noti_Bot
                     if (isJoin == true)
                     {
                         //iCellIndex += values.Count;
-                        range = "CDT 모임!C" + (iCellIndex + iTempCount) + ":C";
+                        range = "CDT 모임!C" + (iCellIndex + iTempCount)/* + ":O" + (iCellIndex + iTempCount)*/;
 
                         // Define request parameters.
                         ValueRange valueRange = new ValueRange();
-                        valueRange.MajorDimension = "COLUMNS"; //"ROWS";//COLUMNS 
+                        valueRange.MajorDimension = "ROWS"; //"ROWS";//COLUMNS 
 
-                        var oblist = new List<object>() { "" };
+                        var oblist = new List<object>() { "", "", "", "", "", "", "", "", "", "", "", "", "", "" };
                         valueRange.Values = new List<IList<object>> { oblist };
 
                         SpreadsheetsResource.ValuesResource.UpdateRequest updateRequest = service.Spreadsheets.Values.Update(valueRange, spreadsheetId, range);
