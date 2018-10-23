@@ -44,7 +44,6 @@ namespace CDT_Noti_Bot
         SheetsService service;
         CNotice Notice = new CNotice();
         CEasterEgg EasterEgg = new CEasterEgg();
-        bool bRun = false;
 
         // Bot Token
 #if DEBUG
@@ -724,7 +723,7 @@ namespace CDT_Noti_Bot
                         {
                             if (row.Count == 0)
                             {
-                                iCellIndex += iTempCount;
+                                break;
                             }
                             else
                             {
@@ -740,7 +739,7 @@ namespace CDT_Noti_Bot
                     }
 
                     //iCellIndex += values.Count;
-                    range = "10월 정모추진 (모집중)!C" + iCellIndex + ":C";
+                    range = "10월 정모추진 (모집중)!C" + (iCellIndex + iTempCount) + ":C";
                     
                     // Define request parameters.
                     ValueRange valueRange = new ValueRange();
@@ -796,8 +795,8 @@ namespace CDT_Noti_Bot
                             {
                                 if (row[0].ToString() == strNickName)
                                 {
-                                    iCellIndex += iTempCount;
                                     isJoin = true;
+                                    break;
                                 }
                             }
 
@@ -808,7 +807,7 @@ namespace CDT_Noti_Bot
                     if (isJoin == true)
                     {
                         //iCellIndex += values.Count;
-                        range = "10월 정모추진 (모집중)!C" + iCellIndex + ":C";
+                        range = "10월 정모추진 (모집중)!C" + (iCellIndex + iTempCount) + ":C";
 
                         // Define request parameters.
                         ValueRange valueRange = new ValueRange();
