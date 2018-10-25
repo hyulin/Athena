@@ -176,6 +176,7 @@ namespace CDT_Noti_Bot
             string strLastName = varMessage.From.LastName;
             int iMessageID = varMessage.MessageId;
 
+            // 이스터에그 (아테나 대사 출력)
             if (varMessage.ReplyToMessage != null && varMessage.ReplyToMessage.From.FirstName.Contains("아테나") == true)
             {
                 await Bot.SendTextMessageAsync(varMessage.Chat.Id, EasterEgg.GetEasterEgg(), ParseMode.Default, false, false, iMessageID);
@@ -616,7 +617,7 @@ namespace CDT_Noti_Bot
                                         strPrint += row[3] + " (" + row[4].ToString() + "/" + row[5].ToString() + "/" + row[6].ToString() + ")\n";
                                         bResult = true;
                                     }
-                                }                                
+                                }
                             }
                         }
                     }
@@ -773,7 +774,7 @@ namespace CDT_Noti_Bot
                             }
                         }
                     }
-                    
+
                     strPrint += "\n- 미정 : ";
                     bFirst = true;
 
@@ -1024,6 +1025,91 @@ namespace CDT_Noti_Bot
                 }
 
                 await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
+            }
+            //========================================================================================
+            // 투표 관련 명령어
+            //========================================================================================
+            else if (strCommend == "/투표")
+            {
+                // Define request parameters.
+                String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                String range = "CDT 투표!B4:J";
+                SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+
+                ValueRange response = request.Execute();
+                if (response != null)
+                {
+                    IList<IList<Object>> values = response.Values;
+                    if (values != null && values.Count > 0)
+                    {
+                        CVoteDirector voteDirector = new CVoteDirector();
+
+                        // 익명 여부
+                        var value = values[0];
+                        string anonymous = value[4].ToString();
+                        voteDirector.setAnonymous(anonymous != "");
+
+                        // 투표 내용
+                        value = values[1];
+                        string voteContents = value[0].ToString();
+                        voteDirector.setVoteContents(voteContents);
+
+                        if (voteContents != "")
+                        {
+                            // 투표 항목
+                            value = values[11];
+                            int index = 0;
+                            foreach (var row in value)
+                            {
+                                string item = row.ToString();
+                                if (item != "")
+                                {
+                                    CVoteItem voteItem = new CVoteItem();
+                                    voteItem.AddItem(item);
+
+                                    voteDirector.AddItem(voteItem);
+                                }
+                            }
+
+                            // 투표자
+                            index = 14;
+                            for (; index < values.Count; index++)
+                            {
+                                value = values[index];
+
+                                for (int i = 0; i < value.Count - 1; i++)
+                                {
+                                    voteDirector.AddVoter(i, value[i + 1].ToString());
+                                }
+                            }
+
+                            // 순위
+                            index = 1;
+                            for (int i = 6; index <= 8; index++)
+                            {
+                                value = values[index];
+                                voteDirector.AddRanking(value[i].ToString());
+                            }
+
+
+                            strPrint += voteDirector.getVoteContents() + "\n\n";
+                            for (int i = 0; i < voteDirector.GetItemCount(); i++)
+                            {
+                                strPrint += i + 1 + ". " + voteDirector.GetItem(i).getItem() + "\n";
+                            }
+                            strPrint += "\n \"/투표 숫자\"로 투표해주세요.";
+                        }
+                    }
+                }
+
+                if (strPrint != "")
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
+                }
+                else
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 현재 투표가 없습니다.", ParseMode.Default, false, false, iMessageID);
+                }
             }
             //========================================================================================
             // 안내 관련 명령어

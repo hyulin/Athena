@@ -94,6 +94,8 @@
   <ItemGroup>
     <Compile Include="CEasterEgg.cs" />
     <Compile Include="CSystemInfo.cs" />
+    <Compile Include="CVoteDirector.cs" />
+    <Compile Include="CVoteItem.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
