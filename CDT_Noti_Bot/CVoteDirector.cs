@@ -9,7 +9,7 @@ namespace CDT_Noti_Bot
     class CVoteDirector
     {
         List<CVoteItem> lstItem_ = new List<CVoteItem>();
-        List<string> ranking_ = new List<string>();
+        List<CVoteRanking> ranking_ = new List<CVoteRanking>();
         string voteContents_ = "";
         bool isAnonymous_ = false;
 
@@ -58,11 +58,11 @@ namespace CDT_Noti_Bot
         }
 
         // 순위
-        public void AddRanking(string item)
+        public void AddRanking(CVoteRanking voteRanking)
         {
-            ranking_.Add(item);
+            ranking_.Add(voteRanking);
         }
-        public List<string> getRanking()
+        public List<CVoteRanking> getRanking()
         {
             return ranking_;
         }

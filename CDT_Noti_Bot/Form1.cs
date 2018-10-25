@@ -1059,6 +1059,7 @@ namespace CDT_Noti_Bot
                             // 투표 항목
                             value = values[11];
                             int index = 0;
+                            int itemCount = 0;
                             foreach (var row in value)
                             {
                                 string item = row.ToString();
@@ -1068,12 +1069,13 @@ namespace CDT_Noti_Bot
                                     voteItem.AddItem(item);
 
                                     voteDirector.AddItem(voteItem);
+                                    itemCount++;
                                 }
                             }
 
                             // 투표자
                             index = 14;
-                            for (; index < values.Count; index++)
+                            for (; index < itemCount; index++)
                             {
                                 value = values[index];
 
@@ -1088,27 +1090,47 @@ namespace CDT_Noti_Bot
                             for (int i = 6; index <= 8; index++)
                             {
                                 value = values[index];
-                                voteDirector.AddRanking(value[i].ToString());
+
+                                if (value[i].ToString() != "")
+                                {
+                                    CVoteRanking ranking = new CVoteRanking();
+
+                                    ranking.setRanking(value[i].ToString(), Convert.ToInt32(value[i + 1].ToString()), value[i + 2].ToString());
+                                    voteDirector.AddRanking(ranking);
+                                }
                             }
 
-
-                            strPrint += voteDirector.getVoteContents() + "\n\n";
-                            for (int i = 0; i < voteDirector.GetItemCount(); i++)
+                            if (strContents == "")
                             {
-                                strPrint += i + 1 + ". " + voteDirector.GetItem(i).getItem() + "\n";
+                                strPrint += voteDirector.getVoteContents() + "\n";
+                                strPrint += "=============================\n";
+                                for (int i = 0; i < voteDirector.GetItemCount(); i++)
+                                {
+                                    strPrint += i + 1 + ". " + voteDirector.GetItem(i).getItem() + "\n";
+                                }
+                                strPrint += "\n \"/투표 숫자\"로 투표해주세요.";
                             }
-                            strPrint += "\n \"/투표 숫자\"로 투표해주세요.";
+                            else if (strContents == "결과")
+                            {
+                                strPrint += voteDirector.getVoteContents() + "\n";
+                                strPrint += "=============================\n";
+                                for (int i = 0; i < voteDirector.getRanking().Count; i++)
+                                {
+                                    var ranking = voteDirector.getRanking().ElementAt(i);
+                                    strPrint += i + 1 + "위. " + ranking.getVoteItem() + " - " + ranking.getVoteCount() + "표 - " + ranking.getVoteRate() + "\n";
+                                }
+                            }
+                        }
+
+                        if (strPrint != "")
+                        {
+                            await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
+                        }
+                        else
+                        {
+                            await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 현재 투표가 없습니다.", ParseMode.Default, false, false, iMessageID);
                         }
                     }
-                }
-
-                if (strPrint != "")
-                {
-                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
-                }
-                else
-                {
-                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 현재 투표가 없습니다.", ParseMode.Default, false, false, iMessageID);
                 }
             }
             //========================================================================================
