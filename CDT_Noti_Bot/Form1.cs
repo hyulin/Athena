@@ -281,6 +281,9 @@ namespace CDT_Noti_Bot
                 strPrint += "/참가 확정 : 모임에 참가 확정합니다.\n";
                 strPrint += "       (이미 참가일 경우 확정만 체크)\n";
                 strPrint += "/불참 : 모임에 참가 신청을 취소합니다.\n";
+                strPrint += "/투표 : 현재 진행 중인 투표를 출력합니다.\n";
+                strPrint += "/투표 숫자 : 현재 진행 중인 투표에 투표합니다.\n";
+                strPrint += "/투표 결과 : 현재 진행 중인 투표의 결과를 출력합니다.\n";
                 strPrint += "/안내 : 팀 안내 메시지를 출력합니다.\n";
                 strPrint += "/리포트 : 업데이트 내역, 개발 예정 항목을 출력합니다.\n";
                 strPrint += "/상태 : 현재 봇 상태를 출력합니다. 대답이 없으면 이상.\n";
@@ -1043,14 +1046,9 @@ namespace CDT_Noti_Bot
                     if (values != null && values.Count > 0)
                     {
                         CVoteDirector voteDirector = new CVoteDirector();
-
-                        // 익명 여부
-                        var value = values[0];
-                        string anonymous = value[4].ToString();
-                        voteDirector.setAnonymous(anonymous != "");
-
+                        
                         // 투표 내용
-                        value = values[1];
+                        var value = values[1];
                         string voteContents = value[0].ToString();
                         voteDirector.setVoteContents(voteContents);
 
@@ -1075,7 +1073,8 @@ namespace CDT_Noti_Bot
 
                             // 투표자
                             index = 14;
-                            for (; index < itemCount; index++)
+                            int roofCount = index + itemCount;
+                            for (; index < roofCount; index++)
                             {
                                 value = values[index];
 
@@ -1118,6 +1117,93 @@ namespace CDT_Noti_Bot
                                 {
                                     var ranking = voteDirector.getRanking().ElementAt(i);
                                     strPrint += i + 1 + "위. " + ranking.getVoteItem() + " - " + ranking.getVoteCount() + "표 - " + ranking.getVoteRate() + "\n";
+                                }
+                            }
+                            else
+                            {
+                                // 투표 했는지 체크
+                                for (int i = 0; i < voteDirector.GetItemCount(); i++)
+                                {
+                                    List<string> voterCheckList = voteDirector.getVoter(i);
+
+                                    foreach (var item in voterCheckList)
+                                    {
+                                        if (item == (strFirstName + strLastName))
+                                        {
+                                            await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 이미 투표를 하셨습니다.", ParseMode.Default, false, false, iMessageID);
+                                            return;
+                                        }
+                                    }
+                                }
+
+                                string cellChar = "";
+
+                                switch (strContents)
+                                {
+                                    case "1":
+                                        cellChar = "C";
+                                        break;
+                                    case "2":
+                                        cellChar = "D";
+                                        break;
+                                    case "3":
+                                        cellChar = "E";
+                                        break;
+                                    case "4":
+                                        cellChar = "F";
+                                        break;
+                                    case "5":
+                                        cellChar = "G";
+                                        break;
+                                    case "6":
+                                        cellChar = "H";
+                                        break;
+                                    case "7":
+                                        cellChar = "I";
+                                        break;
+                                    case "8":
+                                        cellChar = "J";
+                                        break;
+                                    default:
+                                        {
+                                            await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 투표 항목을 잘못 선택하셨습니다.", ParseMode.Default, false, false, iMessageID);
+                                            return;
+                                        }
+                                }
+
+                                
+                                int voteIndex = Convert.ToInt32(strContents);
+                                if (voteIndex <= 0)
+                                {
+                                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 투표 항목을 잘못 선택하셨습니다.", ParseMode.Default, false, false, iMessageID);
+                                    return;
+                                }
+
+                                List<string> voterList = voteDirector.getVoter(voteIndex - 1);
+                                int voterCount = voterList.Count;
+                                string updateRange = "CDT 투표!" + cellChar + (18 + voterCount) + ":" + cellChar;
+
+                                // Define request parameters.
+                                SpreadsheetsResource.ValuesResource.GetRequest updateRequest = service.Spreadsheets.Values.Get(spreadsheetId, updateRange);
+                                ValueRange valueRange = new ValueRange();
+                                valueRange.MajorDimension = "COLUMNS"; //"ROWS";//COLUMNS 
+
+                                var oblist = new List<object>() { strFirstName + strLastName };
+                                valueRange.Values = new List<IList<object>> { oblist };
+
+                                SpreadsheetsResource.ValuesResource.UpdateRequest releaseRequest = service.Spreadsheets.Values.Update(valueRange, spreadsheetId, updateRange);
+
+                                releaseRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.RAW;
+                                UpdateValuesResponse releaseResponse = releaseRequest.Execute();
+                                if (releaseResponse == null)
+                                {
+                                    strPrint = "[ERROR] 시트를 업데이트 할 수 없습니다.";
+                                    return;
+                                }
+                                else
+                                {
+                                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[SUCCESS] 투표를 완료했습니다.", ParseMode.Default, false, false, iMessageID);
+                                    return;
                                 }
                             }
                         }
