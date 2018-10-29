@@ -816,7 +816,10 @@ namespace CDT_Noti_Bot
                 string strNickName = strFirstName + strLastName;
                 int iCellIndex = 16;
                 int iTempCount = 0;
+                int iRealCount = 0;
+                int iBlankCell = 0;
                 bool isConfirm = false;
+                bool isJoin = false;
 
                 // Define request parameters.
                 String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
@@ -833,22 +836,26 @@ namespace CDT_Noti_Bot
                         {
                             if (row.Count == 0)
                             {
-                                break;
+                                if (iBlankCell == 0)
+                                {
+                                    iBlankCell = iTempCount;
+                                }
+
+                                iTempCount++;
+
+                                continue;
                             }
                             else
                             {
                                 if (row[0].ToString() == strNickName)
                                 {
+                                    iRealCount = iTempCount;
+                                    isJoin = true;
+
                                     if (strContents == "확정")
                                     {
                                         isConfirm = true;
                                     }
-                                    else
-                                    {
-                                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 이미 모임에 참가신청을 했습니다.", ParseMode.Default, false, false, iMessageID);
-                                    }
-
-                                    break;
                                 }
 
                                 iTempCount++;
@@ -856,10 +863,22 @@ namespace CDT_Noti_Bot
                         }
                     }
 
+                    if (isJoin == true && isConfirm == false)
+                    {
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 이미 모임에 참가신청을 했습니다.", ParseMode.Default, false, false, iMessageID);
+                        return;
+                    }
+
                     if (isConfirm == false)
                     {
-                        //iCellIndex += values.Count;
-                        range = "CDT 모임!C" + (iCellIndex + iTempCount) + ":C";
+                        if (iBlankCell == 0)
+                        {
+                            range = "CDT 모임!C" + (iCellIndex + iRealCount) + ":C";
+                        }
+                        else
+                        {
+                            range = "CDT 모임!C" + (iCellIndex + iBlankCell) + ":C";
+                        }
 
                         // Define request parameters.
                         ValueRange valueRange = new ValueRange();
@@ -888,7 +907,14 @@ namespace CDT_Noti_Bot
 
                     if (strContents == "확정")
                     {
-                        range = "CDT 모임!O" + (iCellIndex + iTempCount) + ":O";
+                        if (iBlankCell == 0)
+                        {
+                            range = "CDT 모임!O" + (iCellIndex + iRealCount) + ":O";
+                        }
+                        else
+                        {
+                            range = "CDT 모임!O" + (iCellIndex + iBlankCell) + ":O";
+                        }
 
                         // Define request parameters.
                         ValueRange valueRange = new ValueRange();
