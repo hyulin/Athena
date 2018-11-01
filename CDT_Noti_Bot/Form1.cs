@@ -175,6 +175,7 @@ namespace CDT_Noti_Bot
             string strFirstName = varMessage.From.FirstName;
             string strLastName = varMessage.From.LastName;
             int iMessageID = varMessage.MessageId;
+            int senderKey = varMessage.From.Id;
 
             // 이스터에그 (아테나 대사 출력)
             if (varMessage.ReplyToMessage != null && varMessage.ReplyToMessage.From.FirstName.Contains("아테나") == true)
@@ -220,7 +221,7 @@ namespace CDT_Noti_Bot
                     strInfo += "\n";
                     strInfo += "저희 CDT에서 즐거운 오버워치 생활,\n";
                     strInfo += "그리고 더 나아가 즐거운 라이프를\n";
-                    strInfo += "즐기셨으면 합니다.\n\n";
+                    strInfo += "즐기셨으면 좋겠습니다.\n\n";
                     strInfo += "잘 부탁드립니다 :)\n";
 
                     await Bot.SendTextMessageAsync(varMessage.Chat.Id, strInfo);
@@ -1060,6 +1061,8 @@ namespace CDT_Noti_Bot
             //========================================================================================
             else if (strCommend == "/투표")
             {
+                bool isAnonymous = false;
+
                 // Define request parameters.
                 String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
                 String range = "CDT 투표!B4:J";
@@ -1072,9 +1075,16 @@ namespace CDT_Noti_Bot
                     if (values != null && values.Count > 0)
                     {
                         CVoteDirector voteDirector = new CVoteDirector();
-                        
+
+                        // 익명 여부
+                        var value = values[0];
+                        if (value[4].ToString() != "")
+                        {
+                            isAnonymous = true;
+                        }
+
                         // 투표 내용
-                        var value = values[1];
+                        value = values[1];
                         string voteContents = value[0].ToString();
                         voteDirector.setVoteContents(voteContents);
 
@@ -1106,9 +1116,12 @@ namespace CDT_Noti_Bot
 
                                 for (int i = 0; i < value.Count - 1; i++)
                                 {
-                                    voteDirector.AddVoter(i, value[i + 1].ToString());
+                                    if (value[i + 1].ToString() != "")
+                                    {
+                                        voteDirector.AddVoter(i, value[i + 1].ToString());
+                                    }
                                 }
-                            }
+                            }                         
 
                             // 순위
                             index = 1;
@@ -1148,13 +1161,29 @@ namespace CDT_Noti_Bot
                             else
                             {
                                 // 투표 했는지 체크
-                                for (int i = 0; i < voteDirector.GetItemCount(); i++)
+                                if (isAnonymous == false)
                                 {
-                                    List<string> voterCheckList = voteDirector.getVoter(i);
-
-                                    foreach (var item in voterCheckList)
+                                    // 익명 투표가 아닐 경우에만 시트로 체크
+                                    for (int i = 0; i < voteDirector.GetItemCount(); i++)
                                     {
-                                        if (item == (strFirstName + strLastName))
+                                        List<string> voterCheckList = voteDirector.getVoter(i);
+
+                                        foreach (var item in voterCheckList)
+                                        {
+                                            if (item == (strFirstName + strLastName))
+                                            {
+                                                await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 이미 투표를 하셨습니다.", ParseMode.Default, false, false, iMessageID);
+                                                return;
+                                            }
+                                        }
+                                    }
+                                }
+                                else // 익명 투표일 경우 파일에서 유저의 키로 중복 체크
+                                {
+                                    string[] voters = System.IO.File.ReadAllLines(@"_Voter.txt");
+                                    foreach (string voter in voters)
+                                    {
+                                        if (voter.ToString() == senderKey.ToString())
                                         {
                                             await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 이미 투표를 하셨습니다.", ParseMode.Default, false, false, iMessageID);
                                             return;
@@ -1196,7 +1225,6 @@ namespace CDT_Noti_Bot
                                             return;
                                         }
                                 }
-
                                 
                                 int voteIndex = Convert.ToInt32(strContents);
                                 if (voteIndex <= 0)
@@ -1214,7 +1242,19 @@ namespace CDT_Noti_Bot
                                 ValueRange valueRange = new ValueRange();
                                 valueRange.MajorDimension = "COLUMNS"; //"ROWS";//COLUMNS 
 
-                                var oblist = new List<object>() { strFirstName + strLastName };
+                                string updateString = "";
+                                if (isAnonymous == false)
+                                {
+                                    // 실명투표일 경우 대화명 입력
+                                    updateString = strFirstName + strLastName;
+                                }
+                                else
+                                {
+                                    // 익명투표일 경우 O표시만
+                                    updateString = "O";
+                                }
+
+                                var oblist = new List<object>() { updateString };
                                 valueRange.Values = new List<IList<object>> { oblist };
 
                                 SpreadsheetsResource.ValuesResource.UpdateRequest releaseRequest = service.Spreadsheets.Values.Update(valueRange, spreadsheetId, updateRange);
@@ -1224,13 +1264,22 @@ namespace CDT_Noti_Bot
                                 if (releaseResponse == null)
                                 {
                                     strPrint = "[ERROR] 시트를 업데이트 할 수 없습니다.";
-                                    return;
                                 }
                                 else
                                 {
                                     await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[SUCCESS] 투표를 완료했습니다.", ParseMode.Default, false, false, iMessageID);
-                                    return;
                                 }
+
+                                if (isAnonymous == false)
+                                {
+                                    System.IO.File.AppendAllText(@"_Voter.txt", strFirstName + strLastName + "\n", Encoding.Default);
+                                }
+                                else
+                                {
+                                    System.IO.File.AppendAllText(@"_Voter.txt", senderKey.ToString() + "\n", Encoding.Default);
+                                }
+
+                                return;
                             }
                         }
 
