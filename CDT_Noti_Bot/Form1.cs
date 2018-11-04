@@ -1320,6 +1320,10 @@ namespace CDT_Noti_Bot
                 await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream02, "");
                 await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream03, "");
                 await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream04, "");
+
+                strPrint = "위 가이드는 본방에서 /안내 입력 시 다시 보실 수 있습니다.";
+
+                await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
             }
             else if (strCommend == "/리포트")
             {
