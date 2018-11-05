@@ -1121,7 +1121,7 @@ namespace CDT_Noti_Bot
                                         voteDirector.AddVoter(i, value[i + 1].ToString());
                                     }
                                 }
-                            }                         
+                            }
 
                             // 순위
                             index = 1;
@@ -1225,7 +1225,7 @@ namespace CDT_Noti_Bot
                                             return;
                                         }
                                 }
-                                
+
                                 int voteIndex = Convert.ToInt32(strContents);
                                 if (voteIndex <= 0)
                                 {
@@ -1291,6 +1291,171 @@ namespace CDT_Noti_Bot
                         {
                             await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 현재 투표가 없습니다.", ParseMode.Default, false, false, iMessageID);
                         }
+                    }
+                }
+            }
+            //========================================================================================
+            // 명예의 전당 관련 명령어
+            //========================================================================================
+            else if (strCommend == "/기록")
+            {
+                if (strContents == "")
+                {
+                    // 내부 대회
+                    String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                    String range = "CDT 명예의 전당!B7:F16";
+                    SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+
+                    ValueRange response = request.Execute();
+                    if (response != null)
+                    {
+                        IList<IList<Object>> values = response.Values;
+                        if (values != null && values.Count > 0)
+                        {
+                            int index = 1;
+                            strPrint += "★ CDT 오버워치 리그 우승팀 ★\n==============================\n";
+
+                            foreach (var row in values)
+                            {
+                                if (row.Count <= 0)
+                                {
+                                    break;
+                                }
+
+                                strPrint += "[ 1-" + index++ + " ] " + row[0].ToString() + " <" + row[1].ToString() + ">\n";
+                            }
+                        }
+                    }
+
+                    // 외부 대회
+                    range = "CDT 명예의 전당!B21:F30";
+                    request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+
+                    response = request.Execute();
+                    if (response != null)
+                    {
+                        IList<IList<Object>> values = response.Values;
+                        if (values != null && values.Count > 0)
+                        {
+                            int index = 1;
+                            strPrint += "\n★ 외부 대회 출전 ★\n==============================\n";
+
+                            foreach (var row in values)
+                            {
+                                if (row.Count <= 0)
+                                {
+                                    break;
+                                }
+
+                                strPrint += "[ 2-" + index++ + " ] " + row[0].ToString() + " <" + row[1].ToString() + ">\n";
+                            }
+                        }
+                    }
+
+                    if (strPrint != "")
+                    {
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
+                    }
+                    else
+                    {
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 명예의 전당이 비어있습니다.", ParseMode.Default, false, false, iMessageID);
+                    }
+                }
+                else
+                {
+                    string[] category = strContents.ToString().Split('-');
+                    if (category.Count() <= 0)
+                    {
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 항목을 잘못 입력했습니다.", ParseMode.Default, false, false, iMessageID);
+                        return;
+                    }
+
+                    // 내부 or 외부
+                    string upper = category[0].ToUpper();
+                    if (upper.Length > 1)
+                    {
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 항목을 잘못 입력했습니다.", ParseMode.Default, false, false, iMessageID);
+                        return;
+                    }
+
+                    // 내부 대회
+                    if (upper == "1")
+                    {
+                        // 항목
+                        string strItem = category[1].ToString();
+                        int item = Convert.ToInt32(strItem);
+                        if (item < 1 || item > 999)
+                        {
+                            await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 항목을 잘못 입력했습니다.", ParseMode.Default, false, false, iMessageID);
+                            return;
+                        }
+
+                        item--;
+
+                        String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                        String range = "CDT 명예의 전당!B" + (7 + item) + ":F" + (7 + item);
+                        SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+
+                        ValueRange response = request.Execute();
+                        if (response != null)
+                        {
+                            IList<IList<Object>> values = response.Values;
+                            if (values != null && values.Count > 0)
+                            {
+                                strPrint += "★ CDT 오버워치 리그 우승팀 ★\n==============================\n";
+
+                                var row = values[0];
+                                string member = row[4].ToString().Replace("/", ",");
+
+                                strPrint += "▷ " + row[0].ToString() + " 우승팀 [ " + row[2].ToString() + " ]\n";
+                                strPrint += "* 팀장 : " + row[3].ToString() + "\n";
+                                strPrint += "* 팀원 : " + member;
+                            }
+                        }
+                    }
+                    // 외부 대회
+                    else if (upper == "2")
+                    {
+                        // 항목
+                        string strItem = category[1].ToString();
+                        int item = Convert.ToInt32(strItem);
+                        if (item < 1 || item > 999)
+                        {
+                            await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 항목을 잘못 입력했습니다.", ParseMode.Default, false, false, iMessageID);
+                            return;
+                        }
+
+                        item--;
+
+                        String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                        String range = "CDT 명예의 전당!B" + (21 + item) + ":F" + (21 + item);
+                        SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+
+                        ValueRange response = request.Execute();
+                        if (response != null)
+                        {
+                            IList<IList<Object>> values = response.Values;
+                            if (values != null && values.Count > 0)
+                            {
+                                strPrint += "★ 외부 대회 출전 ★\n==============================\n";
+
+                                var row = values[0];
+                                string member = row[4].ToString().Replace("/", ",");
+
+                                strPrint += "▷ " + row[0].ToString() + " [ " + row[2].ToString() + " ]\n";
+                                strPrint += "* 팀장 : " + row[3].ToString() + "\n";
+                                strPrint += "* 팀원 : " + member;
+                            }
+                        }
+                    }
+
+                    if (strPrint != "")
+                    {
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
+                    }
+                    else
+                    {
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 명예의 전당이 비어있습니다.", ParseMode.Default, false, false, iMessageID);
                     }
                 }
             }
