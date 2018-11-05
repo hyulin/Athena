@@ -139,9 +139,15 @@ namespace CDT_Noti_Bot
                     }
 
 #if DEBUG
-                    Bot.SendTextMessageAsync(-1001312491933, strPrint);  // 운영진방
+                    const string notice = @"Function/Notice.jpg";
+                    var fileName = notice.Split(Path.DirectorySeparatorChar).Last();
+                    var fileStream = new FileStream(notice, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    Bot.SendPhotoAsync(1001312491933, fileStream, strPrint, ParseMode.Default);
 #else
-                    Bot.SendTextMessageAsync(-1001202203239, strPrint);  // 클랜방
+                    const string notice = @"Function/Notice.jpg";
+                    var fileName = notice.Split(Path.DirectorySeparatorChar).Last();
+                    var fileStream = new FileStream(notice, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    Bot.SendPhotoAsync(1001202203239, fileStream, strPrint, ParseMode.Default);
 #endif
                 }
             }
@@ -223,8 +229,11 @@ namespace CDT_Noti_Bot
                     strInfo += "그리고 더 나아가 즐거운 라이프를\n";
                     strInfo += "즐기셨으면 좋겠습니다.\n\n";
                     strInfo += "잘 부탁드립니다 :)\n";
-
-                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, strInfo);
+                    
+                    const string record = @"Function/Logo.jpg";
+                    var fileName = record.Split(Path.DirectorySeparatorChar).Last();
+                    var fileStream = new FileStream(record, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream, strInfo);
 
                     return;
                 }
@@ -233,14 +242,6 @@ namespace CDT_Noti_Bot
                     return;
                 }
             }
-
-            //if ( (varMessage.Chat.Id == -1001312491933) || (varMessage.Chat.Id == -1001202203239) )
-            //{
-            //    if (varMessage.Text.Contains("#공지사항"))
-            //    {
-            //        await Bot.PinChatMessageAsync(varMessage.Chat.Id, varMessage.MessageId);
-            //    }
-            //}
 
             string strMassage = varMessage.Text;
             string strUserName = varMessage.Chat.FirstName + varMessage.Chat.LastName;
@@ -270,7 +271,7 @@ namespace CDT_Noti_Bot
             if (strCommend == "/도움말" || strCommend == "/help" || strCommend == "/help@CDT_Noti_Bot")
             {
                 strPrint += "==================================\n";
-                strPrint += "[ 아테나 v1.2 ]\n[ Clien Delicious Team Notice Bot ]\n\n";
+                strPrint += "[ 아테나 v1.3 ]\n[ Clien Delicious Team Notice Bot ]\n\n";
                 strPrint += "/공지 : 팀 공지사항을 출력합니다.\n";
                 strPrint += "/조회 검색어 : 클랜원을 조회합니다.\n";
                 strPrint += "               (검색범위 : 대화명, 배틀태그, 부계정)\n";
@@ -327,7 +328,10 @@ namespace CDT_Noti_Bot
 
                 if (strPrint != "")
                 {
-                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
+                    const string notice = @"Function/Logo.jpg";
+                    var fileName = notice.Split(Path.DirectorySeparatorChar).Last();
+                    var fileStream = new FileStream(notice, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream, strPrint, ParseMode.Default, false, iMessageID);
                 }
                 else
                 {
@@ -567,7 +571,10 @@ namespace CDT_Noti_Bot
 
                 if (strPrint != "")
                 {
-                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
+                    const string video = @"Function/Video.jpg";
+                    var fileName = video.Split(Path.DirectorySeparatorChar).Last();
+                    var fileStream = new FileStream(video, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream, strPrint, ParseMode.Default, false, iMessageID);
                 }
                 else
                 {
@@ -811,7 +818,10 @@ namespace CDT_Noti_Bot
 
                 if (strPrint != "")
                 {
-                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
+                    const string meeting = @"Function/Meeting.jpg";
+                    var fileName = meeting.Split(Path.DirectorySeparatorChar).Last();
+                    var fileStream = new FileStream(meeting, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream, strPrint, ParseMode.Default, false, iMessageID);
                 }
                 else
                 {
@@ -1027,36 +1037,6 @@ namespace CDT_Noti_Bot
                 {
                     await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 시트를 업데이트 할 수 없습니다.", ParseMode.Default, false, false, iMessageID);
                 }
-            }
-            else if (strCommend == "/모임등록")
-            {
-                if (strContents == "")
-                {
-                    strPrint += "[ERROR] 모임 내용이 없습니다.";
-                }
-                else
-                {
-                    System.IO.File.WriteAllText(@"_Meeting.txt", strContents, Encoding.Unicode);
-                    strPrint += "[SUCCESS] 모임 등록완료.";
-                }
-
-                await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
-            }
-            else if (strCommend == "/모임삭제")
-            {
-                string strMeetingValue = System.IO.File.ReadAllText(@"_Meeting.txt");
-
-                if (strMeetingValue == "")
-                {
-                    strPrint += "[ERROR] 현재 모임이 등록되지 않았습니다.";
-                }
-                else
-                {
-                    System.IO.File.WriteAllText(@"_Meeting.txt", "", Encoding.Unicode);
-                    strPrint += "[SUCCESS] 모임 삭제완료.";
-                }
-
-                await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
             }
             //========================================================================================
             // 투표 관련 명령어
@@ -1287,7 +1267,10 @@ namespace CDT_Noti_Bot
 
                         if (strPrint != "")
                         {
-                            await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
+                            const string vote = @"Function/Vote.jpg";
+                            var fileName = vote.Split(Path.DirectorySeparatorChar).Last();
+                            var fileStream = new FileStream(vote, FileMode.Open, FileAccess.Read, FileShare.Read);
+                            await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream, strPrint, ParseMode.Default, false, iMessageID);
                         }
                         else
                         {
@@ -1358,12 +1341,10 @@ namespace CDT_Noti_Bot
                     {
                         strPrint += "\n/기록 숫자 로 조회할 수 있습니다.\n(ex: /기록 2-3)";
 
-                        const string record = @"Record/Record.jpg";
+                        const string record = @"Function/Record.jpg";
                         var fileName = record.Split(Path.DirectorySeparatorChar).Last();
                         var fileStream = new FileStream(record, FileMode.Open, FileAccess.Read, FileShare.Read);
                         await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream, strPrint, ParseMode.Default, false, iMessageID);
-
-                        //await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
                     }
                     else
                     {
@@ -1460,12 +1441,10 @@ namespace CDT_Noti_Bot
 
                     if (strPrint != "")
                     {
-                        const string record = @"Record/Record.jpg";
+                        const string record = @"Function/Record.jpg";
                         var fileName = record.Split(Path.DirectorySeparatorChar).Last();
                         var fileStream = new FileStream(record, FileMode.Open, FileAccess.Read, FileShare.Read);
                         await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream, strPrint, ParseMode.Default, false, iMessageID);
-
-                        //await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
                     }
                     else
                     {
@@ -1524,8 +1503,6 @@ namespace CDT_Noti_Bot
                 strPrint += "Running.......\n";
                 strPrint += "[System Time] " + systemInfo.GetNowTime() + "\n";
                 strPrint += "[Running Time] " + systemInfo.GetRunningTime() + "\n";
-                //strPrint += "[Message Request Count] " + systemInfo.GetMessageReqCount() + "\n";
-                //strPrint += "[Google Sheetp API Request Count] " + systemInfo.GetGoogleSheetReqCount() + "\n";
 
                 await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
             }
