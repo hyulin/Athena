@@ -139,15 +139,9 @@ namespace CDT_Noti_Bot
                     }
 
 #if DEBUG
-                    const string notice = @"Function/Notice.jpg";
-                    var fileName = notice.Split(Path.DirectorySeparatorChar).Last();
-                    var fileStream = new FileStream(notice, FileMode.Open, FileAccess.Read, FileShare.Read);
-                    Bot.SendPhotoAsync(1001312491933, fileStream, strPrint, ParseMode.Default);
+                    Bot.SendTextMessageAsync(-1001312491933, strPrint);  // 운영진방
 #else
-                    const string notice = @"Function/Notice.jpg";
-                    var fileName = notice.Split(Path.DirectorySeparatorChar).Last();
-                    var fileStream = new FileStream(notice, FileMode.Open, FileAccess.Read, FileShare.Read);
-                    Bot.SendPhotoAsync(1001202203239, fileStream, strPrint, ParseMode.Default);
+                    Bot.SendTextMessageAsync(-1001202203239, strPrint);  // 클랜방
 #endif
                 }
             }
