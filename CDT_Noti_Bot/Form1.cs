@@ -285,6 +285,8 @@ namespace CDT_Noti_Bot
                 strPrint += "/투표 : 현재 진행 중인 투표를 출력합니다.\n";
                 strPrint += "/투표 숫자 : 현재 진행 중인 투표에 투표합니다.\n";
                 strPrint += "/투표 결과 : 현재 진행 중인 투표의 결과를 출력합니다.\n";
+                strPrint += "/기록 : 클랜 명예의 전당을 조회합니다.\n";
+                strPrint += "/기록 숫자 : 명예의 전당 상세내용을 조회합니다.\n";
                 strPrint += "/안내 : 팀 안내 메시지를 출력합니다.\n";
                 strPrint += "/리포트 : 업데이트 내역, 개발 예정 항목을 출력합니다.\n";
                 strPrint += "/상태 : 현재 봇 상태를 출력합니다. 대답이 없으면 이상.\n";
@@ -1354,7 +1356,14 @@ namespace CDT_Noti_Bot
 
                     if (strPrint != "")
                     {
-                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
+                        strPrint += "\n/기록 숫자 로 조회할 수 있습니다.\n(ex: /기록 2-3)";
+
+                        const string record = @"Record/Record.jpg";
+                        var fileName = record.Split(Path.DirectorySeparatorChar).Last();
+                        var fileStream = new FileStream(record, FileMode.Open, FileAccess.Read, FileShare.Read);
+                        await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream, strPrint, ParseMode.Default, false, iMessageID);
+
+                        //await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
                     }
                     else
                     {
@@ -1451,7 +1460,12 @@ namespace CDT_Noti_Bot
 
                     if (strPrint != "")
                     {
-                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
+                        const string record = @"Record/Record.jpg";
+                        var fileName = record.Split(Path.DirectorySeparatorChar).Last();
+                        var fileStream = new FileStream(record, FileMode.Open, FileAccess.Read, FileShare.Read);
+                        await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream, strPrint, ParseMode.Default, false, iMessageID);
+
+                        //await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
                     }
                     else
                     {
