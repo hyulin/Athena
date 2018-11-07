@@ -348,7 +348,7 @@ namespace CDT_Noti_Bot
             {
                 if (strContents == "")
                 {
-                    strPrint += "[ERROR] 대화명이 없습니다.";
+                    strPrint += "[ERROR] 조회 대상이 없습니다.";
                     await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
                 }
                 else
@@ -384,85 +384,130 @@ namespace CDT_Noti_Bot
 
                             foreach (var row in values)
                             {
-                                if (row[0].ToString().ToUpper().Contains(strContents.ToUpper()) ||
-                                    row[1].ToString().ToUpper().Contains(strContents.ToUpper()) ||
-                                    row[2].ToString().ToUpper().Contains(strContents.ToUpper()))
+                                bool isSubAccount = false;
+                                bool isSearch = false;
+                                string strUrl = "";
+                                string battleTag = "";
+                                string mainBattleTag = "";
+
+                                if (row[0].ToString().ToUpper().Contains(strContents.ToUpper()))
+                                {
+                                    isSubAccount = false;
+                                    isSearch = true;
+                                }
+
+                                if (row[1].ToString().ToUpper().Contains(strContents.ToUpper()))
+                                {
+                                    isSubAccount = false;
+                                    isSearch = true;
+                                }
+
+                                if (row[2].ToString().ToUpper().Contains(strContents.ToUpper()))
+                                {
+                                    isSubAccount = true;
+                                    isSearch = true;
+                                }
+
+                                if (isSearch == true && isSubAccount == false)
                                 {
                                     string[] strBattleTag = row[1].ToString().Split('#');
-                                    string strUrl = "http://playoverwatch.com/ko-kr/career/pc/" + strBattleTag[0] + "-" + strBattleTag[1];
-                                    string strScore = "전적을 조회할 수 없습니다.";
-                                    string strTier = "전적을 조회할 수 없습니다.";
-
-                                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "'" + strBattleTag[0] + "#" + strBattleTag[1] + "'의 전적을 조회 중입니다.\n잠시만 기다려주세요.");
-
-                                    try
-                                    {
-                                        WebClient wc = new WebClient();
-                                        wc.Encoding = Encoding.UTF8;
-
-                                        ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-                                        ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
-
-                                        string html = wc.DownloadString(strUrl);
-                                        HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
-                                        doc.LoadHtml(html);
-
-                                        strScore = doc.DocumentNode.SelectSingleNode("//div[@class='competitive-rank']").InnerText;
-
-                                        if (Int32.Parse(strScore) >= 0 && Int32.Parse(strScore) < 1500)
-                                        {
-                                            strTier = "브론즈";
-                                        }
-                                        else if (Int32.Parse(strScore) >= 1500 && Int32.Parse(strScore) < 2000)
-                                        {
-                                            strTier = "실버";
-                                        }
-                                        else if (Int32.Parse(strScore) >= 2000 && Int32.Parse(strScore) < 2500)
-                                        {
-                                            strTier = "골드";
-                                        }
-                                        else if (Int32.Parse(strScore) >= 2500 && Int32.Parse(strScore) < 3000)
-                                        {
-                                            strTier = "플래티넘";
-                                        }
-                                        else if (Int32.Parse(strScore) >= 3000 && Int32.Parse(strScore) < 3500)
-                                        {
-                                            strTier = "다이아";
-                                        }
-                                        else if (Int32.Parse(strScore) >= 3500 && Int32.Parse(strScore) < 4000)
-                                        {
-                                            strTier = "마스터";
-                                        }
-                                        else if (Int32.Parse(strScore) >= 4000 && Int32.Parse(strScore) <= 5000)
-                                        {
-                                            strTier = "그랜드마스터";
-                                        }
-                                    }
-                                    catch
-                                    {
-                                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "'" + strBattleTag[0] + "#" + strBattleTag[1] + "'의 전적을 조회할 수 없습니다.");
-                                    }
-
-                                    if (bContinue == true)
-                                    {
-                                        strPrint += "==================================\n";
-                                    }
-
-                                    strPrint += "[ " + row[0].ToString() + " ]\n";
-                                    strPrint += "* 티어 및 점수는 전적을 조회합니다. *\n\n";
-                                    strPrint += "1. 배틀태그 : " + row[1] + "\n";
-                                    strPrint += "2. 티어 : " + strTier + "\n";
-                                    strPrint += "3. 점수 : " + strScore + "\n";
-                                    strPrint += "4. 부계정 배틀태그 : " + row[2] + "\n";
-                                    strPrint += "5. 포지션 : " + row[3] + "\n";
-                                    strPrint += "6. 모스트 : " + row[4].ToString() + " / " + row[5].ToString() + " / " + row[6].ToString() + "\n";
-                                    strPrint += "7. 이외 가능 픽 : " + row[7] + "\n";
-                                    strPrint += "8. 접속 시간대 : " + row[8] + "\n";
-                                    strPrint += "9. 소개\n";
-                                    strPrint += "\t- " + row[9] + "\n";
-
-                                    bContinue = true;   // 한 명만 출력된다면 이 부분은 무시됨.
+                                    battleTag = strBattleTag[0] + "#" + strBattleTag[1];
+                                    strUrl = "http://playoverwatch.com/ko-kr/career/pc/" + strBattleTag[0] + "-" + strBattleTag[1];
                                 }
+                                else if (isSearch == true && isSubAccount == true)
+                                {
+                                    string[] strSubAccount = row[2].ToString().Split(',');
+                                    mainBattleTag = row[1].ToString();
+
+                                    foreach (var acc in strSubAccount)
+                                    {
+                                        if (acc.ToString().ToUpper().Contains(strContents.ToUpper()))
+                                        {
+                                            string[] strBattleTag = acc.ToString().Split('#');
+                                            battleTag = strBattleTag[0] + "#" + strBattleTag[1];
+                                            strUrl = "http://playoverwatch.com/ko-kr/career/pc/" + strBattleTag[0] + "-" + strBattleTag[1];
+                                            break;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    continue;
+                                }
+                                    
+                                string strScore = "전적을 조회할 수 없습니다.";
+                                string strTier = "전적을 조회할 수 없습니다.";
+
+                                await Bot.SendTextMessageAsync(varMessage.Chat.Id, "'" + battleTag + "'의 전적을 조회 중입니다.\n잠시만 기다려주세요.");
+
+                                try
+                                {
+                                    WebClient wc = new WebClient();
+                                    wc.Encoding = Encoding.UTF8;
+
+                                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+                                    ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+
+                                    string html = wc.DownloadString(strUrl);
+                                    HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
+                                    doc.LoadHtml(html);
+
+                                    strScore = doc.DocumentNode.SelectSingleNode("//div[@class='competitive-rank']").InnerText;
+
+                                    if (Int32.Parse(strScore) >= 0 && Int32.Parse(strScore) < 1500)
+                                    {
+                                        strTier = "브론즈";
+                                    }
+                                    else if (Int32.Parse(strScore) >= 1500 && Int32.Parse(strScore) < 2000)
+                                    {
+                                        strTier = "실버";
+                                    }
+                                    else if (Int32.Parse(strScore) >= 2000 && Int32.Parse(strScore) < 2500)
+                                    {
+                                        strTier = "골드";
+                                    }
+                                    else if (Int32.Parse(strScore) >= 2500 && Int32.Parse(strScore) < 3000)
+                                    {
+                                        strTier = "플래티넘";
+                                    }
+                                    else if (Int32.Parse(strScore) >= 3000 && Int32.Parse(strScore) < 3500)
+                                    {
+                                        strTier = "다이아";
+                                    }
+                                    else if (Int32.Parse(strScore) >= 3500 && Int32.Parse(strScore) < 4000)
+                                    {
+                                        strTier = "마스터";
+                                    }
+                                    else if (Int32.Parse(strScore) >= 4000 && Int32.Parse(strScore) <= 5000)
+                                    {
+                                        strTier = "그랜드마스터";
+                                    }
+                                }
+                                catch
+                                {
+                                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "'" + battleTag + "'의 전적을 조회할 수 없습니다.");
+                                }
+
+                                if (bContinue == true)
+                                {
+                                    strPrint += "==================================\n";
+                                }
+
+                                strPrint += "* 티어 및 점수는 전적을 조회합니다. *\n\n";
+                                strPrint += "[ " + row[0].ToString() + " ]\n";
+                                strPrint += "- 조회 배틀태그 : " + battleTag + "\n";
+                                strPrint += "- 티어 : " + strTier + "\n";
+                                strPrint += "- 점수 : " + strScore + "\n";
+                                strPrint += "- 본 계정 배틀태그 : " + mainBattleTag + "\n";
+                                strPrint += "- 부 계정 배틀태그 : " + row[2].ToString() + "\n";
+                                strPrint += "- 포지션 : " + row[3].ToString() + "\n";
+                                strPrint += "- 모스트 : " + row[4].ToString() + " / " + row[5].ToString() + " / " + row[6].ToString() + "\n";
+                                strPrint += "- 이외 가능 픽 : " + row[7].ToString() + "\n";
+                                strPrint += "- 접속 시간대 : " + row[8].ToString() + "\n";
+                                strPrint += "- 소개\n";
+                                strPrint += "\t- " + row[9] + "\n";
+
+                                bContinue = true;   // 한 명만 출력된다면 이 부분은 무시됨.
                             }
                         }
                     }
