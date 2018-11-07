@@ -172,9 +172,10 @@ namespace CDT_Noti_Bot
                 return;
             }
 
-            if (varMessage.Chat.Title != "CDT 사전 활동안내" &&
-                varMessage.Chat.Title != "클리앙 딜리셔스 팀 (CDT)" &&
-                varMessage.Chat.Title != "CDT 1기 운영진" &&
+            // CDT 관련방 아니면 동작하지 않도록 수정
+            if (varMessage.Chat.Id != -1001202203239 &&     // 본방
+                varMessage.Chat.Id != -1001312491933 &&     // 운영진방
+                varMessage.Chat.Id != -1001389956706 &&     // 사전안내방
                 varMessage.Chat.Username != "hyulin")
             {
                 return;
@@ -195,11 +196,11 @@ namespace CDT_Noti_Bot
             // 입장 메시지 일 경우
             if (varMessage.Type == MessageType.ChatMembersAdded)
             {
-                if (varMessage.Chat.Title == "CDT 사전 활동안내")
+                if (varMessage.Chat.Id == -1001389956706)   // 사전안내방
                 {
                     varMessage.Text = "/안내";
                 }
-                else if (varMessage.Chat.Title == "클리앙 딜리셔스 팀 (CDT)")
+                else if (varMessage.Chat.Id == -1001202203239)      // 본방
                 {
                     string strInfo = "";
 
