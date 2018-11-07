@@ -172,6 +172,14 @@ namespace CDT_Noti_Bot
                 return;
             }
 
+            if (varMessage.Chat.Title != "CDT 사전 활동안내" &&
+                varMessage.Chat.Title != "클리앙 딜리셔스 팀 (CDT)" &&
+                varMessage.Chat.Title != "CDT 1기 운영진" &&
+                varMessage.Chat.Username != "hyulin")
+            {
+                return;
+            }
+
             string strFirstName = varMessage.From.FirstName;
             string strLastName = varMessage.From.LastName;
             int iMessageID = varMessage.MessageId;
