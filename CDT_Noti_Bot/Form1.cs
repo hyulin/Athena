@@ -412,6 +412,7 @@ namespace CDT_Noti_Bot
                                 {
                                     string[] strBattleTag = row[1].ToString().Split('#');
                                     battleTag = strBattleTag[0] + "#" + strBattleTag[1];
+                                    mainBattleTag = row[1].ToString();
                                     strUrl = "http://playoverwatch.com/ko-kr/career/pc/" + strBattleTag[0] + "-" + strBattleTag[1];
                                 }
                                 else if (isSearch == true && isSubAccount == true)
