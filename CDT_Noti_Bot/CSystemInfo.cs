@@ -22,6 +22,11 @@ namespace CDT_Noti_Bot
             return startTime_.ToString();
         }
 
+        public DateTime GetStartTimeToDate()
+        {
+            return startTime_;
+        }
+
         public string GetRunningTime()
         {
             DateTime nowTime = System.DateTime.Now;

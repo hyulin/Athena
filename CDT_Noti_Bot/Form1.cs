@@ -172,6 +172,12 @@ namespace CDT_Noti_Bot
                 return;
             }
 
+            DateTime convertTime = varMessage.Date.AddHours(9);
+            if (convertTime < systemInfo.GetStartTimeToDate())
+            {
+                return;
+            }
+
             // CDT 관련방 아니면 동작하지 않도록 수정
             if (varMessage.Chat.Id != -1001202203239 &&     // 본방
                 varMessage.Chat.Id != -1001312491933 &&     // 운영진방
@@ -727,6 +733,15 @@ namespace CDT_Noti_Bot
                                 else if (row[0].ToString() != "" && row[1].ToString() != "")
                                 {
                                     strPrint += "* " + row[0].ToString() + " : " + row[1].ToString() + "\n";
+                                }
+                                else
+                                {
+                                    strPrint = "[SYSTEM] 현재 예정된 모임이 없습니다.";
+                                    const string meeting = @"Function/Meeting.jpg";
+                                    var fileName = meeting.Split(Path.DirectorySeparatorChar).Last();
+                                    var fileStream = new FileStream(meeting, FileMode.Open, FileAccess.Read, FileShare.Read);
+                                    await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream, strPrint, ParseMode.Default, false, iMessageID);
+                                    return;
                                 }
                             }
                         }
