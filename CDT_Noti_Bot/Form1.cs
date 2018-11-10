@@ -1171,15 +1171,15 @@ namespace CDT_Noti_Bot
 
                             // 순위
                             index = 1;
-                            for (int i = 6; index <= 8; index++)
+                            for (int i = 5; index <= 8; index++)
                             {
                                 value = values[index];
 
-                                if (value[i].ToString() != "")
+                                if (value[i + 1].ToString() != "")
                                 {
                                     CVoteRanking ranking = new CVoteRanking();
 
-                                    ranking.setRanking(value[i].ToString(), Convert.ToInt32(value[i + 1].ToString()), value[i + 2].ToString());
+                                    ranking.setRanking(Convert.ToInt32(value[i].ToString()), value[i + 1].ToString(), Convert.ToInt32(value[i + 2].ToString()), value[i + 3].ToString());
                                     voteDirector.AddRanking(ranking);
                                 }
                             }
@@ -1201,7 +1201,7 @@ namespace CDT_Noti_Bot
                                 for (int i = 0; i < voteDirector.getRanking().Count; i++)
                                 {
                                     var ranking = voteDirector.getRanking().ElementAt(i);
-                                    strPrint += i + 1 + "위. " + ranking.getVoteItem() + " - " + ranking.getVoteCount() + "표 - " + ranking.getVoteRate() + "\n";
+                                    strPrint += ranking.getRanking().ToString() + "위. " + ranking.getVoteItem() + " [ " + ranking.getVoteCount() + "표 ] - " + ranking.getVoteRate() + "\n";
                                 }
                             }
                             else
