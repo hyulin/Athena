@@ -94,6 +94,7 @@
   <ItemGroup>
     <Compile Include="CBotClient.cs" />
     <Compile Include="CEasterEgg.cs" />
+    <Compile Include="CNaturalLanguage.cs" />
     <Compile Include="CSystemInfo.cs" />
     <Compile Include="CVoteDirector.cs" />
     <Compile Include="CVoteItem.cs" />

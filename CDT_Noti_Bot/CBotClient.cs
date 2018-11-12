@@ -44,6 +44,7 @@ namespace CDT_Noti_Bot
         SheetsService service;
         CNotice Notice = new CNotice();
         CEasterEgg EasterEgg = new CEasterEgg();
+        CNaturalLanguage naturalLanguage = new CNaturalLanguage();
 
         // Bot Token
 #if DEBUG
@@ -257,7 +258,11 @@ namespace CDT_Noti_Bot
 
             if (strMassage.Substring(0, 1) != "/")
             {
-                return;
+                // 아테나가 언급되면 자연어 명령
+                if (strMassage.Contains("아테나"))
+                {
+                    strMassage = naturalLanguage.DetectionCommand(strMassage);
+                }
             }
 
             if (strMassage.IndexOf(" ") == -1)
