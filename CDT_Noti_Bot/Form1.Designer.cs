@@ -1,4 +1,5 @@
-﻿namespace CDT_Noti_Bot
+﻿#if DEBUG
+namespace CDT_Noti_Bot
 {
     partial class Form1
     {
@@ -20,7 +21,7 @@
             base.Dispose(disposing);
         }
 
-        #region Windows Form 디자이너에서 생성한 코드
+#region Windows Form 디자이너에서 생성한 코드
 
         /// <summary>
         /// 디자이너 지원에 필요한 메서드입니다. 
@@ -54,9 +55,9 @@
 
         }
 
-        #endregion
+#endregion
 
         private System.Windows.Forms.Label label1;
     }
 }
-
+#endif
