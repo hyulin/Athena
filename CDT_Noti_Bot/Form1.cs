@@ -8,7 +8,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-#if DEBUG
 namespace CDT_Noti_Bot
 {
     public partial class Form1 : Form
@@ -30,4 +29,3 @@ namespace CDT_Noti_Bot
         }
     }
 }
-#endif

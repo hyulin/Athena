@@ -1,5 +1,4 @@
-﻿#if DEBUG
-namespace CDT_Noti_Bot
+﻿namespace CDT_Noti_Bot
 {
     partial class Form1
     {
@@ -60,4 +59,3 @@ namespace CDT_Noti_Bot
         private System.Windows.Forms.Label label1;
     }
 }
-#endif
