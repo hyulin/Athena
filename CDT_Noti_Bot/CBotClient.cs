@@ -1177,7 +1177,8 @@ namespace CDT_Noti_Bot
                                 {
                                     CVoteRanking ranking = new CVoteRanking();
 
-                                    if (value[i].ToString() != "#N/A")
+                                    if ( (value[i].ToString() == "1") || (value[i].ToString() == "2") || (value[i].ToString() == "3") || (value[i].ToString() == "4") ||
+                                        (value[i].ToString() == "5") || (value[i].ToString() == "6") || (value[i].ToString() == "7") || (value[i].ToString() == "8") )
                                     {
                                         ranking.setRanking(Convert.ToInt32(value[i].ToString()), value[i + 1].ToString(), Convert.ToInt32(value[i + 2].ToString()), value[i + 3].ToString());
                                         voteDirector.AddRanking(ranking);
