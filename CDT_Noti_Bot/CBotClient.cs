@@ -709,7 +709,7 @@ namespace CDT_Noti_Bot
             {
                 // Define request parameters.
                 String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
-                String range = "CDT 모임!C4:R12";
+                String range = "모임!C4:R12";
                 SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
                 ValueRange response = request.Execute();
@@ -780,7 +780,7 @@ namespace CDT_Noti_Bot
                 List<string> lstUndefine = new List<string>();
 
                 // Define request parameters.
-                range = "CDT 모임!C16:O";
+                range = "모임!C16:O";
                 request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
                 response = request.Execute();
@@ -906,7 +906,7 @@ namespace CDT_Noti_Bot
 
                 // Define request parameters.
                 String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
-                String range = "CDT 모임!C" + iCellIndex + ":C";
+                String range = "모임!C" + iCellIndex + ":C";
                 SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
                 ValueRange response = request.Execute();
@@ -956,11 +956,11 @@ namespace CDT_Noti_Bot
                     {
                         if (iBlankCell == 0)
                         {
-                            range = "CDT 모임!C" + (iCellIndex + iRealCount) + ":C";
+                            range = "모임!C" + (iCellIndex + iRealCount) + ":C";
                         }
                         else
                         {
-                            range = "CDT 모임!C" + (iCellIndex + iBlankCell) + ":C";
+                            range = "모임!C" + (iCellIndex + iBlankCell) + ":C";
                         }
 
                         // Define request parameters.
@@ -992,11 +992,11 @@ namespace CDT_Noti_Bot
                     {
                         if (iBlankCell == 0)
                         {
-                            range = "CDT 모임!O" + (iCellIndex + iRealCount) + ":O";
+                            range = "모임!O" + (iCellIndex + iRealCount) + ":O";
                         }
                         else
                         {
-                            range = "CDT 모임!O" + (iCellIndex + iBlankCell) + ":O";
+                            range = "모임!O" + (iCellIndex + iBlankCell) + ":O";
                         }
 
                         // Define request parameters.
@@ -1040,7 +1040,7 @@ namespace CDT_Noti_Bot
 
                 // Define request parameters.
                 String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
-                String range = "CDT 모임!C" + iCellIndex + ":C";
+                String range = "모임!C" + iCellIndex + ":C";
                 SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
                 ValueRange response = request.Execute();
@@ -1067,7 +1067,7 @@ namespace CDT_Noti_Bot
                     if (isJoin == true)
                     {
                         //iCellIndex += values.Count;
-                        range = "CDT 모임!C" + (iCellIndex + iTempCount)/* + ":O" + (iCellIndex + iTempCount)*/;
+                        range = "모임!C" + (iCellIndex + iTempCount)/* + ":O" + (iCellIndex + iTempCount)*/;
 
                         // Define request parameters.
                         ValueRange valueRange = new ValueRange();
@@ -1113,7 +1113,7 @@ namespace CDT_Noti_Bot
 
                 // Define request parameters.
                 String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
-                String range = "CDT 투표!B4:J";
+                String range = "투표!B4:J";
                 SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
                 ValueRange response = request.Execute();
@@ -1292,7 +1292,7 @@ namespace CDT_Noti_Bot
 
                                 List<string> voterList = voteDirector.getVoter(voteIndex - 1);
                                 int voterCount = voterList.Count;
-                                string updateRange = "CDT 투표!" + cellChar + (18 + voterCount) + ":" + cellChar;
+                                string updateRange = "투표!" + cellChar + (18 + voterCount) + ":" + cellChar;
 
                                 // Define request parameters.
                                 SpreadsheetsResource.ValuesResource.GetRequest updateRequest = service.Spreadsheets.Values.Get(spreadsheetId, updateRange);
@@ -1359,7 +1359,7 @@ namespace CDT_Noti_Bot
                 {
                     // 내부 대회
                     String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
-                    String range = "CDT 명예의 전당!B7:F16";
+                    String range = "명예의 전당!B7:F16";
                     SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
                     ValueRange response = request.Execute();
@@ -1384,7 +1384,7 @@ namespace CDT_Noti_Bot
                     }
 
                     // 외부 대회
-                    range = "CDT 명예의 전당!B21:F30";
+                    range = "명예의 전당!B21:F30";
                     request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
                     response = request.Execute();
@@ -1454,7 +1454,7 @@ namespace CDT_Noti_Bot
                         item--;
 
                         String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
-                        String range = "CDT 명예의 전당!B" + (7 + item) + ":F" + (7 + item);
+                        String range = "명예의 전당!B" + (7 + item) + ":F" + (7 + item);
                         SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
                         ValueRange response = request.Execute();
@@ -1489,7 +1489,7 @@ namespace CDT_Noti_Bot
                         item--;
 
                         String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
-                        String range = "CDT 명예의 전당!B" + (21 + item) + ":F" + (21 + item);
+                        String range = "명예의 전당!B" + (21 + item) + ":F" + (21 + item);
                         SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
                         ValueRange response = request.Execute();
