@@ -301,7 +301,6 @@ namespace CDT_Noti_Bot
                 strPrint += "/기록 : 클랜 명예의 전당을 조회합니다.\n";
                 strPrint += "/기록 숫자 : 명예의 전당 상세내용을 조회합니다.\n";
                 strPrint += "/안내 : 팀 안내 메시지를 출력합니다.\n";
-                strPrint += "/리포트 : 업데이트 내역, 개발 예정 항목을 출력합니다.\n";
                 strPrint += "/상태 : 현재 봇 상태를 출력합니다. 대답이 없으면 이상.\n";
                 strPrint += "----------------------------------\n";
                 strPrint += "CDT 1대 운영자 : 냉각콜라, 휴린, 청포도, 만슬\n";
@@ -1328,11 +1327,7 @@ namespace CDT_Noti_Bot
                                     await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[SUCCESS] 투표를 완료했습니다.", ParseMode.Default, false, false, iMessageID);
                                 }
 
-                                if (isAnonymous == false)
-                                {
-                                    System.IO.File.AppendAllText(@"_Voter.txt", strFirstName + strLastName + "\n", Encoding.Default);
-                                }
-                                else
+                                if (isAnonymous == true)
                                 {
                                     System.IO.File.AppendAllText(@"_Voter.txt", senderKey.ToString() + "\n", Encoding.Default);
                                 }
