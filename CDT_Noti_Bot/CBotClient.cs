@@ -1127,7 +1127,7 @@ namespace CDT_Noti_Bot
 
                         // 익명 여부
                         var value = values[0];
-                        if (value[4].ToString() != "")
+                        if (value[3].ToString() != "")
                         {
                             isAnonymous = true;
                         }
@@ -1174,7 +1174,7 @@ namespace CDT_Noti_Bot
 
                             // 순위
                             index = 1;
-                            for (int i = 5; index <= 8; index++)
+                            for (int i = 4; index <= 8; index++)
                             {
                                 value = values[index];
 
@@ -1185,12 +1185,12 @@ namespace CDT_Noti_Bot
                                     if ( (value[i].ToString() == "1") || (value[i].ToString() == "2") || (value[i].ToString() == "3") || (value[i].ToString() == "4") ||
                                         (value[i].ToString() == "5") || (value[i].ToString() == "6") || (value[i].ToString() == "7") || (value[i].ToString() == "8") )
                                     {
-                                        ranking.setRanking(Convert.ToInt32(value[i].ToString()), value[i + 1].ToString(), Convert.ToInt32(value[i + 2].ToString()), value[i + 3].ToString());
+                                        ranking.setRanking(Convert.ToInt32(value[i].ToString()), value[i + 1].ToString(), value[i + 2].ToString(), Convert.ToInt32(value[i + 3].ToString()), value[i + 4].ToString());
                                         voteDirector.AddRanking(ranking);
                                     }
                                     else
                                     {
-                                        ranking.setRanking(0, value[i + 1].ToString(), Convert.ToInt32(value[i + 2].ToString()), value[i + 3].ToString());
+                                        ranking.setRanking(0, value[i + 1].ToString(), value[i + 2].ToString(), Convert.ToInt32(value[i + 3].ToString()), value[i + 4].ToString());
                                         voteDirector.AddRanking(ranking);
                                     }
                                 }
@@ -1213,7 +1213,7 @@ namespace CDT_Noti_Bot
                                 for (int i = 0; i < voteDirector.getRanking().Count; i++)
                                 {
                                     var ranking = voteDirector.getRanking().ElementAt(i);
-                                    strPrint += ranking.getRanking().ToString() + "위. " + ranking.getVoteItem() + " [ " + ranking.getVoteCount() + "표 ] - " + ranking.getVoteRate() + "\n";
+                                    strPrint += ranking.getRanking().ToString() + "위. " + ranking.getNumber() + " " + ranking.getVoteItem() + " [ " + ranking.getVoteCount() + "표 ] - " + ranking.getVoteRate() + "\n";
                                 }
                             }
                             else
@@ -1561,18 +1561,7 @@ namespace CDT_Noti_Bot
             }
             else if (strCommend == "/리포트")
             {
-                string strReportValue = System.IO.File.ReadAllText(@"_Report.txt");
-
-                if (strReportValue == "")
-                {
-                    strPrint += "[ERROR] 현재 업데이트 리포트가 등록되지 않았습니다.";
-                }
-                else
-                {
-                    strPrint += strReportValue;
-                }
-
-                await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
+                //await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
             }
             else if (strCommend == "/상태")
             {
