@@ -330,8 +330,6 @@ namespace CDT_Noti_Bot
                     }
                 }
 
-                System.IO.File.WriteAllText(@"_Notice.txt", strPrint, Encoding.Unicode);
-
                 if (strPrint != "")
                 {
                     const string notice = @"Function/Logo.jpg";
