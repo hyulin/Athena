@@ -93,7 +93,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CBotClient.cs" />
-    <Compile Include="CConfig.cs" />
     <Compile Include="CEasterEgg.cs" />
     <Compile Include="CSystemInfo.cs" />
     <Compile Include="CVoteDirector.cs" />
