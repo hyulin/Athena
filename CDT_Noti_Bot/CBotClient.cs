@@ -1177,8 +1177,16 @@ namespace CDT_Noti_Bot
                                 {
                                     CVoteRanking ranking = new CVoteRanking();
 
-                                    ranking.setRanking(Convert.ToInt32(value[i].ToString()), value[i + 1].ToString(), Convert.ToInt32(value[i + 2].ToString()), value[i + 3].ToString());
-                                    voteDirector.AddRanking(ranking);
+                                    if (value[i].ToString() != "#N/A")
+                                    {
+                                        ranking.setRanking(Convert.ToInt32(value[i].ToString()), value[i + 1].ToString(), Convert.ToInt32(value[i + 2].ToString()), value[i + 3].ToString());
+                                        voteDirector.AddRanking(ranking);
+                                    }
+                                    else
+                                    {
+                                        ranking.setRanking(0, value[i + 1].ToString(), Convert.ToInt32(value[i + 2].ToString()), value[i + 3].ToString());
+                                        voteDirector.AddRanking(ranking);
+                                    }
                                 }
                             }
 
