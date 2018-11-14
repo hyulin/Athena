@@ -1059,8 +1059,7 @@ namespace CDT_Noti_Bot
 
                     if (isJoin == true)
                     {
-                        //iCellIndex += values.Count;
-                        range = "모임!C" + (iCellIndex + iTempCount)/* + ":O" + (iCellIndex + iTempCount)*/;
+                        range = "모임!C" + (iCellIndex + iTempCount);
 
                         // Define request parameters.
                         ValueRange valueRange = new ValueRange();
@@ -1513,6 +1512,103 @@ namespace CDT_Noti_Bot
                     else
                     {
                         await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 명예의 전당이 비어있습니다.", ParseMode.Default, false, false, iMessageID);
+                    }
+                }
+            }
+            //========================================================================================
+            // 스크림 관련 명령어
+            //========================================================================================
+            else if (strCommend == "/스크림")
+            {
+                if (strContents == "")
+                {
+                    String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                    String range = "스크림!B2:P17";
+                    SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+
+                    ValueRange response = request.Execute();
+                    if (response != null)
+                    {
+                        IList<IList<Object>> values = response.Values;
+                        if (values != null && values.Count > 0)
+                        {
+                            // 스크림 이름
+                            var title = values[0];
+                            if (title[0].ToString() != "")
+                            {
+                                strPrint += "[ " + title[0].ToString() + " ]\n============================\n";
+
+                                int index = 4;
+                                for (int i = index; i < 15; i++)
+                                {
+                                    var row = values[i];
+
+                                    if (row.Count <= 1)
+                                    {
+                                        break;
+                                    }
+
+                                    string battleTag = row[1].ToString();
+                                    string score = row[2].ToString();
+                                    string position = row[4].ToString();
+                                    string date = "";
+                                    if (row[12].ToString() == "O")
+                                        date += "금 ";
+                                    if (row[13].ToString() == "O")
+                                        date += "토 ";
+                                    if (row[14].ToString() == "O")
+                                        date += "일";
+
+                                    strPrint += battleTag.ToString() + " (" + position.ToString() + ") / " + score.ToString() + " - " + date.ToString() + "\n";
+                                }
+                            }
+                        }
+                    }
+
+                    if (strPrint != "")
+                    {
+                        const string scrim = @"Function/Scrim.png";
+                        var fileName = scrim.Split(Path.DirectorySeparatorChar).Last();
+                        var fileStream = new FileStream(scrim, FileMode.Open, FileAccess.Read, FileShare.Read);
+                        await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream, strPrint, ParseMode.Default, false, iMessageID);
+                    }
+                    else
+                    {
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 현재 모집 중인 스크림이 없습니다.", ParseMode.Default, false, false, iMessageID);
+                    }
+                }
+                else // 일정을 입력했을 경우
+                {
+                    int size = strContents.Length;
+                    string[] day = new string[3];
+
+                    // 가능 날짜 추출
+                    for (int i=0; i<size; i++)
+                    {
+                        day[i] = strContents.Substring(i, 1);
+                    }
+
+                    String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                    
+                    // Todo : 클랜원 목록에서 정보 추출 및 전적 조회하여 점수 입력되도록.
+
+
+
+                    // Define request parameters.
+                    String range = "스크림!B2:P17";
+                    ValueRange valueRange = new ValueRange();
+                    valueRange.MajorDimension = "ROWS"; //"ROWS";//COLUMNS 
+
+                    var oblist = new List<object>() { "", "", "", "", "", "", "", "", "", "", "", "", "", "" };
+                    valueRange.Values = new List<IList<object>> { oblist };
+
+                    SpreadsheetsResource.ValuesResource.UpdateRequest updateRequest = service.Spreadsheets.Values.Update(valueRange, spreadsheetId, range);
+
+                    updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.RAW;
+                    UpdateValuesResponse updateResponse = updateRequest.Execute();
+                    if (updateResponse == null)
+                    {
+                        strPrint += "[ERROR] 시트를 업데이트 할 수 없습니다.";
                     }
                 }
             }
