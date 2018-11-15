@@ -44,6 +44,7 @@ namespace CDT_Noti_Bot
         SheetsService service;
         CNotice Notice = new CNotice();
         CEasterEgg EasterEgg = new CEasterEgg();
+        CUserDirector userDirector = new CUserDirector();
 
         // Bot Token
 #if DEBUG
@@ -78,6 +79,11 @@ namespace CDT_Noti_Bot
                 ApplicationName = ApplicationName,
             });
 
+
+            // 시트에서 유저 정보를 Load
+            loadUserInfo();
+
+
             // 타이머 생성 및 시작
             System.Timers.Timer timer = new System.Timers.Timer();
             timer.Interval = 5000; // 5초
@@ -97,6 +103,70 @@ namespace CDT_Noti_Bot
             Bot.OnMessage += Bot_OnMessage;     // 이벤트를 추가해줍니다. 
 
             Bot.StartReceiving();               // 이 함수가 실행이 되어야 사용자로부터 메세지를 받을 수 있습니다.
+        }
+
+        public void loadUserInfo()
+        {
+            // Define request parameters.
+            String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+            String range = "클랜원 목록!C7:N";
+            SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+
+            ValueRange response = request.Execute();
+            if (response != null)
+            {
+                IList<IList<Object>> values = response.Values;
+                if (values != null && values.Count > 0)
+                {
+                    foreach (var row in values)
+                    {
+                        bool isReflesh = false;
+
+                        // 아테나에 등록되지 않은 유저
+                        if (row[10].ToString() == "")
+                            continue;
+
+                        long userKey = Convert.ToInt64(row[10].ToString());
+                        var userData = userDirector.getUserInfo(userKey);
+                        if (userData.UserKey != 0)
+                        {
+                            // 이미 등록한 유저. 갱신한다.
+                            isReflesh = true;
+                        }
+
+                        CUser user = new CUser();
+
+                        user.UserKey = userKey;
+                        user.Name = row[0].ToString();
+                        user.MainBattleTag = row[1].ToString();
+                        user.SubBattleTag = row[2].ToString().Trim().Split(',');
+
+                        if (row[3].ToString() == "플렉스")
+                            user.Position |= (int)POSITION.POSITION_FLEX;
+                        if (row[3].ToString().ToUpper().Contains("딜"))
+                            user.Position |= (int)POSITION.POSITION_DPS;
+                        if (row[3].ToString().ToUpper().Contains("탱"))
+                            user.Position |= (int)POSITION.POSITION_TANK;
+                        if (row[3].ToString().ToUpper().Contains("힐"))
+                            user.Position |= (int)POSITION.POSITION_SUPP;
+
+                        string[] most = new string[3];
+                        most[0] = row[4].ToString();
+                        most[1] = row[5].ToString();
+                        most[2] = row[6].ToString();
+                        user.MostPick = most;
+
+                        user.OtherPick = row[7].ToString();
+                        user.Time = row[8].ToString();
+                        user.Info = row[9].ToString();
+
+                        if (isReflesh == false)
+                            userDirector.AddUserInfo(userKey, user);
+                        else
+                            userDirector.reflechUserInfo(userKey, user);
+                    }
+                }
+            }
         }
 
         // 쓰레드풀의 작업쓰레드가 지정된 시간 간격으로
@@ -273,7 +343,7 @@ namespace CDT_Noti_Bot
             string strPrint = "";
 
             //========================================================================================
-            // 공지사항 관련 명령어
+            // 도움말
             //========================================================================================
             if (strCommend == "/도움말" || strCommend == "/help" || strCommend == "/help@CDT_Noti_Bot")
             {
@@ -333,6 +403,8 @@ namespace CDT_Noti_Bot
                             int index = 0;
                             int searchIndex = 0;
                             int searchCount = 0;
+                            bool isReflesh = false;
+                            CUser user = new CUser();
 
                             foreach (var row in values)
                             {
@@ -344,9 +416,32 @@ namespace CDT_Noti_Bot
 
                                     if (row[10].ToString() != "")
                                     {
-                                        strPrint += "[ERROR] 이미 등록되어있습니다.\n만약 본인이 등록하지 않았다면\n운영진에게 문의해주세요.";
-                                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
-                                        return;
+                                        // 이미 값이 있으므로 갱신한다.
+                                        user.UserKey = Convert.ToInt64(row[10].ToString());
+                                        user.Name = row[0].ToString();
+                                        user.MainBattleTag = row[1].ToString();
+                                        user.SubBattleTag = row[2].ToString().Trim().Split(',');
+
+                                        if (row[3].ToString() == "플렉스")
+                                            user.Position |= (int)POSITION.POSITION_FLEX;
+                                        if (row[3].ToString().ToUpper().Contains("딜"))
+                                            user.Position |= (int)POSITION.POSITION_DPS;
+                                        if (row[3].ToString().ToUpper().Contains("탱"))
+                                            user.Position |= (int)POSITION.POSITION_TANK;
+                                        if (row[3].ToString().ToUpper().Contains("힐"))
+                                            user.Position |= (int)POSITION.POSITION_SUPP;
+
+                                        string[] most = new string[3];
+                                        most[0] = row[4].ToString();
+                                        most[1] = row[5].ToString();
+                                        most[2] = row[6].ToString();
+                                        user.MostPick = most;
+
+                                        user.OtherPick = row[7].ToString();
+                                        user.Time = row[8].ToString();
+                                        user.Info = row[9].ToString();
+
+                                        isReflesh = true;
                                     }
                                 }
                                 else
@@ -366,6 +461,17 @@ namespace CDT_Noti_Bot
                             else if (searchCount < 0)
                             {
                                 strPrint += "[ERROR] 알 수 없는 문제";
+                            }
+                            else if (isReflesh == true)
+                            {
+                                if (userDirector.reflechUserInfo(user.UserKey, user) == true)
+                                {
+                                    strPrint += "[SUCCESS] 갱신 완료됐습니다.";
+                                }
+                                else
+                                {
+                                    strPrint += "[ERROR] 갱신을 실패했습니다.";
+                                }
                             }
                             else
                             {
