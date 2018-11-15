@@ -188,7 +188,7 @@ namespace CDT_Noti_Bot
             string strFirstName = varMessage.From.FirstName;
             string strLastName = varMessage.From.LastName;
             int iMessageID = varMessage.MessageId;
-            int senderKey = varMessage.From.Id;
+            long senderKey = varMessage.From.Id;
 
             // 이스터에그 (아테나 대사 출력)
             if (varMessage.ReplyToMessage != null && varMessage.ReplyToMessage.From.FirstName.Contains("아테나") == true)
@@ -313,7 +313,7 @@ namespace CDT_Noti_Bot
             {
                 if (strContents == "")
                 {
-                    strPrint += "[ERROR] /등록 [본 계정 배틀태그] 로 등록해주세요.\n(ex: /등록 휴린#3602)";
+                    strPrint += "[ERROR] 사용자 등록을 하려면\n/등록 [본 계정 배틀태그] 로 등록해주세요.\n(ex: /등록 휴린#3602)";
                 }
                 else
                 {
