@@ -280,21 +280,22 @@ namespace CDT_Noti_Bot
                 strPrint += "==================================\n";
                 strPrint += "[ 아테나 v1.3 ]\n[ Clien Delicious Team Notice Bot ]\n\n";
                 strPrint += "/공지 : 팀 공지사항을 출력합니다.\n";
-                strPrint += "/조회 검색어 : 클랜원을 조회합니다.\n";
+                strPrint += "/등록 [본 계정 배틀태그] : 아테나에 클랜원 등록을 합니다.";
+                strPrint += "/조회 [검색어] : 클랜원을 조회합니다.\n";
                 strPrint += "               (검색범위 : 대화명, 배틀태그, 부계정)\n";
                 strPrint += "/영상 : 영상이 있던 날짜를 조회합니다.\n";
-                strPrint += "/영상 날짜 : 플레이 영상을 조회합니다. (/영상 181006)\n";
-                strPrint += "/검색 검색어 : 포지션, 모스트별로 클랜원을 검색합니다.\n";
+                strPrint += "/영상 [날짜] : 플레이 영상을 조회합니다. (/영상 181006)\n";
+                strPrint += "/검색 [검색어] : 포지션, 모스트별로 클랜원을 검색합니다.\n";
                 strPrint += "/모임 : 모임 공지와 참가자를 출력합니다.\n";
                 strPrint += "/참가 : 모임에 참가 신청합니다.\n";
                 strPrint += "/참가 확정 : 모임에 참가 확정합니다.\n";
                 strPrint += "       (이미 참가일 경우 확정만 체크)\n";
                 strPrint += "/불참 : 모임에 참가 신청을 취소합니다.\n";
                 strPrint += "/투표 : 현재 진행 중인 투표를 출력합니다.\n";
-                strPrint += "/투표 숫자 : 현재 진행 중인 투표에 투표합니다.\n";
+                strPrint += "/투표 [숫자] : 현재 진행 중인 투표에 투표합니다.\n";
                 strPrint += "/투표 결과 : 현재 진행 중인 투표의 결과를 출력합니다.\n";
                 strPrint += "/기록 : 클랜 명예의 전당을 조회합니다.\n";
-                strPrint += "/기록 숫자 : 명예의 전당 상세내용을 조회합니다.\n";
+                strPrint += "/기록 [숫자] : 명예의 전당 상세내용을 조회합니다.\n";
                 strPrint += "/안내 : 팀 안내 메시지를 출력합니다.\n";
                 strPrint += "/상태 : 현재 봇 상태를 출력합니다. 대답이 없으면 이상.\n";
                 strPrint += "----------------------------------\n";
@@ -302,6 +303,98 @@ namespace CDT_Noti_Bot
                 strPrint += "==================================\n";
                 strPrint += "버그 및 문의사항이 있으시면 '휴린'에게 문의해주세요. :)\n";
                 strPrint += "==================================\n";
+
+                await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
+            }
+            //========================================================================================
+            // 등록
+            //========================================================================================
+            else if (strCommend == "/등록")
+            {
+                if (strContents == "")
+                {
+                    strPrint += "[ERROR] /등록 [본 계정 배틀태그] 로 등록해주세요.\n(ex: /등록 휴린#3602)";
+                }
+                else
+                {
+                    string battleTag = strContents;
+
+                    // Define request parameters.
+                    String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                    String range = "클랜원 목록!C7:N";
+                    SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+
+                    ValueRange response = request.Execute();
+                    if (response != null)
+                    {
+                        IList<IList<Object>> values = response.Values;
+                        if (values != null && values.Count > 0)
+                        {
+                            int index = 0;
+                            int searchIndex = 0;
+                            int searchCount = 0;
+
+                            foreach (var row in values)
+                            {
+                                // 검색 성공
+                                if (battleTag == row[1].ToString())
+                                {
+                                    searchCount++;
+                                    searchIndex = index;
+
+                                    if (row[10].ToString() != "")
+                                    {
+                                        strPrint += "[ERROR] 이미 등록되어있습니다.\n만약 본인이 등록하지 않았다면\n운영진에게 문의해주세요.";
+                                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
+                                        return;
+                                    }
+                                }
+                                else
+                                {
+                                    index++;
+                                }
+                            }
+
+                            if (searchCount == 0)
+                            {
+                                strPrint += "[ERROR] 배틀태그를 검색할 수 없습니다.";
+                            }
+                            else if (searchCount > 1)
+                            {
+                                strPrint += "[ERROR] 검색 결과가 2개 이상입니다. 배틀태그를 확인해주세요.";
+                            }
+                            else if (searchCount < 0)
+                            {
+                                strPrint += "[ERROR] 알 수 없는 문제";
+                            }
+                            else
+                            {
+                                range = "클랜원 목록!M" + (7 + searchIndex);
+
+                                // Define request parameters.
+                                ValueRange valueRange = new ValueRange();
+                                valueRange.MajorDimension = "COLUMNS"; //"ROWS";//COLUMNS 
+
+                                var oblist = new List<object>() { senderKey };
+                                valueRange.Values = new List<IList<object>> { oblist };
+
+                                SpreadsheetsResource.ValuesResource.UpdateRequest updateRequest = service.Spreadsheets.Values.Update(valueRange, spreadsheetId, range);
+
+                                updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.RAW;
+                                UpdateValuesResponse updateResponse = updateRequest.Execute();
+
+                                if (updateResponse == null)
+                                {
+                                    strPrint += "[ERROR] 시트를 업데이트 할 수 없습니다.";
+                                }
+                                else
+                                {
+                                    strPrint += "[SUCCESS] 등록이 완료됐습니다.";
+                                }
+                            }
+                        }
+                    }
+                }
 
                 await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
             }
