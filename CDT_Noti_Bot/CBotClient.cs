@@ -306,7 +306,7 @@ namespace CDT_Noti_Bot
                 await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
             }
             //========================================================================================
-            // 공지사항 관련 명령어
+            // 공지사항
             //========================================================================================
             else if (strCommend == "/공지")
             {
@@ -343,7 +343,7 @@ namespace CDT_Noti_Bot
                 }
             }
             //========================================================================================
-            // 조회 관련 명령어
+            // 조회
             //========================================================================================
             else if (strCommend == "/조회")
             {
@@ -356,7 +356,7 @@ namespace CDT_Noti_Bot
                 {
                     // Define request parameters.
                     String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
-                    String range = "클랜원 목록!C7:M";
+                    String range = "클랜원 목록!C7:N";
                     SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
                     ValueRange response = request.Execute();
@@ -506,8 +506,7 @@ namespace CDT_Noti_Bot
                                 strPrint += "- 모스트 : " + row[4].ToString() + " / " + row[5].ToString() + " / " + row[6].ToString() + "\n";
                                 strPrint += "- 이외 가능 픽 : " + row[7].ToString() + "\n";
                                 strPrint += "- 접속 시간대 : " + row[8].ToString() + "\n";
-                                strPrint += "- 소개\n";
-                                strPrint += "\t- " + row[9] + "\n";
+                                strPrint += "- 소개 : " + row[9].ToString() + "\n";
 
                                 bContinue = true;   // 한 명만 출력된다면 이 부분은 무시됨.
                             }
@@ -524,6 +523,9 @@ namespace CDT_Noti_Bot
                     }
                 }
             }
+            //========================================================================================
+            // 영상
+            //========================================================================================
             else if (strCommend == "/영상")
             {
                 // Define request parameters.
@@ -631,6 +633,9 @@ namespace CDT_Noti_Bot
                     await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 영상을 찾을 수 없습니다.", ParseMode.Default, false, false, iMessageID);
                 }
             }
+            //========================================================================================
+            // 검색
+            //========================================================================================
             else if (strCommend == "/검색")
             {
                 if (strContents == "")
@@ -642,7 +647,7 @@ namespace CDT_Noti_Bot
                 {
                     // Define request parameters.
                     String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
-                    String range = "클랜원 목록!C7:M";
+                    String range = "클랜원 목록!C7:N";
                     SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
                     bool bResult = false;
 
@@ -696,7 +701,7 @@ namespace CDT_Noti_Bot
                 }
             }
             //========================================================================================
-            // 정모 관련 명령어
+            // 모임
             //========================================================================================
             else if (strCommend == "/모임")
             {
@@ -1097,7 +1102,7 @@ namespace CDT_Noti_Bot
                 }
             }
             //========================================================================================
-            // 투표 관련 명령어
+            // 투표
             //========================================================================================
             else if (strCommend == "/투표")
             {
@@ -1343,7 +1348,7 @@ namespace CDT_Noti_Bot
                 }
             }
             //========================================================================================
-            // 명예의 전당 관련 명령어
+            // 명예의 전당
             //========================================================================================
             else if (strCommend == "/기록")
             {
@@ -1516,7 +1521,7 @@ namespace CDT_Noti_Bot
                 }
             }
             //========================================================================================
-            // 스크림 관련 명령어
+            // 스크림
             //========================================================================================
             else if (strCommend == "/스크림")
             {
@@ -1613,7 +1618,7 @@ namespace CDT_Noti_Bot
                 }
             }
             //========================================================================================
-            // 안내 관련 명령어
+            // 안내
             //========================================================================================
             else if (strCommend == "/안내")
             {
@@ -1643,10 +1648,16 @@ namespace CDT_Noti_Bot
 
                 await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
             }
+            //========================================================================================
+            // 리포트
+            //========================================================================================
             else if (strCommend == "/리포트")
             {
                 //await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
             }
+            //========================================================================================
+            // 상태
+            //========================================================================================
             else if (strCommend == "/상태")
             {
                 strPrint += "Running.......\n";
