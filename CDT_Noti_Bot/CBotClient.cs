@@ -246,19 +246,20 @@ namespace CDT_Noti_Bot
                 return;
             }
 
+            string strFirstName = varMessage.From.FirstName;
+            string strLastName = varMessage.From.LastName;
+            int iMessageID = varMessage.MessageId;
+            long senderKey = varMessage.From.Id;
+
             // CDT 관련방 아니면 동작하지 않도록 수정
             if (varMessage.Chat.Id != -1001202203239 &&     // 본방
                 varMessage.Chat.Id != -1001312491933 &&     // 운영진방
                 varMessage.Chat.Id != -1001389956706 &&     // 사전안내방
                 varMessage.Chat.Username != "hyulin")
             {
+                await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 사용할 수 없는 대화방입니다.", ParseMode.Default, false, false, iMessageID);
                 return;
             }
-
-            string strFirstName = varMessage.From.FirstName;
-            string strLastName = varMessage.From.LastName;
-            int iMessageID = varMessage.MessageId;
-            long senderKey = varMessage.From.Id;
 
             // 이스터에그 (아테나 대사 출력)
             if (varMessage.ReplyToMessage != null && varMessage.ReplyToMessage.From.FirstName.Contains("아테나") == true)
