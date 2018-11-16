@@ -2310,7 +2310,8 @@ namespace CDT_Noti_Bot
 
                     int index = 0;
 
-                    range = "일정 조사!C5:J";
+                    spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                    range = "일정 조사!B5:J74";
                     request = service.Spreadsheets.Values.Get(spreadsheetId, range);
                     response = request.Execute();
                     if (response != null)
@@ -2319,17 +2320,37 @@ namespace CDT_Noti_Bot
                         if (values != null && values.Count > 0)
                         {
                             int count = 0;
+                            bool isInput = false;
+                            bool isBlank = false;
 
                             foreach (var row in values)
                             {
-                                if (row.Count == 0 || row[0].ToString() == "")
+                                if (row.Count > 1 && row[1].ToString() != "")
                                 {
-                                    index += count;
+                                    if (row[1].ToString() == strUserName)
+                                    {
+                                        index = count;
+                                        isInput = true;
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        count++;
+                                    }
                                 }
                                 else
                                 {
-                                    count++;
+                                    if (index == 0 && isBlank == false)
+                                    {
+                                        index = count++;
+                                        isBlank = true;
+                                    }
                                 }
+                            }
+
+                            if (isInput == false  && isBlank == false && index == 0)
+                            {
+                                index = count;
                             }
                         }
                     }
@@ -2391,7 +2412,7 @@ namespace CDT_Noti_Bot
 
                     if (strPrint != "")
                     {
-                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[SYSTEM] 일정 조사를 완료했습니다.", ParseMode.Default, false, false, iMessageID);
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
                     }
                     else
                     {
