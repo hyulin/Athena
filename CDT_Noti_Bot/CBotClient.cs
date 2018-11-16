@@ -350,7 +350,7 @@ namespace CDT_Noti_Bot
                 strPrint += "==================================\n";
                 strPrint += "[ 아테나 v1.3 ]\n[ Clien Delicious Team Notice Bot ]\n\n";
                 strPrint += "/공지 : 팀 공지사항을 출력합니다.\n";
-                strPrint += "/등록 [본 계정 배틀태그] : 아테나에 클랜원 등록을 합니다.";
+                strPrint += "/등록 [본 계정 배틀태그] : 아테나에 등록 합니다.\n";
                 strPrint += "/조회 [검색어] : 클랜원을 조회합니다.\n";
                 strPrint += "               (검색범위 : 대화명, 배틀태그, 부계정)\n";
                 strPrint += "/영상 : 영상이 있던 날짜를 조회합니다.\n";
