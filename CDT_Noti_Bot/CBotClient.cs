@@ -412,7 +412,7 @@ namespace CDT_Noti_Bot
             }
 
             string strMassage = varMessage.Text;
-            string strUserName = varMessage.Chat.FirstName + varMessage.Chat.LastName;
+            string strUserName = varMessage.From.FirstName + varMessage.From.LastName;
             string strCommend = "";
             string strContents = "";
 
