@@ -2202,6 +2202,8 @@ namespace CDT_Noti_Bot
 
                     if (strPrint != "")
                     {
+                        strPrint += "\n조사에 참여하려면 /조사 [요일] 로 참여해주세요.\n(ex: /조사 금토일)";
+
                         const string calendar_research = @"Function/calendar_research.jpg";
                         var fileName = calendar_research.Split(Path.DirectorySeparatorChar).Last();
                         var fileStream = new FileStream(calendar_research, FileMode.Open, FileAccess.Read, FileShare.Read);
