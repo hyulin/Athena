@@ -450,6 +450,8 @@ namespace CDT_Noti_Bot
                 strPrint += "/스크림 : 현재 모집 중인 스크림의 참가자를 출력합니다.\n";
                 strPrint += "/스크림 [요일] : 현재 모집 중인 스크림에 참가신청합니다.\n";
                 strPrint += "/스크림 취소 : 신청한 스크림에 참가를 취소합니다.\n";
+                strPrint += "/조사 : 현재 진행 중인 일정 조사를 출력합니다.\n";
+                strPrint += "/조사 [요일] : 현재 진행 중인 일정 조사에 체크합니다.\n";
                 strPrint += "/모임 : 모임 공지와 참가자를 출력합니다.\n";
                 strPrint += "/참가 : 모임에 참가 신청합니다.\n";
                 strPrint += "/참가 확정 : 모임에 참가 확정합니다.\n";
@@ -1922,6 +1924,12 @@ namespace CDT_Noti_Bot
                     }
                     else
                     {
+                        if (strContents.Contains("요") == true)
+                        {
+                            await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 잘못된 날짜입니다.", ParseMode.Default, false, false, iMessageID);
+                            return;
+                        }
+
                         // 가능 날짜 추출
                         for (int i = 0; i < size; i++)
                         {
@@ -2151,6 +2159,241 @@ namespace CDT_Noti_Bot
                     if (strPrint != "")
                     {
                         await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
+                    }
+                }
+            }
+            //========================================================================================
+            // 일정 조사
+            //========================================================================================
+            else if (strCommend == "/조사")
+            {
+                if (strContents == "")
+                {
+                    String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                    String range = "일정 조사!L5:R12";
+                    SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+                    ValueRange response = request.Execute();
+                    if (response != null)
+                    {
+                        IList<IList<Object>> values = response.Values;
+                        if (values != null && values.Count > 0)
+                        {
+                            var title = values[0];
+                            if (title.Count == 0)
+                            {
+                                strPrint += "[ERROR] 현재 조사 중인 일정이 없습니다.";
+                                await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
+                                return;
+                            }
+                            else
+                            {
+                                strPrint += title[0].ToString() + "\n============================\n";
+
+                                var day = values[6];
+                                var count = values[7];
+
+                                for (int i=0; i<7; i++)
+                                {
+                                    strPrint += "- " + day[i].ToString() + " : " + count[i].ToString() + "명\n";
+                                }
+                            }
+                        }
+                    }
+
+                    if (strPrint != "")
+                    {
+                        const string calendar_research = @"Function/calendar_research.jpg";
+                        var fileName = calendar_research.Split(Path.DirectorySeparatorChar).Last();
+                        var fileStream = new FileStream(calendar_research, FileMode.Open, FileAccess.Read, FileShare.Read);
+                        await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream, strPrint, ParseMode.Default, false, iMessageID);
+                    }
+                    else
+                    {
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 현재 모집 중인 스크림이 없습니다.", ParseMode.Default, false, false, iMessageID);
+                    }
+                }
+                else
+                {
+                    int size = strContents.Length;
+                    string[] day = { "", "", "", "", "", "", "" };
+                    bool isConfirmDay = false;
+                    bool isCancel = false;
+
+                    if (strContents == "취소")
+                    {
+                        isCancel = true;
+                    }
+                    else
+                    {
+                        if (strContents.Contains("요") == true)
+                        {
+                            await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 잘못된 날짜입니다.", ParseMode.Default, false, false, iMessageID);
+                            return;
+                        }
+
+                        // 가능 날짜 추출
+                        for (int i = 0; i < size; i++)
+                        {
+                            string inputDay = strContents.Substring(i, 1);
+
+                            if (inputDay == "월")
+                            {
+                                day[0] = "O";
+                                isConfirmDay = true;
+                            }
+                            if (inputDay == "화")
+                            {
+                                day[1] = "O";
+                                isConfirmDay = true;
+                            }
+                            if (inputDay == "수")
+                            {
+                                day[2] = "O";
+                                isConfirmDay = true;
+                            }
+                            if (inputDay == "목")
+                            {
+                                day[3] = "O";
+                                isConfirmDay = true;
+                            }
+                            if (inputDay == "금")
+                            {
+                                day[4] = "O";
+                                isConfirmDay = true;
+                            }
+                            if (inputDay == "토")
+                            {
+                                day[5] = "O";
+                                isConfirmDay = true;
+                            }
+                            if (inputDay == "일")
+                            {
+                                day[6] = "O";
+                                isConfirmDay = true;
+                            }
+                        }
+
+                        if (isConfirmDay == false)
+                        {
+                            await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 잘못된 날짜입니다.", ParseMode.Default, false, false, iMessageID);
+                            return;
+                        }
+                    }
+
+                    string calTitle = "";
+
+                    String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                    String range = "일정 조사!L5:L";
+                    SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+                    ValueRange response = request.Execute();
+                    if (response != null)
+                    {
+                        IList<IList<Object>> values = response.Values;
+                        if (values != null && values.Count > 0)
+                        {
+                            var title = values[0];
+                            if (title.Count == 0)
+                            {
+                                strPrint += "[ERROR] 현재 조사 중인 일정이 없습니다.";
+                                await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
+                                return;
+                            }
+                            else
+                            {
+                                // 일정 조사 제목
+                                calTitle = title[0].ToString();
+                            }
+                        }
+                    }
+
+                    int index = 0;
+
+                    range = "일정 조사!C5:J";
+                    request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+                    response = request.Execute();
+                    if (response != null)
+                    {
+                        IList<IList<Object>> values = response.Values;
+                        if (values != null && values.Count > 0)
+                        {
+                            int count = 0;
+
+                            foreach (var row in values)
+                            {
+                                if (row.Count == 0 || row[0].ToString() == "")
+                                {
+                                    index += count;
+                                }
+                                else
+                                {
+                                    count++;
+                                }
+                            }
+                        }
+                    }
+
+                    if (isCancel == false)
+                    {
+                        range = "일정 조사!C" + (5 + index) + ":J" + (5 + index);
+                        ValueRange valueRange = new ValueRange();
+                        valueRange.MajorDimension = "ROWS"; //"ROWS";//COLUMNS 
+
+                        var oblist = new List<object>()
+                            {
+                                strUserName,
+                                day[0],             // 월
+                                day[1],             // 화
+                                day[2],             // 수
+                                day[3],             // 목
+                                day[4],             // 금
+                                day[5],             // 토
+                                day[6]              // 일
+                            };
+                        valueRange.Values = new List<IList<object>> { oblist };
+
+                        SpreadsheetsResource.ValuesResource.UpdateRequest updateRequest = service.Spreadsheets.Values.Update(valueRange, spreadsheetId, range);
+
+                        updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.RAW;
+                        UpdateValuesResponse updateResponse = updateRequest.Execute();
+                        if (updateResponse == null)
+                        {
+                            strPrint += "[ERROR] 시트를 업데이트 할 수 없습니다.";
+                        }
+                        else
+                        {
+                            strPrint += "[SYSTEM] 일정 조사를 완료했습니다.";
+                        }
+                    }
+                    else
+                    {
+                        range = "일정 조사!C" + (5 + index) + ":J" + (5 + index);
+                        ValueRange valueRange = new ValueRange();
+                        valueRange.MajorDimension = "ROWS"; //"ROWS";//COLUMNS 
+
+                        var oblist = new List<object>() {"","","","","","","",""};
+                        valueRange.Values = new List<IList<object>> { oblist };
+
+                        SpreadsheetsResource.ValuesResource.UpdateRequest updateRequest = service.Spreadsheets.Values.Update(valueRange, spreadsheetId, range);
+
+                        updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.RAW;
+                        UpdateValuesResponse updateResponse = updateRequest.Execute();
+                        if (updateResponse == null)
+                        {
+                            strPrint += "[ERROR] 시트를 업데이트 할 수 없습니다.";
+                        }
+                        else
+                        {
+                            strPrint += "[SYSTEM] 일정 조사를 취소했습니다.";
+                        }
+                    }
+
+                    if (strPrint != "")
+                    {
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[SYSTEM] 일정 조사를 완료했습니다.", ParseMode.Default, false, false, iMessageID);
+                    }
+                    else
+                    {
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 일정 조사를 할 수 없습니다.", ParseMode.Default, false, false, iMessageID);
                     }
                 }
             }
