@@ -35,7 +35,7 @@ namespace CDT_Noti_Bot
         public USER_TYPE UserType { get; set; }
         public string MainBattleTag { get; set; }
         public string[] SubBattleTag { get; set; }
-        public int Position { get; set; }
+        public POSITION Position { get; set; }
         public string[] MostPick { get; set; }
         public string OtherPick { get; set; }
         public string Time { get; set; }

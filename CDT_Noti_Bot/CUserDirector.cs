@@ -28,20 +28,13 @@ namespace CDT_Noti_Bot
         // 유저키로 유저 정보 얻어옴
         public CUser getUserInfo(long userKey)
         {
+            if (userInfo.ContainsKey(userKey) == true)
+            {
+                return userInfo[userKey];
+            }
+
             CUser tempUserInfo = new CUser();
-
-            if (userKey <= 0)
-            {
-                // 유저 키가 없음
-                return tempUserInfo;
-            }
-
-            if (userCount <= 0)
-            {
-                return tempUserInfo;
-            }
-
-            return userInfo[userKey];
+            return tempUserInfo;
         }
 
         // 유저 정보 갱신
