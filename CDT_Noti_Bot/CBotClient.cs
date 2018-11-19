@@ -351,6 +351,34 @@ namespace CDT_Noti_Bot
                 return;
             }
 
+            // 명령어, 서브명령어 분리
+            string strMassage = varMessage.Text;
+            string strUserName = varMessage.From.FirstName + varMessage.From.LastName;
+            string strCommend = "";
+            string strContents = "";
+
+            if (strMassage.Substring(0, 1) != "/")
+            {
+                return;
+            }
+
+            if (strMassage.IndexOf(" ") == -1)
+            {
+                strCommend = strMassage;
+            }
+            else
+            {
+                strCommend = strMassage.Substring(0, strMassage.IndexOf(" "));
+                strContents = strMassage.Substring(strMassage.IndexOf(" ") + 1, strMassage.Count() - strMassage.IndexOf(" ") - 1);
+            }
+
+            // 미등록 유저는 사용할 수 없다.
+            if (strCommend != "/등록" && userDirector.getUserInfo(senderKey).UserKey == 0)
+            {
+                await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 아테나에 등록되지 않은 유저입니다.", ParseMode.Default, false, false, iMessageID);
+                return;
+            }
+
             // 이스터에그 (아테나 대사 출력)
             if (varMessage.ReplyToMessage != null && varMessage.ReplyToMessage.From.FirstName.Contains("아테나") == true)
             {
@@ -411,26 +439,6 @@ namespace CDT_Noti_Bot
                 }
             }
 
-            string strMassage = varMessage.Text;
-            string strUserName = varMessage.From.FirstName + varMessage.From.LastName;
-            string strCommend = "";
-            string strContents = "";
-
-            if (strMassage.Substring(0, 1) != "/")
-            {
-                return;
-            }
-
-            if (strMassage.IndexOf(" ") == -1)
-            {
-                strCommend = strMassage;
-            }
-            else
-            {
-                strCommend = strMassage.Substring(0, strMassage.IndexOf(" "));
-                strContents = strMassage.Substring(strMassage.IndexOf(" ") + 1, strMassage.Count() - strMassage.IndexOf(" ") - 1);
-            }
-
             string strPrint = "";
 
             //========================================================================================
@@ -479,7 +487,7 @@ namespace CDT_Noti_Bot
             {
                 if (strContents == "")
                 {
-                    strPrint += "[ERROR] 사용자 등록을 하려면\n/등록 [본 계정 배틀태그] 로 등록해주세요.\n(ex: /등록 휴린#3602)";
+                    strPrint += "[SYSTEM] 사용자 등록을 하려면\n/등록 [본 계정 배틀태그] 로 등록해주세요.\n(ex: /등록 휴린#3602)";
                 }
                 else
                 {
@@ -507,38 +515,44 @@ namespace CDT_Noti_Bot
                                 // 검색 성공
                                 if (battleTag == row[1].ToString())
                                 {
+                                    long userKey = 0;
                                     searchCount++;
                                     searchIndex = index;
 
                                     if (row[10].ToString() != "")
                                     {
                                         // 이미 값이 있으므로 갱신한다.
-                                        user.UserKey = Convert.ToInt64(row[10].ToString());
-                                        user.Name = row[0].ToString();
-                                        user.MainBattleTag = row[1].ToString();
-                                        user.SubBattleTag = row[2].ToString().Trim().Split(',');
-
-                                        if (row[3].ToString() == "플렉스")
-                                            user.Position |= POSITION.POSITION_FLEX;
-                                        if (row[3].ToString().ToUpper().Contains("딜"))
-                                            user.Position |= POSITION.POSITION_DPS;
-                                        if (row[3].ToString().ToUpper().Contains("탱"))
-                                            user.Position |= POSITION.POSITION_TANK;
-                                        if (row[3].ToString().ToUpper().Contains("힐"))
-                                            user.Position |= POSITION.POSITION_SUPP;
-
-                                        string[] most = new string[3];
-                                        most[0] = row[4].ToString();
-                                        most[1] = row[5].ToString();
-                                        most[2] = row[6].ToString();
-                                        user.MostPick = most;
-
-                                        user.OtherPick = row[7].ToString();
-                                        user.Time = row[8].ToString();
-                                        user.Info = row[9].ToString();
-
+                                        userKey = Convert.ToInt64(row[10].ToString());
                                         isReflesh = true;
                                     }
+                                    else
+                                    {
+                                        userKey = senderKey;
+                                    }
+
+                                    user.UserKey = userKey;
+                                    user.Name = row[0].ToString();
+                                    user.MainBattleTag = row[1].ToString();
+                                    user.SubBattleTag = row[2].ToString().Trim().Split(',');
+
+                                    if (row[3].ToString() == "플렉스")
+                                        user.Position |= POSITION.POSITION_FLEX;
+                                    if (row[3].ToString().ToUpper().Contains("딜"))
+                                        user.Position |= POSITION.POSITION_DPS;
+                                    if (row[3].ToString().ToUpper().Contains("탱"))
+                                        user.Position |= POSITION.POSITION_TANK;
+                                    if (row[3].ToString().ToUpper().Contains("힐"))
+                                        user.Position |= POSITION.POSITION_SUPP;
+
+                                    string[] most = new string[3];
+                                    most[0] = row[4].ToString();
+                                    most[1] = row[5].ToString();
+                                    most[2] = row[6].ToString();
+                                    user.MostPick = most;
+
+                                    user.OtherPick = row[7].ToString();
+                                    user.Time = row[8].ToString();
+                                    user.Info = row[9].ToString();
                                 }
                                 else
                                 {
@@ -592,6 +606,7 @@ namespace CDT_Noti_Bot
                                 else
                                 {
                                     strPrint += "[SUCCESS] 등록이 완료됐습니다.";
+                                    userDirector.AddUserInfo(senderKey, user);
                                 }
                             }
                         }
