@@ -375,7 +375,7 @@ namespace CDT_Noti_Bot
             // 미등록 유저는 사용할 수 없다.
             if (strCommend != "/등록" && userDirector.getUserInfo(senderKey).UserKey == 0)
             {
-                await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 아테나에 등록되지 않은 유저입니다.", ParseMode.Default, false, false, iMessageID);
+                await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 아테나에 등록되지 않은 유저입니다.\n등록을 하시려면 /등록 명령어를 참고해주세요.", ParseMode.Default, false, false, iMessageID);
                 return;
             }
 
