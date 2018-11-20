@@ -1474,10 +1474,9 @@ namespace CDT_Noti_Bot
 
                             // 투표자
                             index = 14;
-                            int roofCount = index + itemCount;
-                            for (; index < roofCount; index++)
+                            while (true)
                             {
-                                value = values[index];
+                                value = values[index++];
 
                                 for (int i = 0; i < value.Count - 1; i++)
                                 {
@@ -1485,6 +1484,11 @@ namespace CDT_Noti_Bot
                                     {
                                         voteDirector.AddVoter(i, value[i + 1].ToString());
                                     }
+                                }
+
+                                if (value.Count == 1)
+                                {
+                                    break;
                                 }
                             }
 
