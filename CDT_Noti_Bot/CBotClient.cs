@@ -1591,7 +1591,7 @@ namespace CDT_Noti_Bot
                                 }
 
                                 int voteIndex = Convert.ToInt32(strContents);
-                                if (voteIndex <= 0)
+                                if ( (voteIndex <= 0) || (voteIndex > voteDirector.GetItemCount()) )
                                 {
                                     await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 투표 항목을 잘못 선택하셨습니다.", ParseMode.Default, false, false, iMessageID);
                                     return;
