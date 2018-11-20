@@ -356,32 +356,36 @@ namespace CDT_Noti_Bot
             string strUserName = varMessage.From.FirstName + varMessage.From.LastName;
             string strCommend = "";
             string strContents = "";
+            bool isCommand = false;
 
-            if (strMassage.Substring(0, 1) != "/")
+            // 명령어인지 아닌지 구분
+            if (strMassage.Substring(0, 1) == "/")
             {
-                return;
-            }
+                isCommand = true;
 
-            if (strMassage.IndexOf(" ") == -1)
-            {
-                strCommend = strMassage;
-            }
-            else
-            {
-                strCommend = strMassage.Substring(0, strMassage.IndexOf(" "));
-                strContents = strMassage.Substring(strMassage.IndexOf(" ") + 1, strMassage.Count() - strMassage.IndexOf(" ") - 1);
-            }
+                // 명령어와 서브명령어 구분
+                if (strMassage.IndexOf(" ") == -1)
+                {
+                    strCommend = strMassage;
+                }
+                else
+                {
+                    strCommend = strMassage.Substring(0, strMassage.IndexOf(" "));
+                    strContents = strMassage.Substring(strMassage.IndexOf(" ") + 1, strMassage.Count() - strMassage.IndexOf(" ") - 1);
+                }
 
-            // 미등록 유저는 사용할 수 없다.
-            if (strCommend != "/등록" && userDirector.getUserInfo(senderKey).UserKey == 0)
-            {
-                await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 아테나에 등록되지 않은 유저입니다.\n등록을 하시려면 /등록 명령어를 참고해주세요.", ParseMode.Default, false, false, iMessageID);
-                return;
+                // 미등록 유저는 사용할 수 없다.
+                if (strCommend != "/등록" && userDirector.getUserInfo(senderKey).UserKey == 0)
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 아테나에 등록되지 않은 유저입니다.\n등록을 하시려면 /등록 명령어를 참고해주세요.", ParseMode.Default, false, false, iMessageID);
+                    return;
+                }
             }
 
             // 이스터에그 (아테나 대사 출력)
-            if (varMessage.ReplyToMessage != null && varMessage.ReplyToMessage.From.FirstName.Contains("아테나") == true)
+            if (userDirector.getUserInfo(senderKey).UserKey != 0 && varMessage.ReplyToMessage != null && varMessage.ReplyToMessage.From.FirstName.Contains("아테나") == true)
             {
+                // 등록된 유저가 시도했을 경우 출력
                 await Bot.SendTextMessageAsync(varMessage.Chat.Id, EasterEgg.GetEasterEgg(), ParseMode.Default, false, false, iMessageID);
                 return;
             }
@@ -437,6 +441,12 @@ namespace CDT_Noti_Bot
                 {
                     return;
                 }
+            }
+
+            // 명령어가 아닐 경우 아래는 태울 필요 없다.
+            if (isCommand == false)
+            {
+                return;
             }
 
             string strPrint = "";
