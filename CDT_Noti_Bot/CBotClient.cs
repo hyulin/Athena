@@ -2314,7 +2314,7 @@ namespace CDT_Noti_Bot
                     string calTitle = "";
 
                     String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
-                    String range = "일정 조사!L5:L";
+                    String range = "일정 조사!L7:L";
                     SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
                     ValueRange response = request.Execute();
                     if (response != null)
