@@ -13,7 +13,7 @@ namespace CDT_Noti_Bot
         int userCount = 0;
 
         // 유저 추가
-        public void AddUserInfo(long userKey, CUser user)
+        public void addUserInfo(long userKey, CUser user)
         {
             if (userKey <= 0)
             {

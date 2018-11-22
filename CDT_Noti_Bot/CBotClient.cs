@@ -145,7 +145,7 @@ namespace CDT_Noti_Bot
                         }
 
                         if (isReflesh == false)
-                            userDirector.AddUserInfo(userKey, user);
+                            userDirector.addUserInfo(userKey, user);
                         else
                             userDirector.reflechUserInfo(userKey, user);
                     }
@@ -616,7 +616,7 @@ namespace CDT_Noti_Bot
                                 else
                                 {
                                     strPrint += "[SUCCESS] 등록이 완료됐습니다.";
-                                    userDirector.AddUserInfo(senderKey, user);
+                                    userDirector.addUserInfo(senderKey, user);
                                 }
                             }
                         }
@@ -660,6 +660,104 @@ namespace CDT_Noti_Bot
                 else
                 {
                     await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 공지가 등록되지 않았습니다.", ParseMode.Default, false, false, iMessageID);
+                }
+            }
+            //========================================================================================
+            // 일정
+            //========================================================================================
+            else if (strCommend == "/일정")
+            {
+                // Define request parameters.
+                String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                String range = "클랜 공지!I15:P27";
+                SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+
+                ValueRange response = request.Execute();
+                if (response != null)
+                {
+                    IList<IList<Object>> values = response.Values;
+                    if (values != null && values.Count > 0)
+                    {
+                        CCalendarDirector calendarDirector = new CCalendarDirector();
+
+                        var title = values[0];
+                        strPrint += "[ " + title[0].ToString() + " ]\n\n";
+
+                        var week1st = values[2];
+                        var week2nd = values[4];
+                        var week3rd = values[6];
+                        var week4th = values[8];
+                        var week5th = values[10];
+
+                        var todo1st = values[3];
+                        var todo2nd = values[5];
+                        var todo3rd = values[7];
+                        var todo4th = values[9];
+                        var todo5th = values[11];
+
+                        // 날짜
+                        for (int index = 3; index < values.Count; index += 2)
+                        {
+                            var row = values[index];
+                            CCalendar calendar = new CCalendar();
+                            int weekDay = 0;
+
+                            for(int wday = 0; wday < (int)DAY_WEEK.DAY_WEEK_MAX; wday++)
+                            {
+                                // 중간에 한 칸이 비어있음
+                                if (wday == 1)
+                                    continue;
+
+                                if (row[wday].ToString() == "")
+                                    continue;
+
+                                switch (wday)
+                                {
+                                    case 0:
+                                        weekDay = (int)DAY_WEEK.DAY_WEEK_SUNDAY;
+                                        break;
+                                    case 1:
+                                        break;
+                                    case 2:
+                                        weekDay = (int)DAY_WEEK.DAY_WEEK_MONDAY;
+                                        break;
+                                    case 3:
+                                        weekDay = (int)DAY_WEEK.DAY_WEEK_TUESDAY;
+                                        break;
+                                    case 4:
+                                        weekDay = (int)DAY_WEEK.DAY_WEEK_WEDNESDAY;
+                                        break;
+                                    case 5:
+                                        weekDay = (int)DAY_WEEK.DAY_WEEK_THURSDAY;
+                                        break;
+                                    case 6:
+                                        weekDay = (int)DAY_WEEK.DAY_WEEK_FRIDAY;
+                                        break;
+                                    case 7:
+                                        weekDay = (int)DAY_WEEK.DAY_WEEK_SATURDAY;
+                                        break;
+                                    default:
+                                        continue;
+                                }
+
+                                calendar.Day = Convert.ToInt32(row[wday].ToString());
+                                calendar.WEEK = (DAY_WEEK)weekDay;
+                                calendarDirector.addCalendar(calendar);
+                            }
+                        }
+                    }
+                }
+
+                if (strPrint != "")
+                {
+                    const string notice = @"Function/Calendar.png";
+                    var fileName = notice.Split(Path.DirectorySeparatorChar).Last();
+                    var fileStream = new FileStream(notice, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream, strPrint, ParseMode.Default, false, iMessageID);
+                }
+                else
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 일정이 등록되지 않았습니다.", ParseMode.Default, false, false, iMessageID);
                 }
             }
             //========================================================================================
