@@ -1214,6 +1214,25 @@ namespace CDT_Noti_Bot
             }
             else if (strCommend == "/참가")
             {
+                String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                String range = "모임!D4:D";
+                SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+
+                ValueRange response = request.Execute();
+                if (response != null)
+                {
+                    IList<IList<Object>> values = response.Values;
+                    if (values != null && values.Count > 0)
+                    {
+                        var row = values[0];
+                        if (row.Count == 0)
+                        {
+                            await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 모임이 등록되지 않았습니다.", ParseMode.Default, false, false, iMessageID);
+                            return;
+                        }
+                    }
+                }
+
                 string strNickName = strFirstName + strLastName;
                 int iCellIndex = 16;
                 int iTempCount = 0;
@@ -1223,11 +1242,11 @@ namespace CDT_Noti_Bot
                 bool isJoin = false;
 
                 // Define request parameters.
-                String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
-                String range = "모임!C" + iCellIndex + ":C";
-                SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+                spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                range = "모임!C" + iCellIndex + ":C";
+                request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
-                ValueRange response = request.Execute();
+                response = request.Execute();
                 if (response != null)
                 {
                     IList<IList<Object>> values = response.Values;
@@ -1351,17 +1370,36 @@ namespace CDT_Noti_Bot
             }
             else if (strCommend == "/불참")
             {
+                String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                String range = "모임!D4:D";
+                SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+
+                ValueRange response = request.Execute();
+                if (response != null)
+                {
+                    IList<IList<Object>> values = response.Values;
+                    if (values != null && values.Count > 0)
+                    {
+                        var row = values[0];
+                        if (row.Count == 0)
+                        {
+                            await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 모임이 등록되지 않았습니다.", ParseMode.Default, false, false, iMessageID);
+                            return;
+                        }
+                    }
+                }
+
                 string strNickName = strFirstName + strLastName;
                 int iCellIndex = 16;
                 int iTempCount = 0;
                 bool isJoin = false;
 
                 // Define request parameters.
-                String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
-                String range = "모임!C" + iCellIndex + ":C";
-                SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+                spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                range = "모임!C" + iCellIndex + ":C";
+                request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
-                ValueRange response = request.Execute();
+                response = request.Execute();
                 if (response != null)
                 {
                     IList<IList<Object>> values = response.Values;
