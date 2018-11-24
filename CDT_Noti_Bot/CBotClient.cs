@@ -681,7 +681,11 @@ namespace CDT_Noti_Bot
                     if (values != null && values.Count > 0)
                     {
                         var title = values[0];
-                        strPrint += "[ " + title[0].ToString() + " ]\n\n";
+                        if (title.Count == 0)
+                        {
+                            await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 일정이 등록되지 않았습니다.", ParseMode.Default, false, false, iMessageID);
+                            return;
+                        }
 
                         // 날짜
                         for (int index = 3; index < values.Count; index += 2)
@@ -689,10 +693,10 @@ namespace CDT_Noti_Bot
                             var row = values[index];
                             var todo = values[index + 1];
                             
-                            for(int wday = 0; wday < (int)DAY_WEEK.DAY_WEEK_MAX; wday++)
+                            for(int wday = 0; wday < 8/*일주일 7일 + 빈칸 1개*/; wday++)
                             {
                                 CCalendar calendar = new CCalendar();
-                                int weekDay = 0;
+                                string weekDay = "";
                                 
                                 // 중간에 한 칸이 비어있음
                                 if (wday == 1)
@@ -704,34 +708,46 @@ namespace CDT_Noti_Bot
                                 switch (wday)
                                 {
                                     case 0:
-                                        weekDay = (int)DAY_WEEK.DAY_WEEK_SUNDAY;
+                                        weekDay = "일";
                                         break;
                                     case 2:
-                                        weekDay = (int)DAY_WEEK.DAY_WEEK_MONDAY;
+                                        weekDay = "월";
                                         break;
                                     case 3:
-                                        weekDay = (int)DAY_WEEK.DAY_WEEK_TUESDAY;
+                                        weekDay = "화";
                                         break;
                                     case 4:
-                                        weekDay = (int)DAY_WEEK.DAY_WEEK_WEDNESDAY;
+                                        weekDay = "수";
                                         break;
                                     case 5:
-                                        weekDay = (int)DAY_WEEK.DAY_WEEK_THURSDAY;
+                                        weekDay = "목";
                                         break;
                                     case 6:
-                                        weekDay = (int)DAY_WEEK.DAY_WEEK_FRIDAY;
+                                        weekDay = "금";
                                         break;
                                     case 7:
-                                        weekDay = (int)DAY_WEEK.DAY_WEEK_SATURDAY;
+                                        weekDay = "토";
                                         break;
                                     default:
                                         continue;
                                 }
 
                                 calendar.Day = Convert.ToInt32(row[wday].ToString());
-                                calendar.WEEK = (DAY_WEEK)weekDay;
-                                calendar.TODO = todo[wday].ToString();
+                                calendar.Week = weekDay;
+                                calendar.Todo = todo[wday].ToString();
                                 calendarDirector.addCalendar(calendar);
+                            }
+                        }
+
+                        strPrint += "[ " + title[0].ToString() + " ]\n============================\n";
+
+                        for (int i = 1; i <= calendarDirector.getCalendarCount(); i++)
+                        {
+                            CCalendar calendar = calendarDirector.getCalendar(i);
+
+                            if (calendar.Todo != "")
+                            {
+                                strPrint += "* " + calendar.Day + "일(" + calendar.Week + ") : " + calendar.Todo + "\n";
                             }
                         }
                     }

@@ -27,5 +27,10 @@ namespace CDT_Noti_Bot
             CCalendar emptyCalendar = new CCalendar();
             return emptyCalendar;
         }
+
+        public int getCalendarCount()
+        {
+            return calenderDictionary_.Count;
+        }
     }
 }
