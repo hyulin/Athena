@@ -8,26 +8,24 @@ namespace CDT_Noti_Bot
 {
     class CCalendarDirector
     {
-        CCalendar[] calendar_ = new CCalendar[35];
+        Dictionary<int, CCalendar> calenderDictionary_ = new Dictionary<int, CCalendar>();
 
         public void addCalendar(CCalendar calendar)
         {
             int index = calendar.Day;
 
-            calendar_[index].Day = calendar.Day;
-            calendar_[index].WEEK = calendar.WEEK;
-            calendar_[index].TODO = calendar.TODO;
+            calenderDictionary_.Add(index, calendar);
         }
 
         public CCalendar getCalendar(int day)
         {
-            if (day > 0 && day < 32)
+            if (calenderDictionary_.ContainsKey(day) == true)
             {
-                return calendar_[day];
+                return calenderDictionary_[day];
             }
 
-            CCalendar empty = new CCalendar();
-            return empty;
+            CCalendar emptyCalendar = new CCalendar();
+            return emptyCalendar;
         }
     }
 }

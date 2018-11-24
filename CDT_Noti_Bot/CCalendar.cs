@@ -8,7 +8,7 @@ namespace CDT_Noti_Bot
 {
     enum DAY_WEEK
     {
-        DAY_WEEK_SUNDAY,
+        DAY_WEEK_SUNDAY = 1,
         DAY_WEEK_MONDAY,
         DAY_WEEK_TUESDAY,
         DAY_WEEK_WEDNESDAY,

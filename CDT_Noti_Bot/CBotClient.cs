@@ -667,9 +667,11 @@ namespace CDT_Noti_Bot
             //========================================================================================
             else if (strCommend == "/일정")
             {
+                CCalendarDirector calendarDirector = new CCalendarDirector();
+
                 // Define request parameters.
                 String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
-                String range = "클랜 공지!I15:P27";
+                String range = "클랜 공지!I15:Q27";
                 SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
                 ValueRange response = request.Execute();
@@ -678,32 +680,20 @@ namespace CDT_Noti_Bot
                     IList<IList<Object>> values = response.Values;
                     if (values != null && values.Count > 0)
                     {
-                        CCalendarDirector calendarDirector = new CCalendarDirector();
-
                         var title = values[0];
                         strPrint += "[ " + title[0].ToString() + " ]\n\n";
-
-                        var week1st = values[2];
-                        var week2nd = values[4];
-                        var week3rd = values[6];
-                        var week4th = values[8];
-                        var week5th = values[10];
-
-                        var todo1st = values[3];
-                        var todo2nd = values[5];
-                        var todo3rd = values[7];
-                        var todo4th = values[9];
-                        var todo5th = values[11];
 
                         // 날짜
                         for (int index = 3; index < values.Count; index += 2)
                         {
                             var row = values[index];
-                            CCalendar calendar = new CCalendar();
-                            int weekDay = 0;
-
+                            var todo = values[index + 1];
+                            
                             for(int wday = 0; wday < (int)DAY_WEEK.DAY_WEEK_MAX; wday++)
                             {
+                                CCalendar calendar = new CCalendar();
+                                int weekDay = 0;
+                                
                                 // 중간에 한 칸이 비어있음
                                 if (wday == 1)
                                     continue;
@@ -715,8 +705,6 @@ namespace CDT_Noti_Bot
                                 {
                                     case 0:
                                         weekDay = (int)DAY_WEEK.DAY_WEEK_SUNDAY;
-                                        break;
-                                    case 1:
                                         break;
                                     case 2:
                                         weekDay = (int)DAY_WEEK.DAY_WEEK_MONDAY;
@@ -742,6 +730,7 @@ namespace CDT_Noti_Bot
 
                                 calendar.Day = Convert.ToInt32(row[wday].ToString());
                                 calendar.WEEK = (DAY_WEEK)weekDay;
+                                calendar.TODO = todo[wday].ToString();
                                 calendarDirector.addCalendar(calendar);
                             }
                         }
