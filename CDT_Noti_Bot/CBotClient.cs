@@ -458,7 +458,8 @@ namespace CDT_Noti_Bot
             {
                 strPrint += "==================================\n";
                 strPrint += "[ 아테나 v1.5 ]\n[ Clien Delicious Team Notice Bot ]\n\n";
-                strPrint += "/공지 : 팀 공지사항을 출력합니다.\n";
+                strPrint += "/공지 : 클랜 공지사항을 출력합니다.\n";
+                strPrint += "/일정 : 이번 달 클랜 일정을 확인합니다.\n";
                 strPrint += "/등록 [본 계정 배틀태그] : 아테나에 등록 합니다.\n";
                 strPrint += "/조회 [검색어] : 클랜원을 조회합니다.\n";
                 strPrint += "               (검색범위 : 대화명, 배틀태그, 부계정)\n";
@@ -482,10 +483,6 @@ namespace CDT_Noti_Bot
                 strPrint += "/기록 [숫자] : 명예의 전당 상세내용을 조회합니다.\n";
                 strPrint += "/안내 : 팀 안내 메시지를 출력합니다.\n";
                 strPrint += "/상태 : 현재 봇 상태를 출력합니다. 대답이 없으면 이상.\n";
-                strPrint += "----------------------------------\n";
-                strPrint += "CDT 1대 운영자 : 냉각콜라, 휴린, 청포도, 만슬\n";
-                strPrint += "==================================\n";
-                strPrint += "버그 및 문의사항이 있으시면 '휴린'에게 문의해주세요. :)\n";
                 strPrint += "==================================\n";
 
                 await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
