@@ -386,7 +386,7 @@ namespace CDT_Noti_Bot
             if (userDirector.getUserInfo(senderKey).UserKey != 0 && varMessage.ReplyToMessage != null && varMessage.ReplyToMessage.From.FirstName.Contains("아테나") == true)
             {
                 // 등록된 유저가 시도했을 경우 출력
-                await Bot.SendTextMessageAsync(varMessage.Chat.Id, EasterEgg.GetEasterEgg(), ParseMode.Default, false, false, iMessageID);
+                await Bot.SendTextMessageAsync(varMessage.Chat.Id, EasterEgg.getEasterEgg(), ParseMode.Default, false, false, iMessageID);
                 return;
             }
 
@@ -446,6 +446,9 @@ namespace CDT_Noti_Bot
             // 명령어가 아닐 경우 아래는 태울 필요 없다.
             if (isCommand == false)
             {
+                if (EasterEgg.isExistMenu(strMassage) == true)
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, EasterEgg.getMenu(), ParseMode.Default, false, false, iMessageID);
+
                 return;
             }
 

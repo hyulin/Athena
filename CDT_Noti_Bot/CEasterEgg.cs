@@ -21,13 +21,63 @@ namespace CDT_Noti_Bot
             "요원 연결 중."
         };
 
-        public string GetEasterEgg()
+        string[] menu = {
+            "백반", "떡볶이", "순대", "김밥", "짜장면", "짬뽕", "볶음밥", "김치찌개", "육개장", "된장찌개", "제육볶음",
+            "설렁탕", "회덮밥", "냉면", "돈까스", "함박스테이크", "국밥", "갈비탕", "라면", "라멘", "카레", "치킨",
+            "피자", "파스타", "육회비빔밥", "비빔밥", "보쌈", "족발", "막국수", "냉모밀", "소바", "스시", "햄버거", "한솥",
+            "삼겹살", "소고기", "곱창", "삼계탕", "양념갈비", "스테이크", "생선구이", "훈제오리", "샐러드", "만두"
+        };
+
+        string[] enter = {
+            "어떠세요?", "추천합니다.", "땡기네요.", "가보시죠.", "ㄱㄱ", "각", "좋네요.",
+            "어떤가요?", "좋을 듯.", "가시죠.", "?", "!", "너로 정했다!", "기대합니다."
+        };
+
+
+        public string getEasterEgg()
         {
             Random random = new Random();
 
             int iRandomNum = random.Next(0, strEasterEgg.Count());
 
             return strEasterEgg.ElementAt(iRandomNum);
+        }
+
+        public bool isExistMenu(string message)
+        {
+            if (message.Contains("뭐") && message.Contains("먹"))
+                return true;
+
+            if (message.Contains("뭘") && message.Contains("먹"))
+                return true;
+
+            if (message.Contains("어떤") && message.Contains("먹"))
+                return true;
+
+            if (message.Contains("밥") && message.Contains("먹"))
+                return true;
+
+            if (message.Contains("점심") && message.Contains("먹"))
+                return true;
+
+            if (message.Contains("저녁") && message.Contains("먹"))
+                return true;
+
+            if (message.Contains("배고픈데") || message.Contains("배고프다") || message.Contains("배고프네요") || message.Contains("배고픔"))
+                return true;
+
+            return false;   
+        }
+
+        public string getMenu()
+        {
+            Random menuRandom = new Random();
+            Random enterRandom = new Random();
+
+            int menuNum = menuRandom.Next(0, menu.Count());
+            int enterNum = enterRandom.Next(0, enter.Count());
+
+            return menu.ElementAt(menuNum) + " " + enter.ElementAt(enterNum);
         }
     }
 }
