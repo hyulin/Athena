@@ -2661,8 +2661,7 @@ namespace CDT_Noti_Bot
                             strPrint += "[ " + city.Item2 + "의 날씨 ]\n============================\n";
                             strPrint += "- 날씨요약 : " + main + "\n";
                             strPrint += "- 현재기온 : " + temp + "℃\n";
-                            strPrint += "- 현재습도 : " + humidity + "%\n\n";
-                            strPrint += "자료제공 : OpenWeatherMap";
+                            strPrint += "- 현재습도 : " + humidity + "%\n";
                         }
                         catch
                         {
@@ -2670,28 +2669,106 @@ namespace CDT_Noti_Bot
                             return;
                         }
 
-                        //// 공공데이터포럼 미세먼지
-                        //weatherUrl = "http://openapi.airkorea.or.kr/openapi/services/rest/ArpltnInforInqireSvc/getCtprvnRltmMesureDnsty?sidoName=" + city.Item2.ToString() + "&pageNo=1&numOfRows=10&ServiceKey=wg%2FwOk%2Fmolt2CQfeZPTss%2BkroS0o0ygHBPR%2BXoGjPEEJyUYYhvMv1mi1D0kWsSjSEQy7ctTH4sZA1IV2816U8Q%3D%3D&ver=1.3&_returnType=json";
+                        // 공공데이터포럼 미세먼지
+                        weatherUrl = "http://openapi.airkorea.or.kr/openapi/services/rest/ArpltnInforInqireSvc/getCtprvnRltmMesureDnsty?sidoName=" + city.Item2.ToString() + "&pageNo=1&numOfRows=350&ServiceKey=wg%2FwOk%2Fmolt2CQfeZPTss%2BkroS0o0ygHBPR%2BXoGjPEEJyUYYhvMv1mi1D0kWsSjSEQy7ctTH4sZA1IV2816U8Q%3D%3D&ver=1.3&_returnType=json";
 
-                        //try
-                        //{
-                        //    WebClient wc = new WebClient();
-                        //    wc.Encoding = Encoding.UTF8;
+                        try
+                        {
+                            WebClient wc = new WebClient();
+                            wc.Encoding = Encoding.UTF8;
 
-                        //    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-                        //    ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+                            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+                            ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
 
-                        //    string html = wc.DownloadString(weatherUrl);
+                            string html = wc.DownloadString(weatherUrl);
 
-                        //    var json = JObject.Parse(html);
+                            var json = JObject.Parse(html);
+                            uint count = Convert.ToUInt32(json["totalCount"].ToString());
+                            uint pm10Value = 0;
+                            uint pm25Value = 0;
+                            uint pm10Grade = 0;
+                            uint pm25Grade = 0;
+                            uint pm10ValueCount = 0;
+                            uint pm10GradeCount = 0;
+                            uint pm25ValueCount = 0;
+                            uint pm25GradeCount = 0;
 
-                        //    strPrint += "자료제공 : 한국환경공단, 공공데이터포럼";
-                        //}
-                        //catch
-                        //{
-                        //    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 날씨를 조회할 수 없습니다.", ParseMode.Default, false, false, iMessageID);
-                        //    return;
-                        //}
+                            for (int i = 0; i < count; i++)
+                            {
+                                if (json["list"][i]["pm10Grade"].ToString() != "" && json["list"][i]["pm10Grade"].ToString() != "-")
+                                {
+                                    pm10Grade += Convert.ToUInt32(json["list"][i]["pm10Grade"].ToString());
+                                    pm10GradeCount++;
+                                }
+
+                                if (json["list"][i]["pm10Value"].ToString() != "" && json["list"][i]["pm10Value"].ToString() != "-")
+                                {
+                                    pm10Value += Convert.ToUInt32(json["list"][i]["pm10Value"].ToString());
+                                    pm10ValueCount++;
+                                }
+
+                                if (json["list"][i]["pm25Grade"].ToString() != "" && json["list"][i]["pm25Grade"].ToString() != "-")
+                                {
+                                    pm25Grade += Convert.ToUInt32(json["list"][i]["pm25Grade"].ToString());
+                                    pm25GradeCount++;
+                                }
+
+                                if (json["list"][i]["pm25Value"].ToString() != "" && json["list"][i]["pm25Value"].ToString() != "-")
+                                {
+                                    pm25Value += Convert.ToUInt32(json["list"][i]["pm25Value"].ToString());
+                                    pm25ValueCount++;
+                                }
+                            }
+
+                            pm10Value = Convert.ToUInt32(pm10Value / pm10ValueCount);
+                            pm25Value = Convert.ToUInt32(pm25Value / pm10GradeCount);
+                            pm10Grade = Convert.ToUInt32(pm10Grade / pm25GradeCount);
+                            pm25Grade = Convert.ToUInt32(pm25Grade / pm25ValueCount);
+
+                            string pm10GradeString = "";
+                            string pm25GradeString = "";
+
+                            switch (pm10Grade)
+                            {
+                                case 1:
+                                    pm10GradeString = "좋음";
+                                    break;
+                                case 2:
+                                    pm10GradeString = "보통";
+                                    break;
+                                case 3:
+                                    pm10GradeString = "나쁨";
+                                    break;
+                                case 4:
+                                    pm10GradeString = "매우나쁨";
+                                    break;
+                            }
+
+                            switch (pm25Grade)
+                            {
+                                case 1:
+                                    pm25GradeString = "좋음";
+                                    break;
+                                case 2:
+                                    pm25GradeString = "보통";
+                                    break;
+                                case 3:
+                                    pm25GradeString = "나쁨";
+                                    break;
+                                case 4:
+                                    pm25GradeString = "매우나쁨";
+                                    break;
+                            }
+
+                            strPrint += "- 미세먼지 : " + pm10GradeString.ToString() + "(" + pm10Value.ToString() + ")\n";
+                            strPrint += "- 초미세먼지 : " + pm25GradeString.ToString() + "(" + pm25Value.ToString() + ")\n\n";
+                            strPrint += "* 자료제공\n(날씨) OpenWeatherMap\n(대기) 한국환경공단, 공공데이터포럼";
+                        }
+                        catch
+                        {
+                            await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 날씨를 조회할 수 없습니다.", ParseMode.Default, false, false, iMessageID);
+                            return;
+                        }
                     }
                 }
 
