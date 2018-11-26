@@ -387,7 +387,7 @@ namespace CDT_Noti_Bot
             if (userDirector.getUserInfo(senderKey).UserKey != 0 && varMessage.ReplyToMessage != null && varMessage.ReplyToMessage.From.FirstName.Contains("아테나") == true)
             {
                 // 등록된 유저가 시도했을 경우 출력
-                await Bot.SendTextMessageAsync(varMessage.Chat.Id, EasterEgg.GetEasterEgg(), ParseMode.Default, false, false, iMessageID);
+                await Bot.SendTextMessageAsync(varMessage.Chat.Id, EasterEgg.getEasterEgg(), ParseMode.Default, false, false, iMessageID);
                 return;
             }
 
@@ -450,12 +450,26 @@ namespace CDT_Noti_Bot
                 // 아테나가 언급되면 자연어 명령
                 if (strMassage.Contains("아테나"))
                 {
-                    string[] natural = naturalLanguage.DetectionCommand(strMassage).Split(' ');
-                    if (natural.Count() >= 1)
-                        strCommend = natural[0].ToString();
-                    if (natural.Count() >= 2)
-                        strContents = natural[1].ToString();
+                    if (EasterEgg.isExistMenu(strMassage) == true)
+                    {
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, EasterEgg.getMenu(), ParseMode.Default, false, false, iMessageID);
+                    }
+                    else
+                    {
+                        string[] natural = naturalLanguage.DetectionCommand(strMassage).Split(' ');
+                        if (natural.Count() >= 1)
+                            strCommend = natural[0].ToString();
+                        if (natural.Count() >= 2)
+                            strContents = natural[1].ToString();
+                    }
                 }
+                else
+                {
+                    if (EasterEgg.isExistMenu(strMassage) == true)
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, EasterEgg.getMenu(), ParseMode.Default, false, false, iMessageID);
+                }
+
+                return;
             }
 
             string strPrint = "";
@@ -490,6 +504,7 @@ namespace CDT_Noti_Bot
                 strPrint += "/투표 결과 : 현재 진행 중인 투표의 결과를 출력합니다.\n";
                 strPrint += "/기록 : 클랜 명예의 전당을 조회합니다.\n";
                 strPrint += "/기록 [숫자] : 명예의 전당 상세내용을 조회합니다.\n";
+                strPrint += "/뽑기 [항목1] [항목2] [항목3] ... : 하나를 뽑습니다.\n";
                 strPrint += "/안내 : 팀 안내 메시지를 출력합니다.\n";
                 strPrint += "/상태 : 현재 봇 상태를 출력합니다. 대답이 없으면 이상.\n";
                 strPrint += "==================================\n";
@@ -2594,6 +2609,34 @@ namespace CDT_Noti_Bot
                     {
                         await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 일정 조사를 할 수 없습니다.", ParseMode.Default, false, false, iMessageID);
                     }
+                }
+            }
+            //========================================================================================
+            // 뽑기
+            //========================================================================================
+            else if (strCommend == "/뽑기")
+            {
+                if (strContents == "")
+                {
+                    strPrint += "[SYSTEM] 뽑을 항목을 추가해주세요.\n (ex: /뽑기 [항목1] [항목2] ...)";
+                }
+                else
+                {
+                    string[] item = strContents.Split(' ');
+
+                    Random random = new Random();
+                    int index = random.Next(0, item.Count());
+
+                    strPrint += item.ElementAt(index);
+                }
+
+                if (strPrint != "")
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
+                }
+                else
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 뽑기를 할 수 없습니다.", ParseMode.Default, false, false, iMessageID);
                 }
             }
             //========================================================================================
