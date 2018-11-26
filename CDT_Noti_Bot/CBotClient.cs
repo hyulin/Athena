@@ -2591,6 +2591,34 @@ namespace CDT_Noti_Bot
                 }
             }
             //========================================================================================
+            // 뽑기
+            //========================================================================================
+            else if (strCommend == "/뽑기")
+            {
+                if (strContents == "")
+                {
+                    strPrint += "[SYSTEM] 뽑을 항목을 추가해주세요.\n (ex: /뽑기 [항목1] [항목2] ...)";
+                }
+                else
+                {
+                    string[] item = strContents.Split(' ');
+
+                    Random random = new Random();
+                    int index = random.Next(0, item.Count());
+
+                    strPrint += item.ElementAt(index);
+                }
+
+                if (strPrint != "")
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
+                }
+                else
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 뽑기를 할 수 없습니다.", ParseMode.Default, false, false, iMessageID);
+                }
+            }
+            //========================================================================================
             // 안내
             //========================================================================================
             else if (strCommend == "/안내")
