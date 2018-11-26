@@ -13,6 +13,7 @@ using System.Net;
 using System.Timers;
 using System.Threading;
 using System.Xml.XPath;
+using Newtonsoft.Json.Linq;
 
 //Telegram API
 using Telegram.Bot;
@@ -2620,6 +2621,46 @@ namespace CDT_Noti_Bot
                 }
             }
             //========================================================================================
+            // 날씨
+            //========================================================================================
+            else if (strCommend == "/날씨")
+            {
+                if (strContents == "")
+                {
+                    strPrint += "[SYSTEM] 지역을 추가해주세요.";
+                }
+                else
+                {
+                    string city = getCity(strContents);
+
+                    if (city == "")
+                    {
+                        strPrint += "[ERROR] 지역을 다시 확인해주세요.";
+                    }
+                    else
+                    {
+                        string weatherUrl = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=604e54fc977920798ff275b8da0a687f";
+
+                        try
+                        {
+                            WebClient wc = new WebClient();
+                            wc.Encoding = Encoding.UTF8;
+
+                            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+                            ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+
+                            string html = wc.DownloadString(weatherUrl);
+
+                            var json = JObject.Parse(html);
+                        }
+                        catch
+                        {
+                            //await Bot.SendTextMessageAsync(varMessage.Chat.Id, "'" + battleTag + "'의 전적을 조회할 수 없습니다.", ParseMode.Default, false, false, iMessageID);
+                        }
+                    }
+                }
+            }
+            //========================================================================================
             // 안내
             //========================================================================================
             else if (strCommend == "/안내")
@@ -2670,6 +2711,34 @@ namespace CDT_Noti_Bot
             }
 
             strPrint = "";
+        }
+
+        public string getCity(string city)
+        {
+            string outputCity = "";
+
+            if (city.Contains("서울") == true)
+                outputCity = "Seoul";
+            else if (city.Contains("경기") == true)
+                outputCity = "Gyeonggi-do";
+            else if (city.Contains("부산") == true)
+                outputCity = "Busan";
+            else if (city.Contains("대구") == true)
+                outputCity = "Daegu";
+            else if (city.Contains("광주") == true)
+                outputCity = "Gwangju";
+            else if (city.Contains("인천") == true)
+                outputCity = "Incheon";
+            else if (city.Contains("대전") == true)
+                outputCity = "Daejeon";
+            else if (city.Contains("울산") == true)
+                outputCity = "Ulsan";
+            else if (city.Contains("제주") == true)
+                outputCity = "Jeju";
+            else
+                outputCity = "";
+
+            return outputCity;
         }
     }
 }
