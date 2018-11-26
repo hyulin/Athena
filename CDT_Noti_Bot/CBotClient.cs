@@ -2627,19 +2627,20 @@ namespace CDT_Noti_Bot
             {
                 if (strContents == "")
                 {
-                    strPrint += "[SYSTEM] 지역을 추가해주세요.";
+                    strPrint += "[SYSTEM] 지역을 추가해주세요.\n- 가능지역 : 서울, 경기, 부산, 대구, 광주, 인천, 대전, 울산, 세종, 제주";
                 }
                 else
                 {
-                    string city = getCity(strContents);
+                    Tuple<string, string> city = getCity(strContents);
 
-                    if (city == "")
+                    if (city.Item1 == "" || city.Item2 == "")
                     {
                         strPrint += "[ERROR] 지역을 다시 확인해주세요.";
                     }
                     else
                     {
-                        string weatherUrl = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=604e54fc977920798ff275b8da0a687f";
+                        // OpenWeatherMap 날씨
+                        string weatherUrl = "http://api.openweathermap.org/data/2.5/weather?q=" + city.Item1.ToString() + ",KR&appid=604e54fc977920798ff275b8da0a687f";
 
                         try
                         {
@@ -2652,12 +2653,55 @@ namespace CDT_Noti_Bot
                             string html = wc.DownloadString(weatherUrl);
 
                             var json = JObject.Parse(html);
+
+                            string main = json["weather"][0]["main"].ToString();
+                            string temp = Math.Round(Convert.ToDouble(json["main"]["temp"].ToString()) - 273.15, 1).ToString();
+                            string humidity = json["main"]["humidity"].ToString();
+
+                            strPrint += "[ " + city.Item2 + "의 날씨 ]\n============================\n";
+                            strPrint += "- 날씨요약 : " + main + "\n";
+                            strPrint += "- 현재기온 : " + temp + "℃\n";
+                            strPrint += "- 현재습도 : " + humidity + "%\n\n";
+                            strPrint += "자료제공 : OpenWeatherMap";
                         }
                         catch
                         {
-                            //await Bot.SendTextMessageAsync(varMessage.Chat.Id, "'" + battleTag + "'의 전적을 조회할 수 없습니다.", ParseMode.Default, false, false, iMessageID);
+                            await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 날씨를 조회할 수 없습니다.", ParseMode.Default, false, false, iMessageID);
+                            return;
                         }
+
+                        //// 공공데이터포럼 미세먼지
+                        //weatherUrl = "http://openapi.airkorea.or.kr/openapi/services/rest/ArpltnInforInqireSvc/getCtprvnRltmMesureDnsty?sidoName=" + city.Item2.ToString() + "&pageNo=1&numOfRows=10&ServiceKey=wg%2FwOk%2Fmolt2CQfeZPTss%2BkroS0o0ygHBPR%2BXoGjPEEJyUYYhvMv1mi1D0kWsSjSEQy7ctTH4sZA1IV2816U8Q%3D%3D&ver=1.3&_returnType=json";
+
+                        //try
+                        //{
+                        //    WebClient wc = new WebClient();
+                        //    wc.Encoding = Encoding.UTF8;
+
+                        //    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+                        //    ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+
+                        //    string html = wc.DownloadString(weatherUrl);
+
+                        //    var json = JObject.Parse(html);
+
+                        //    strPrint += "자료제공 : 한국환경공단, 공공데이터포럼";
+                        //}
+                        //catch
+                        //{
+                        //    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 날씨를 조회할 수 없습니다.", ParseMode.Default, false, false, iMessageID);
+                        //    return;
+                        //}
                     }
+                }
+
+                if (strPrint != "")
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
+                }
+                else
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 날씨를 조회할 수 없습니다.", ParseMode.Default, false, false, iMessageID);
                 }
             }
             //========================================================================================
@@ -2713,32 +2757,65 @@ namespace CDT_Noti_Bot
             strPrint = "";
         }
 
-        public string getCity(string city)
+        public Tuple<string, string> getCity(string city)
         {
-            string outputCity = "";
+            string eng = "";
+            string kor = "";
 
             if (city.Contains("서울") == true)
-                outputCity = "Seoul";
+            {
+                eng = "seoul";
+                kor = "서울";
+            }
             else if (city.Contains("경기") == true)
-                outputCity = "Gyeonggi-do";
+            {
+                eng = "gyeonggi-do";
+                kor = "경기";
+            }
             else if (city.Contains("부산") == true)
-                outputCity = "Busan";
+            {
+                eng = "busan";
+                kor = "부산";
+            }
             else if (city.Contains("대구") == true)
-                outputCity = "Daegu";
+            {
+                eng = "daegu";
+                kor = "대구";
+            }
             else if (city.Contains("광주") == true)
-                outputCity = "Gwangju";
+            {
+                eng = "gwangju";
+                kor = "광주";
+            }
             else if (city.Contains("인천") == true)
-                outputCity = "Incheon";
+            {
+                eng = "incheon";
+                kor = "인천";
+            }
             else if (city.Contains("대전") == true)
-                outputCity = "Daejeon";
+            {
+                eng = "daejeon";
+                kor = "대전";
+            }
             else if (city.Contains("울산") == true)
-                outputCity = "Ulsan";
+            {
+                eng = "ulsan";
+                kor = "울산";
+            }
+            else if (city.Contains("세종") == true)
+            {
+                eng = "sejong";
+                kor = "세종";
+            }
             else if (city.Contains("제주") == true)
-                outputCity = "Jeju";
-            else
-                outputCity = "";
+            {
+                eng = "jeju";
+                kor = "제주";
+            }
 
-            return outputCity;
+            Tuple<string, string> tuple = Tuple.Create(eng, kor);
+
+            return tuple;
         }
     }
 }
