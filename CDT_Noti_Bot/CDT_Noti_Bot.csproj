@@ -93,9 +93,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CBotClient.cs" />
+    <Compile Include="CCalendar.cs" />
+    <Compile Include="CCalendarDirector.cs" />
     <Compile Include="CEasterEgg.cs" />
     <Compile Include="CNaturalLanguage.cs" />
     <Compile Include="CSystemInfo.cs" />
+    <Compile Include="CUser.cs" />
+    <Compile Include="CUserDirector.cs" />
     <Compile Include="CVoteDirector.cs" />
     <Compile Include="CVoteItem.cs" />
     <Compile Include="CVoteRanking.cs" />

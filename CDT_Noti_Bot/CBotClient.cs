@@ -44,6 +44,7 @@ namespace CDT_Noti_Bot
         SheetsService service;
         CNotice Notice = new CNotice();
         CEasterEgg EasterEgg = new CEasterEgg();
+        CUserDirector userDirector = new CUserDirector();
         CNaturalLanguage naturalLanguage = new CNaturalLanguage();
 
         // Bot Token
@@ -79,6 +80,11 @@ namespace CDT_Noti_Bot
                 ApplicationName = ApplicationName,
             });
 
+
+            // 시트에서 유저 정보를 Load
+            loadUserInfo();
+
+
             // 타이머 생성 및 시작
             System.Timers.Timer timer = new System.Timers.Timer();
             timer.Interval = 5000; // 5초
@@ -98,6 +104,160 @@ namespace CDT_Noti_Bot
             Bot.OnMessage += Bot_OnMessage;     // 이벤트를 추가해줍니다. 
 
             Bot.StartReceiving();               // 이 함수가 실행이 되어야 사용자로부터 메세지를 받을 수 있습니다.
+        }
+
+        public void loadUserInfo()
+        {
+            // Define request parameters.
+            String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+            String range = "클랜원 목록!C7:N";
+            SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+
+            ValueRange response = request.Execute();
+            if (response != null)
+            {
+                IList<IList<Object>> values = response.Values;
+                if (values != null && values.Count > 0)
+                {
+                    foreach (var row in values)
+                    {
+                        bool isReflesh = false;
+
+                        // 아테나에 등록되지 않은 유저
+                        if (row[10].ToString() == "")
+                            continue;
+
+                        long userKey = Convert.ToInt64(row[10].ToString());
+                        var userData = userDirector.getUserInfo(userKey);
+                        if (userData.UserKey != 0)
+                        {
+                            // 이미 등록한 유저. 갱신한다.
+                            isReflesh = true;
+                        }
+
+                        CUser user = new CUser();
+                        user = setUserInfo(row, Convert.ToInt64(row[10].ToString()));
+
+                        // 휴린, 냉각콜라, 만슬, 청포도일 경우
+                        if ( (user.UserKey == 23842788) || (user.UserKey == 50872681) || (user.UserKey == 474057213) || (user.UserKey == 35432635) )
+                        {
+                            // 유저 타입을 관리자로
+                            user.UserType = USER_TYPE.USER_TYPE_ADMIN;
+                        }
+
+                        if (isReflesh == false)
+                            userDirector.addUserInfo(userKey, user);
+                        else
+                            userDirector.reflechUserInfo(userKey, user);
+                    }
+                }
+            }
+        }
+
+        public CUser setUserInfo(IList<object> row, long userKey)
+        {
+            CUser user = new CUser();
+
+            if (row.Count == 0)
+                return user;
+            
+            user.UserKey = userKey;
+            user.Name = row[0].ToString();
+            user.MainBattleTag = row[1].ToString();
+            user.SubBattleTag = row[2].ToString().Trim().Split(',');
+
+            if (row[3].ToString() == "플렉스")
+                user.Position |= POSITION.POSITION_FLEX;
+            if (row[3].ToString().ToUpper().Contains("딜"))
+                user.Position |= POSITION.POSITION_DPS;
+            if (row[3].ToString().ToUpper().Contains("탱"))
+                user.Position |= POSITION.POSITION_TANK;
+            if (row[3].ToString().ToUpper().Contains("힐"))
+                user.Position |= POSITION.POSITION_SUPP;
+
+            string[] most = new string[3];
+            most[0] = row[4].ToString();
+            most[1] = row[5].ToString();
+            most[2] = row[6].ToString();
+            user.MostPick = most;
+
+            user.OtherPick = row[7].ToString();
+            user.Time = row[8].ToString();
+            user.Info = row[9].ToString();
+
+            // 휴린, 냉각콜라, 만슬, 청포도일 경우
+            if ((user.UserKey == 23842788) || (user.UserKey == 50872681) || (user.UserKey == 474057213) || (user.UserKey == 35432635))
+            {
+                // 유저 타입을 관리자로
+                user.UserType = USER_TYPE.USER_TYPE_ADMIN;
+            }
+
+            return user;
+        }
+
+        public Tuple<int, string> referenceScore(string battleTag)
+        {
+            int score = 0;
+            string tier = "";
+
+            string[] strBattleTag = battleTag.Split('#');
+            string strUrl = "http://playoverwatch.com/ko-kr/career/pc/" + strBattleTag[0] + "-" + strBattleTag[1];
+
+            try
+            {
+                WebClient wc = new WebClient();
+                wc.Encoding = Encoding.UTF8;
+
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+                ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+
+                string html = wc.DownloadString(strUrl);
+                HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
+                doc.LoadHtml(html);
+
+                string strScore = doc.DocumentNode.SelectSingleNode("//div[@class='competitive-rank']").InnerText;
+                score = Convert.ToInt32(strScore);
+
+                if (score == 0)
+                {
+                    tier = "Unranked";
+                }
+                else if (score >= 0 && score < 1500)
+                {
+                    tier = "브론즈";
+                }
+                else if (score >= 1500 && score < 2000)
+                {
+                    tier = "실버";
+                }
+                else if (score >= 2000 && score < 2500)
+                {
+                    tier = "골드";
+                }
+                else if (score >= 2500 && score < 3000)
+                {
+                    tier = "플래티넘";
+                }
+                else if (score >= 3000 && score < 3500)
+                {
+                    tier = "다이아";
+                }
+                else if (score >= 3500 && score < 4000)
+                {
+                    tier = "마스터";
+                }
+                else if (score >= 4000 && score <= 5000)
+                {
+                    tier = "그랜드마스터";
+                }
+            }
+            catch
+            {
+                // 아무 작업 안함
+            }
+
+            Tuple<int, string> retTuple = Tuple.Create(score, tier);
+            return retTuple;
         }
 
         // 쓰레드풀의 작업쓰레드가 지정된 시간 간격으로
@@ -177,23 +337,56 @@ namespace CDT_Noti_Bot
                 return;
             }
 
+            string strFirstName = varMessage.From.FirstName;
+            string strLastName = varMessage.From.LastName;
+            int iMessageID = varMessage.MessageId;
+            long senderKey = varMessage.From.Id;
+
             // CDT 관련방 아니면 동작하지 않도록 수정
             if (varMessage.Chat.Id != -1001202203239 &&     // 본방
                 varMessage.Chat.Id != -1001312491933 &&     // 운영진방
                 varMessage.Chat.Id != -1001389956706 &&     // 사전안내방
                 varMessage.Chat.Username != "hyulin")
             {
+                await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 사용할 수 없는 대화방입니다.", ParseMode.Default, false, false, iMessageID);
                 return;
             }
 
-            string strFirstName = varMessage.From.FirstName;
-            string strLastName = varMessage.From.LastName;
-            int iMessageID = varMessage.MessageId;
-            int senderKey = varMessage.From.Id;
+            // 명령어, 서브명령어 분리
+            string strMassage = varMessage.Text;
+            string strUserName = varMessage.From.FirstName + varMessage.From.LastName;
+            string strCommend = "";
+            string strContents = "";
+            bool isCommand = false;
+
+            // 명령어인지 아닌지 구분
+            if (strMassage.Substring(0, 1) == "/")
+            {
+                isCommand = true;
+
+                // 명령어와 서브명령어 구분
+                if (strMassage.IndexOf(" ") == -1)
+                {
+                    strCommend = strMassage;
+                }
+                else
+                {
+                    strCommend = strMassage.Substring(0, strMassage.IndexOf(" "));
+                    strContents = strMassage.Substring(strMassage.IndexOf(" ") + 1, strMassage.Count() - strMassage.IndexOf(" ") - 1);
+                }
+
+                // 미등록 유저는 사용할 수 없다.
+                if (strCommend != "/등록" && userDirector.getUserInfo(senderKey).UserKey == 0)
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 아테나에 등록되지 않은 유저입니다.\n등록을 하시려면 /등록 명령어를 참고해주세요.", ParseMode.Default, false, false, iMessageID);
+                    return;
+                }
+            }
 
             // 이스터에그 (아테나 대사 출력)
-            if (varMessage.ReplyToMessage != null && varMessage.ReplyToMessage.From.FirstName.Contains("아테나") == true)
+            if (userDirector.getUserInfo(senderKey).UserKey != 0 && varMessage.ReplyToMessage != null && varMessage.ReplyToMessage.From.FirstName.Contains("아테나") == true)
             {
+                // 등록된 유저가 시도했을 경우 출력
                 await Bot.SendTextMessageAsync(varMessage.Chat.Id, EasterEgg.GetEasterEgg(), ParseMode.Default, false, false, iMessageID);
                 return;
             }
@@ -251,12 +444,8 @@ namespace CDT_Noti_Bot
                 }
             }
 
-            string strMassage = varMessage.Text;
-            string strUserName = varMessage.Chat.FirstName + varMessage.Chat.LastName;
-            string strCommend = "";
-            string strContents = "";
-
-            if (strMassage.Substring(0, 1) != "/")
+            // 명령어가 아닐 경우 아래는 태울 필요 없다.
+            if (isCommand == false)
             {
                 // 아테나가 언급되면 자연어 명령
                 if (strMassage.Contains("아테나"))
@@ -265,53 +454,181 @@ namespace CDT_Noti_Bot
                 }
             }
 
-            if (strMassage.IndexOf(" ") == -1)
-            {
-                strCommend = strMassage;
-            }
-            else
-            {
-                strCommend = strMassage.Substring(0, strMassage.IndexOf(" "));
-                strContents = strMassage.Substring(strMassage.IndexOf(" ") + 1, strMassage.Count() - strMassage.IndexOf(" ") - 1);
-            }
-
             string strPrint = "";
 
             //========================================================================================
-            // 공지사항 관련 명령어
+            // 도움말
             //========================================================================================
             if (strCommend == "/도움말" || strCommend == "/help" || strCommend == "/help@CDT_Noti_Bot")
             {
                 strPrint += "==================================\n";
-                strPrint += "[ 아테나 v1.3 ]\n[ Clien Delicious Team Notice Bot ]\n\n";
-                strPrint += "/공지 : 팀 공지사항을 출력합니다.\n";
-                strPrint += "/조회 검색어 : 클랜원을 조회합니다.\n";
+                strPrint += "[ 아테나 v1.5 ]\n[ Clien Delicious Team Notice Bot ]\n\n";
+                strPrint += "/공지 : 클랜 공지사항을 출력합니다.\n";
+                strPrint += "/일정 : 이번 달 클랜 일정을 확인합니다.\n";
+                strPrint += "/등록 [본 계정 배틀태그] : 아테나에 등록 합니다.\n";
+                strPrint += "/조회 [검색어] : 클랜원을 조회합니다.\n";
                 strPrint += "               (검색범위 : 대화명, 배틀태그, 부계정)\n";
                 strPrint += "/영상 : 영상이 있던 날짜를 조회합니다.\n";
-                strPrint += "/영상 날짜 : 플레이 영상을 조회합니다. (/영상 181006)\n";
-                strPrint += "/검색 검색어 : 포지션, 모스트별로 클랜원을 검색합니다.\n";
+                strPrint += "/영상 [날짜] : 플레이 영상을 조회합니다. (/영상 181006)\n";
+                strPrint += "/검색 [검색어] : 포지션, 모스트별로 클랜원을 검색합니다.\n";
+                strPrint += "/스크림 : 현재 모집 중인 스크림의 참가자를 출력합니다.\n";
+                strPrint += "/스크림 [요일] : 현재 모집 중인 스크림에 참가신청합니다.\n";
+                strPrint += "/스크림 취소 : 신청한 스크림에 참가를 취소합니다.\n";
+                strPrint += "/조사 : 현재 진행 중인 일정 조사를 출력합니다.\n";
+                strPrint += "/조사 [요일] : 현재 진행 중인 일정 조사에 체크합니다.\n";
                 strPrint += "/모임 : 모임 공지와 참가자를 출력합니다.\n";
                 strPrint += "/참가 : 모임에 참가 신청합니다.\n";
                 strPrint += "/참가 확정 : 모임에 참가 확정합니다.\n";
                 strPrint += "       (이미 참가일 경우 확정만 체크)\n";
                 strPrint += "/불참 : 모임에 참가 신청을 취소합니다.\n";
                 strPrint += "/투표 : 현재 진행 중인 투표를 출력합니다.\n";
-                strPrint += "/투표 숫자 : 현재 진행 중인 투표에 투표합니다.\n";
+                strPrint += "/투표 [숫자] : 현재 진행 중인 투표에 투표합니다.\n";
                 strPrint += "/투표 결과 : 현재 진행 중인 투표의 결과를 출력합니다.\n";
                 strPrint += "/기록 : 클랜 명예의 전당을 조회합니다.\n";
-                strPrint += "/기록 숫자 : 명예의 전당 상세내용을 조회합니다.\n";
+                strPrint += "/기록 [숫자] : 명예의 전당 상세내용을 조회합니다.\n";
                 strPrint += "/안내 : 팀 안내 메시지를 출력합니다.\n";
                 strPrint += "/상태 : 현재 봇 상태를 출력합니다. 대답이 없으면 이상.\n";
-                strPrint += "----------------------------------\n";
-                strPrint += "CDT 1대 운영자 : 냉각콜라, 휴린, 청포도, 만슬\n";
-                strPrint += "==================================\n";
-                strPrint += "버그 및 문의사항이 있으시면 '휴린'에게 문의해주세요. :)\n";
                 strPrint += "==================================\n";
 
                 await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
             }
             //========================================================================================
-            // 공지사항 관련 명령어
+            // 등록
+            //========================================================================================
+            else if (strCommend == "/등록")
+            {
+                if (strContents == "")
+                {
+                    strPrint += "[SYSTEM] 사용자 등록을 하려면\n/등록 [본 계정 배틀태그] 로 등록해주세요.\n(ex: /등록 휴린#3602)";
+                }
+                else
+                {
+                    string battleTag = strContents;
+
+                    // Define request parameters.
+                    String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                    String range = "클랜원 목록!C7:N";
+                    SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+
+                    ValueRange response = request.Execute();
+                    if (response != null)
+                    {
+                        IList<IList<Object>> values = response.Values;
+                        if (values != null && values.Count > 0)
+                        {
+                            int index = 0;
+                            int searchIndex = 0;
+                            int searchCount = 0;
+                            bool isReflesh = false;
+                            CUser user = new CUser();
+
+                            foreach (var row in values)
+                            {
+                                // 검색 성공
+                                if (battleTag == row[1].ToString())
+                                {
+                                    long userKey = 0;
+                                    searchCount++;
+                                    searchIndex = index;
+
+                                    if (row[10].ToString() != "")
+                                    {
+                                        // 이미 값이 있으므로 갱신한다.
+                                        userKey = Convert.ToInt64(row[10].ToString());
+                                        isReflesh = true;
+                                    }
+                                    else
+                                    {
+                                        userKey = senderKey;
+                                    }
+
+                                    user.UserKey = userKey;
+                                    user.Name = row[0].ToString();
+                                    user.MainBattleTag = row[1].ToString();
+                                    user.SubBattleTag = row[2].ToString().Trim().Split(',');
+
+                                    if (row[3].ToString() == "플렉스")
+                                        user.Position |= POSITION.POSITION_FLEX;
+                                    if (row[3].ToString().ToUpper().Contains("딜"))
+                                        user.Position |= POSITION.POSITION_DPS;
+                                    if (row[3].ToString().ToUpper().Contains("탱"))
+                                        user.Position |= POSITION.POSITION_TANK;
+                                    if (row[3].ToString().ToUpper().Contains("힐"))
+                                        user.Position |= POSITION.POSITION_SUPP;
+
+                                    string[] most = new string[3];
+                                    most[0] = row[4].ToString();
+                                    most[1] = row[5].ToString();
+                                    most[2] = row[6].ToString();
+                                    user.MostPick = most;
+
+                                    user.OtherPick = row[7].ToString();
+                                    user.Time = row[8].ToString();
+                                    user.Info = row[9].ToString();
+                                }
+                                else
+                                {
+                                    index++;
+                                }
+                            }
+
+                            if (searchCount == 0)
+                            {
+                                strPrint += "[ERROR] 배틀태그를 검색할 수 없습니다.";
+                            }
+                            else if (searchCount > 1)
+                            {
+                                strPrint += "[ERROR] 검색 결과가 2개 이상입니다. 배틀태그를 확인해주세요.";
+                            }
+                            else if (searchCount < 0)
+                            {
+                                strPrint += "[ERROR] 알 수 없는 문제";
+                            }
+                            else if (isReflesh == true)
+                            {
+                                if (userDirector.reflechUserInfo(user.UserKey, user) == true)
+                                {
+                                    strPrint += "[SUCCESS] 갱신 완료됐습니다.";
+                                }
+                                else
+                                {
+                                    strPrint += "[ERROR] 갱신을 실패했습니다.";
+                                }
+                            }
+                            else
+                            {
+                                range = "클랜원 목록!M" + (7 + searchIndex);
+
+                                // Define request parameters.
+                                ValueRange valueRange = new ValueRange();
+                                valueRange.MajorDimension = "COLUMNS"; //"ROWS";//COLUMNS 
+
+                                var oblist = new List<object>() { senderKey };
+                                valueRange.Values = new List<IList<object>> { oblist };
+
+                                SpreadsheetsResource.ValuesResource.UpdateRequest updateRequest = service.Spreadsheets.Values.Update(valueRange, spreadsheetId, range);
+
+                                updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.RAW;
+                                UpdateValuesResponse updateResponse = updateRequest.Execute();
+
+                                if (updateResponse == null)
+                                {
+                                    strPrint += "[ERROR] 시트를 업데이트 할 수 없습니다.";
+                                }
+                                else
+                                {
+                                    strPrint += "[SUCCESS] 등록이 완료됐습니다.";
+                                    userDirector.addUserInfo(senderKey, user);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
+            }
+            //========================================================================================
+            // 공지사항
             //========================================================================================
             else if (strCommend == "/공지")
             {
@@ -348,7 +665,110 @@ namespace CDT_Noti_Bot
                 }
             }
             //========================================================================================
-            // 조회 관련 명령어
+            // 일정
+            //========================================================================================
+            else if (strCommend == "/일정")
+            {
+                CCalendarDirector calendarDirector = new CCalendarDirector();
+
+                // Define request parameters.
+                String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                String range = "클랜 공지!I15:Q27";
+                SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+
+                ValueRange response = request.Execute();
+                if (response != null)
+                {
+                    IList<IList<Object>> values = response.Values;
+                    if (values != null && values.Count > 0)
+                    {
+                        var title = values[0];
+                        if (title.Count == 0)
+                        {
+                            await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 일정이 등록되지 않았습니다.", ParseMode.Default, false, false, iMessageID);
+                            return;
+                        }
+
+                        // 날짜
+                        for (int index = 3; index < values.Count; index += 2)
+                        {
+                            var row = values[index];
+                            var todo = values[index + 1];
+                            
+                            for(int wday = 0; wday < 8/*일주일 7일 + 빈칸 1개*/; wday++)
+                            {
+                                CCalendar calendar = new CCalendar();
+                                string weekDay = "";
+                                
+                                // 중간에 한 칸이 비어있음
+                                if (wday == 1)
+                                    continue;
+
+                                if (row[wday].ToString() == "")
+                                    continue;
+
+                                switch (wday)
+                                {
+                                    case 0:
+                                        weekDay = "일";
+                                        break;
+                                    case 2:
+                                        weekDay = "월";
+                                        break;
+                                    case 3:
+                                        weekDay = "화";
+                                        break;
+                                    case 4:
+                                        weekDay = "수";
+                                        break;
+                                    case 5:
+                                        weekDay = "목";
+                                        break;
+                                    case 6:
+                                        weekDay = "금";
+                                        break;
+                                    case 7:
+                                        weekDay = "토";
+                                        break;
+                                    default:
+                                        continue;
+                                }
+
+                                calendar.Day = Convert.ToInt32(row[wday].ToString());
+                                calendar.Week = weekDay;
+                                calendar.Todo = todo[wday].ToString();
+                                calendarDirector.addCalendar(calendar);
+                            }
+                        }
+
+                        strPrint += "[ " + title[0].ToString() + " ]\n============================\n";
+
+                        for (int i = 1; i <= calendarDirector.getCalendarCount(); i++)
+                        {
+                            CCalendar calendar = calendarDirector.getCalendar(i);
+
+                            if (calendar.Todo != "")
+                            {
+                                strPrint += "* " + calendar.Day + "일(" + calendar.Week + ") : " + calendar.Todo + "\n";
+                            }
+                        }
+                    }
+                }
+
+                if (strPrint != "")
+                {
+                    const string notice = @"Function/Calendar.png";
+                    var fileName = notice.Split(Path.DirectorySeparatorChar).Last();
+                    var fileStream = new FileStream(notice, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream, strPrint, ParseMode.Default, false, iMessageID);
+                }
+                else
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 일정이 등록되지 않았습니다.", ParseMode.Default, false, false, iMessageID);
+                }
+            }
+            //========================================================================================
+            // 조회
             //========================================================================================
             else if (strCommend == "/조회")
             {
@@ -361,7 +781,7 @@ namespace CDT_Noti_Bot
                 {
                     // Define request parameters.
                     String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
-                    String range = "클랜원 목록!C7:M";
+                    String range = "클랜원 목록!C7:N";
                     SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
                     ValueRange response = request.Execute();
@@ -445,7 +865,7 @@ namespace CDT_Noti_Bot
                                 string strScore = "전적을 조회할 수 없습니다.";
                                 string strTier = "전적을 조회할 수 없습니다.";
 
-                                await Bot.SendTextMessageAsync(varMessage.Chat.Id, "'" + battleTag + "'의 전적을 조회 중입니다.\n잠시만 기다려주세요.");
+                                await Bot.SendTextMessageAsync(varMessage.Chat.Id, "'" + battleTag + "'의 전적을 조회 중입니다.\n잠시만 기다려주세요.", ParseMode.Default, false, false, iMessageID);
 
                                 try
                                 {
@@ -492,7 +912,7 @@ namespace CDT_Noti_Bot
                                 }
                                 catch
                                 {
-                                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "'" + battleTag + "'의 전적을 조회할 수 없습니다.");
+                                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "'" + battleTag + "'의 전적을 조회할 수 없습니다.", ParseMode.Default, false, false, iMessageID);
                                 }
 
                                 if (bContinue == true)
@@ -511,8 +931,7 @@ namespace CDT_Noti_Bot
                                 strPrint += "- 모스트 : " + row[4].ToString() + " / " + row[5].ToString() + " / " + row[6].ToString() + "\n";
                                 strPrint += "- 이외 가능 픽 : " + row[7].ToString() + "\n";
                                 strPrint += "- 접속 시간대 : " + row[8].ToString() + "\n";
-                                strPrint += "- 소개\n";
-                                strPrint += "\t- " + row[9] + "\n";
+                                strPrint += "- 소개 : " + row[9].ToString() + "\n";
 
                                 bContinue = true;   // 한 명만 출력된다면 이 부분은 무시됨.
                             }
@@ -529,11 +948,14 @@ namespace CDT_Noti_Bot
                     }
                 }
             }
+            //========================================================================================
+            // 영상
+            //========================================================================================
             else if (strCommend == "/영상")
             {
                 // Define request parameters.
                 String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
-                String range = "경기 URL (18/4분기)!B5:G";
+                String range = "경기 URL!B5:G";
                 SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
                 if (strContents == "")
@@ -636,6 +1058,9 @@ namespace CDT_Noti_Bot
                     await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 영상을 찾을 수 없습니다.", ParseMode.Default, false, false, iMessageID);
                 }
             }
+            //========================================================================================
+            // 검색
+            //========================================================================================
             else if (strCommend == "/검색")
             {
                 if (strContents == "")
@@ -647,7 +1072,7 @@ namespace CDT_Noti_Bot
                 {
                     // Define request parameters.
                     String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
-                    String range = "클랜원 목록!C7:M";
+                    String range = "클랜원 목록!C7:N";
                     SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
                     bool bResult = false;
 
@@ -701,7 +1126,7 @@ namespace CDT_Noti_Bot
                 }
             }
             //========================================================================================
-            // 정모 관련 명령어
+            // 모임
             //========================================================================================
             else if (strCommend == "/모임")
             {
@@ -894,6 +1319,25 @@ namespace CDT_Noti_Bot
             }
             else if (strCommend == "/참가")
             {
+                String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                String range = "모임!D4:D";
+                SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+
+                ValueRange response = request.Execute();
+                if (response != null)
+                {
+                    IList<IList<Object>> values = response.Values;
+                    if (values != null && values.Count > 0)
+                    {
+                        var row = values[0];
+                        if (row.Count == 0)
+                        {
+                            await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 모임이 등록되지 않았습니다.", ParseMode.Default, false, false, iMessageID);
+                            return;
+                        }
+                    }
+                }
+
                 string strNickName = strFirstName + strLastName;
                 int iCellIndex = 16;
                 int iTempCount = 0;
@@ -903,11 +1347,11 @@ namespace CDT_Noti_Bot
                 bool isJoin = false;
 
                 // Define request parameters.
-                String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
-                String range = "모임!C" + iCellIndex + ":C";
-                SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+                spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                range = "모임!C" + iCellIndex + ":C";
+                request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
-                ValueRange response = request.Execute();
+                response = request.Execute();
                 if (response != null)
                 {
                     IList<IList<Object>> values = response.Values;
@@ -1031,17 +1475,36 @@ namespace CDT_Noti_Bot
             }
             else if (strCommend == "/불참")
             {
+                String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                String range = "모임!D4:D";
+                SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+
+                ValueRange response = request.Execute();
+                if (response != null)
+                {
+                    IList<IList<Object>> values = response.Values;
+                    if (values != null && values.Count > 0)
+                    {
+                        var row = values[0];
+                        if (row.Count == 0)
+                        {
+                            await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 모임이 등록되지 않았습니다.", ParseMode.Default, false, false, iMessageID);
+                            return;
+                        }
+                    }
+                }
+
                 string strNickName = strFirstName + strLastName;
                 int iCellIndex = 16;
                 int iTempCount = 0;
                 bool isJoin = false;
 
                 // Define request parameters.
-                String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
-                String range = "모임!C" + iCellIndex + ":C";
-                SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+                spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                range = "모임!C" + iCellIndex + ":C";
+                request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
-                ValueRange response = request.Execute();
+                response = request.Execute();
                 if (response != null)
                 {
                     IList<IList<Object>> values = response.Values;
@@ -1064,8 +1527,7 @@ namespace CDT_Noti_Bot
 
                     if (isJoin == true)
                     {
-                        //iCellIndex += values.Count;
-                        range = "모임!C" + (iCellIndex + iTempCount)/* + ":O" + (iCellIndex + iTempCount)*/;
+                        range = "모임!C" + (iCellIndex + iTempCount);
 
                         // Define request parameters.
                         ValueRange valueRange = new ValueRange();
@@ -1103,7 +1565,7 @@ namespace CDT_Noti_Bot
                 }
             }
             //========================================================================================
-            // 투표 관련 명령어
+            // 투표
             //========================================================================================
             else if (strCommend == "/투표")
             {
@@ -1155,10 +1617,9 @@ namespace CDT_Noti_Bot
 
                             // 투표자
                             index = 14;
-                            int roofCount = index + itemCount;
-                            for (; index < roofCount; index++)
+                            while (true)
                             {
-                                value = values[index];
+                                value = values[index++];
 
                                 for (int i = 0; i < value.Count - 1; i++)
                                 {
@@ -1166,6 +1627,11 @@ namespace CDT_Noti_Bot
                                     {
                                         voteDirector.AddVoter(i, value[i + 1].ToString());
                                     }
+                                }
+
+                                if (value.Count == 1)
+                                {
+                                    break;
                                 }
                             }
 
@@ -1282,7 +1748,7 @@ namespace CDT_Noti_Bot
                                 }
 
                                 int voteIndex = Convert.ToInt32(strContents);
-                                if (voteIndex <= 0)
+                                if ( (voteIndex <= 0) || (voteIndex > voteDirector.GetItemCount()) )
                                 {
                                     await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 투표 항목을 잘못 선택하셨습니다.", ParseMode.Default, false, false, iMessageID);
                                     return;
@@ -1349,7 +1815,7 @@ namespace CDT_Noti_Bot
                 }
             }
             //========================================================================================
-            // 명예의 전당 관련 명령어
+            // 명예의 전당
             //========================================================================================
             else if (strCommend == "/기록")
             {
@@ -1522,7 +1988,612 @@ namespace CDT_Noti_Bot
                 }
             }
             //========================================================================================
-            // 안내 관련 명령어
+            // 스크림
+            //========================================================================================
+            else if (strCommend == "/스크림")
+            {
+                if (strContents == "")
+                {
+                    String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                    String range = "스크림!B2:U17";
+                    SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+
+                    ValueRange response = request.Execute();
+                    if (response != null)
+                    {
+                        IList<IList<Object>> values = response.Values;
+                        if (values != null && values.Count > 0)
+                        {
+                            // 스크림 이름
+                            var title = values[0];
+                            if (title.Count > 0 && title[0].ToString() != "")
+                            {
+                                strPrint += "[ " + title[0].ToString() + " ]\n============================\n";
+
+                                int index = 4;
+                                for (int i = index; i < 15; i++)
+                                {
+                                    var row = values[i];
+
+                                    if (row.Count <= 1)
+                                    {
+                                        continue;
+                                    }
+
+                                    string battleTag = row[1].ToString();
+                                    string tier = row[2].ToString();
+                                    string score = row[3].ToString();
+                                    string position = row[5].ToString();
+                                    string date = "";
+                                    if (row.Count > 13 && row[13].ToString() == "O")
+                                        date += "월 ";
+                                    if (row.Count > 14 && row[14].ToString() == "O")
+                                        date += "화 ";
+                                    if (row.Count > 15 && row[15].ToString() == "O")
+                                        date += "수 ";
+                                    if (row.Count > 16 && row[16].ToString() == "O")
+                                        date += "목 ";
+                                    if (row.Count > 17 && row[17].ToString() == "O")
+                                        date += "금 ";
+                                    if (row.Count > 18 && row[18].ToString() == "O")
+                                        date += "토 ";
+                                    if (row.Count > 19 && row[19].ToString() == "O")
+                                        date += "일";
+
+                                    strPrint += "- " + battleTag.ToString() + " (" + position.ToString() + ") / " + score.ToString() + " - " + date.ToString() + "\n";
+                                }
+                            }
+                        }
+                    }
+
+                    if (strPrint != "")
+                    {
+                        strPrint += "\n스크림 신청은 /스크림 [요일] 로 해주세요.\n(ex: /스크림 토일)\n신청 후 재신청을 하면 덮어씌워지므로\n날짜를 추가하려면 기존 날짜와\n합해서 신청해주세요.\n(ex: /스크림 토일, /스크림 목금토일)";
+
+                        const string scrim = @"Function/Scrim.png";
+                        var fileName = scrim.Split(Path.DirectorySeparatorChar).Last();
+                        var fileStream = new FileStream(scrim, FileMode.Open, FileAccess.Read, FileShare.Read);
+                        await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream, strPrint, ParseMode.Default, false, iMessageID);
+                    }
+                    else
+                    {
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 현재 모집 중인 스크림이 없습니다.", ParseMode.Default, false, false, iMessageID);
+                    }
+                }
+                else // 일정을 입력했을 경우
+                {
+                    // 타이틀 Load
+                    {
+                        String sheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                        String titleRange = "스크림!B2:B";
+                        SpreadsheetsResource.ValuesResource.GetRequest titleRequest = service.Spreadsheets.Values.Get(sheetId, titleRange);
+
+                        ValueRange titleResponse = titleRequest.Execute();
+                        if (titleResponse != null)
+                        {
+                            IList<IList<Object>> values = titleResponse.Values;
+                            if (values != null && values.Count > 0)
+                            {
+                                // 스크림 이름
+                                var title = values[0];
+                                if (title.Count == 0 || title[0].ToString() == "")
+                                {
+                                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 현재 모집 중인 스크림이 없습니다.", ParseMode.Default, false, false, iMessageID);
+                                    return;
+                                }
+                            }
+                        }
+                    }
+
+                    int size = strContents.Length;
+                    string[] day = {"", "", "", "", "", "", ""};
+                    bool isConfirmDay = false;
+                    bool isCancel = false;
+
+                    if (strContents == "취소")
+                    {
+                        isCancel = true;
+                    }
+                    else
+                    {
+                        if (strContents.Contains("요") == true)
+                        {
+                            await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 잘못된 날짜입니다.", ParseMode.Default, false, false, iMessageID);
+                            return;
+                        }
+
+                        // 가능 날짜 추출
+                        for (int i = 0; i < size; i++)
+                        {
+                            string inputDay = strContents.Substring(i, 1);
+
+                            if (inputDay == "월")
+                            {
+                                day[0] = "O";
+                                isConfirmDay = true;
+                            }
+                            if (inputDay == "화")
+                            {
+                                day[1] = "O";
+                                isConfirmDay = true;
+                            }
+                            if (inputDay == "수")
+                            {
+                                day[2] = "O";
+                                isConfirmDay = true;
+                            }
+                            if (inputDay == "목")
+                            {
+                                day[3] = "O";
+                                isConfirmDay = true;
+                            }
+                            if (inputDay == "금")
+                            {
+                                day[4] = "O";
+                                isConfirmDay = true;
+                            }
+                            if (inputDay == "토")
+                            {
+                                day[5] = "O";
+                                isConfirmDay = true;
+                            }
+                            if (inputDay == "일")
+                            {
+                                day[6] = "O";
+                                isConfirmDay = true;
+                            }
+                        }
+
+                        if (isConfirmDay == false)
+                        {
+                            await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 잘못된 날짜입니다.", ParseMode.Default, false, false, iMessageID);
+                            return;
+                        }
+                    }
+                    
+                    String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                    CUser user = new CUser();
+
+                    // 클랜원 목록에서 정보 추출
+                    String range = "클랜원 목록!C7:N";
+                    SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+                    ValueRange response = request.Execute();
+                    if (response != null)
+                    {
+                        IList<IList<Object>> values = response.Values;
+                        if (values != null && values.Count > 0)
+                        {
+                            foreach (var row in values)
+                            {
+                                if (row[10].ToString() == "")
+                                    continue;
+
+                                // 유저키 일치
+                                if (Convert.ToInt64(row[10].ToString()) == senderKey)
+                                {
+                                    user = setUserInfo(row, senderKey);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    int index = 0;
+                    bool isInput = false;
+
+                    range = "스크림!C6:C";
+                    request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+                    response = request.Execute();
+                    if (response != null)
+                    {
+                        IList<IList<Object>> values = response.Values;
+                        if (values != null && values.Count > 0)
+                        {
+                            int count = 0;
+                            bool isSearch = false;
+
+                            foreach (var row in values)
+                            {
+                                if (row.Count > 0 && row[0].ToString() != "")
+                                {
+                                    if (row[0].ToString() == user.MainBattleTag)
+                                    {
+                                        isSearch = true;
+                                        index = count;
+                                        break;
+                                    }
+
+                                    count++;
+                                }
+                                else
+                                {
+                                    if (isInput == false)
+                                    {
+                                        index = count;
+                                        isInput = true;
+                                    }
+                                }
+                            }
+
+                            if (isCancel == true && isSearch == false)
+                            {
+                                await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 스크림 신청을 하지 않았습니다.", ParseMode.Default, false, false, iMessageID);
+                                return;
+                            }
+                        }
+                    }
+
+                    // 유저키 등록이 되어있다면
+                    if (user.UserKey > 0)
+                    {
+                        // 스크림 신청
+                        if (isCancel == false)
+                        {
+                            string position = "";
+
+                            if (user.Position.HasFlag(POSITION.POSITION_FLEX) == true)
+                            {
+                                position = "플렉스";
+                            }
+                            else
+                            {
+                                if (user.Position.HasFlag(POSITION.POSITION_DPS) == true)
+                                    position += "딜";
+                                if (user.Position.HasFlag(POSITION.POSITION_TANK) == true)
+                                    position += "탱";
+                                if (user.Position.HasFlag(POSITION.POSITION_SUPP) == true)
+                                    position += "힐";
+                            }
+
+                            await Bot.SendTextMessageAsync(varMessage.Chat.Id, "'" + user.MainBattleTag + "'의 전적을 조회 중입니다.\n잠시만 기다려주세요.", ParseMode.Default, false, false, iMessageID);
+
+                            Tuple<int, string> retTuple = referenceScore(user.MainBattleTag);
+                            int score = retTuple.Item1;     // 점수
+                            string tier = retTuple.Item2;   // 티어
+
+                            if (score == 0)
+                            {
+                                await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 전적을 조회 할 수 없습니다.\n시트에 직접 입력해주세요.\n(원인 : 프로필 비공개, 친구공개, 미배치)", ParseMode.Default, false, false, iMessageID);
+                            }
+
+                            // Define request parameters.
+                            range = "스크림!C" + (6 + index) + ":U" + (6 + index);
+                            ValueRange valueRange = new ValueRange();
+                            valueRange.MajorDimension = "ROWS"; //"ROWS";//COLUMNS 
+
+                            var oblist = new List<object>()
+                            {
+                                user.MainBattleTag, // 배틀태그
+                                tier,               // 티어
+                                score,              // 점수
+                                "",                 // 6명 체크
+                                position,           // 포지션
+                                user.MostPick[0],   // 모스트1
+                                user.MostPick[1],   // 모스트2
+                                user.MostPick[2],   // 모스트3
+                                user.OtherPick,     // 이외 가능 픽
+                                "",
+                                "",
+                                "",
+                                day[0],             // 월
+                                day[1],             // 화
+                                day[2],             // 수
+                                day[3],             // 목
+                                day[4],             // 금
+                                day[5],             // 토
+                                day[6]              // 일
+                            };
+                            valueRange.Values = new List<IList<object>> { oblist };
+
+                            SpreadsheetsResource.ValuesResource.UpdateRequest updateRequest = service.Spreadsheets.Values.Update(valueRange, spreadsheetId, range);
+
+                            updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.RAW;
+                            UpdateValuesResponse updateResponse = updateRequest.Execute();
+                            if (updateResponse == null)
+                            {
+                                strPrint += "[ERROR] 시트를 업데이트 할 수 없습니다.";
+                            }
+                            else
+                            {
+                                strPrint += "[SYSTEM] 스크림 신청이 완료 됐습니다.";
+                            }
+                        }
+                        else
+                        {
+                            // 스크림 취소
+                            // Define request parameters.
+                            range = "스크림!C" + (6 + index) + ":Z" + (6 + index);
+                            ValueRange valueRange = new ValueRange();
+                            valueRange.MajorDimension = "ROWS"; //"ROWS";//COLUMNS 
+
+                            var oblist = new List<object>() {"","","","","","","","","","","","","","","","","","","","",""};
+                            valueRange.Values = new List<IList<object>> { oblist };
+
+                            SpreadsheetsResource.ValuesResource.UpdateRequest updateRequest = service.Spreadsheets.Values.Update(valueRange, spreadsheetId, range);
+
+                            updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.RAW;
+                            UpdateValuesResponse updateResponse = updateRequest.Execute();
+                            if (updateResponse == null)
+                            {
+                                strPrint += "[ERROR] 시트를 업데이트 할 수 없습니다.";
+                            }
+                            else
+                            {
+                                strPrint += "[SYSTEM] 스크림 신청을 취소했습니다.";
+                            }
+                        }
+                    }
+                    else
+                    {
+                        strPrint += "[ERROR] 유저 정보를 업데이트 할 수 없습니다.";
+                    }
+
+                    if (strPrint != "")
+                    {
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
+                    }
+                }
+            }
+            //========================================================================================
+            // 일정 조사
+            //========================================================================================
+            else if (strCommend == "/조사")
+            {
+                if (strContents == "")
+                {
+                    String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                    String range = "일정 조사!L7:R14";
+                    SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+                    ValueRange response = request.Execute();
+                    if (response != null)
+                    {
+                        IList<IList<Object>> values = response.Values;
+                        if (values != null && values.Count > 0)
+                        {
+                            var title = values[0];
+                            if (title.Count == 0)
+                            {
+                                strPrint += "[ERROR] 현재 조사 중인 일정이 없습니다.";
+                                await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
+                                return;
+                            }
+                            else
+                            {
+                                strPrint += title[0].ToString() + "\n============================\n";
+
+                                var day = values[6];
+                                var count = values[7];
+
+                                for (int i=0; i<7; i++)
+                                {
+                                    strPrint += "- " + day[i].ToString() + " : " + count[i].ToString() + "명\n";
+                                }
+                            }
+                        }
+                    }
+
+                    if (strPrint != "")
+                    {
+                        strPrint += "\n조사에 참여하려면 /조사 [요일] 로 참여해주세요.\n(ex: /조사 금토일)";
+
+                        const string calendar_research = @"Function/calendar_research.jpg";
+                        var fileName = calendar_research.Split(Path.DirectorySeparatorChar).Last();
+                        var fileStream = new FileStream(calendar_research, FileMode.Open, FileAccess.Read, FileShare.Read);
+                        await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream, strPrint, ParseMode.Default, false, iMessageID);
+                    }
+                    else
+                    {
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 현재 모집 중인 스크림이 없습니다.", ParseMode.Default, false, false, iMessageID);
+                    }
+                }
+                else
+                {
+                    int size = strContents.Length;
+                    string[] day = { "", "", "", "", "", "", "" };
+                    bool isConfirmDay = false;
+                    bool isCancel = false;
+
+                    if (strContents == "취소")
+                    {
+                        isCancel = true;
+                    }
+                    else
+                    {
+                        if (strContents.Contains("요") == true)
+                        {
+                            await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 잘못된 날짜입니다.", ParseMode.Default, false, false, iMessageID);
+                            return;
+                        }
+
+                        // 가능 날짜 추출
+                        for (int i = 0; i < size; i++)
+                        {
+                            string inputDay = strContents.Substring(i, 1);
+
+                            if (inputDay == "월")
+                            {
+                                day[0] = "O";
+                                isConfirmDay = true;
+                            }
+                            if (inputDay == "화")
+                            {
+                                day[1] = "O";
+                                isConfirmDay = true;
+                            }
+                            if (inputDay == "수")
+                            {
+                                day[2] = "O";
+                                isConfirmDay = true;
+                            }
+                            if (inputDay == "목")
+                            {
+                                day[3] = "O";
+                                isConfirmDay = true;
+                            }
+                            if (inputDay == "금")
+                            {
+                                day[4] = "O";
+                                isConfirmDay = true;
+                            }
+                            if (inputDay == "토")
+                            {
+                                day[5] = "O";
+                                isConfirmDay = true;
+                            }
+                            if (inputDay == "일")
+                            {
+                                day[6] = "O";
+                                isConfirmDay = true;
+                            }
+                        }
+
+                        if (isConfirmDay == false)
+                        {
+                            await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 잘못된 날짜입니다.", ParseMode.Default, false, false, iMessageID);
+                            return;
+                        }
+                    }
+
+                    string calTitle = "";
+
+                    String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                    String range = "일정 조사!L7:L";
+                    SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+                    ValueRange response = request.Execute();
+                    if (response != null)
+                    {
+                        IList<IList<Object>> values = response.Values;
+                        if (values != null && values.Count > 0)
+                        {
+                            var title = values[0];
+                            if (title.Count == 0)
+                            {
+                                strPrint += "[ERROR] 현재 조사 중인 일정이 없습니다.";
+                                await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
+                                return;
+                            }
+                            else
+                            {
+                                // 일정 조사 제목
+                                calTitle = title[0].ToString();
+                            }
+                        }
+                    }
+
+                    int index = 0;
+
+                    spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                    range = "일정 조사!B5:J74";
+                    request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+                    response = request.Execute();
+                    if (response != null)
+                    {
+                        IList<IList<Object>> values = response.Values;
+                        if (values != null && values.Count > 0)
+                        {
+                            int count = 0;
+                            bool isInput = false;
+                            bool isBlank = false;
+
+                            foreach (var row in values)
+                            {
+                                if (row.Count > 1 && row[1].ToString() != "")
+                                {
+                                    if (row[1].ToString() == strUserName)
+                                    {
+                                        index = count;
+                                        isInput = true;
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        count++;
+                                    }
+                                }
+                                else
+                                {
+                                    if (index == 0 && isBlank == false)
+                                    {
+                                        index = count++;
+                                        isBlank = true;
+                                    }
+                                }
+                            }
+
+                            if (isInput == false  && isBlank == false && index == 0)
+                            {
+                                index = count;
+                            }
+                        }
+                    }
+
+                    if (isCancel == false)
+                    {
+                        range = "일정 조사!C" + (5 + index) + ":J" + (5 + index);
+                        ValueRange valueRange = new ValueRange();
+                        valueRange.MajorDimension = "ROWS"; //"ROWS";//COLUMNS 
+
+                        var oblist = new List<object>()
+                            {
+                                strUserName,
+                                day[0],             // 월
+                                day[1],             // 화
+                                day[2],             // 수
+                                day[3],             // 목
+                                day[4],             // 금
+                                day[5],             // 토
+                                day[6]              // 일
+                            };
+                        valueRange.Values = new List<IList<object>> { oblist };
+
+                        SpreadsheetsResource.ValuesResource.UpdateRequest updateRequest = service.Spreadsheets.Values.Update(valueRange, spreadsheetId, range);
+
+                        updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.RAW;
+                        UpdateValuesResponse updateResponse = updateRequest.Execute();
+                        if (updateResponse == null)
+                        {
+                            strPrint += "[ERROR] 시트를 업데이트 할 수 없습니다.";
+                        }
+                        else
+                        {
+                            strPrint += "[SYSTEM] 일정 조사를 완료했습니다.";
+                        }
+                    }
+                    else
+                    {
+                        range = "일정 조사!C" + (5 + index) + ":J" + (5 + index);
+                        ValueRange valueRange = new ValueRange();
+                        valueRange.MajorDimension = "ROWS"; //"ROWS";//COLUMNS 
+
+                        var oblist = new List<object>() {"","","","","","","",""};
+                        valueRange.Values = new List<IList<object>> { oblist };
+
+                        SpreadsheetsResource.ValuesResource.UpdateRequest updateRequest = service.Spreadsheets.Values.Update(valueRange, spreadsheetId, range);
+
+                        updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.RAW;
+                        UpdateValuesResponse updateResponse = updateRequest.Execute();
+                        if (updateResponse == null)
+                        {
+                            strPrint += "[ERROR] 시트를 업데이트 할 수 없습니다.";
+                        }
+                        else
+                        {
+                            strPrint += "[SYSTEM] 일정 조사를 취소했습니다.";
+                        }
+                    }
+
+                    if (strPrint != "")
+                    {
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
+                    }
+                    else
+                    {
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 일정 조사를 할 수 없습니다.", ParseMode.Default, false, false, iMessageID);
+                    }
+                }
+            }
+            //========================================================================================
+            // 안내
             //========================================================================================
             else if (strCommend == "/안내")
             {
@@ -1552,10 +2623,16 @@ namespace CDT_Noti_Bot
 
                 await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
             }
+            //========================================================================================
+            // 리포트
+            //========================================================================================
             else if (strCommend == "/리포트")
             {
                 //await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
             }
+            //========================================================================================
+            // 상태
+            //========================================================================================
             else if (strCommend == "/상태")
             {
                 strPrint += "Running.......\n";
