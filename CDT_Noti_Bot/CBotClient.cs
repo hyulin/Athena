@@ -450,7 +450,11 @@ namespace CDT_Noti_Bot
                 // 아테나가 언급되면 자연어 명령
                 if (strMassage.Contains("아테나"))
                 {
-                    strMassage = naturalLanguage.DetectionCommand(strMassage);
+                    string[] natural = naturalLanguage.DetectionCommand(strMassage).Split(' ');
+                    if (natural.Count() >= 1)
+                        strCommend = natural[0].ToString();
+                    if (natural.Count() >= 2)
+                        strContents = natural[1].ToString();
                 }
             }
 
