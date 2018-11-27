@@ -48,6 +48,9 @@ namespace CDT_Noti_Bot
         CUserDirector userDirector = new CUserDirector();
         CNaturalLanguage naturalLanguage = new CNaturalLanguage();
 
+        bool isGoodMorning = false;
+        //bool isGoodNight = false;
+
         // Bot Token
 #if DEBUG
         const string strBotToken = "624245556:AAHJQ3bwdUB6IRf1KhQ2eAg4UDWB5RTiXzI";     // 테스트 봇 토큰
@@ -267,6 +270,34 @@ namespace CDT_Noti_Bot
         {
             string strPrint = "";
 
+            if (isGoodMorning == false)
+            {
+                if (DateTime.Now.Hour == 8 && DateTime.Now.Hour == 9)
+                {
+                    Random random = new Random();
+                    int randomNum = random.Next(1, 100);
+
+                    if (randomNum == 1)
+                    {
+                        isGoodMorning = true;
+                        strPrint += "굿모닝~ 안녕히 주무셨나요?\n오늘도 즐거운 하루 되세요~ :)";
+
+#if DEBUG
+                        Bot.SendTextMessageAsync(-1001312491933, strPrint);  // 운영진방
+#else
+                        Bot.SendTextMessageAsync(-1001202203239, strPrint);  // 클랜방
+#endif
+                    }
+                }
+            }
+            else
+            {
+                if (DateTime.Now.Hour > 9)
+                {
+                    isGoodMorning = false;
+                }
+            }
+
             // Define request parameters.
             String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
             String range = "클랜 공지!C15:C23";
@@ -384,14 +415,6 @@ namespace CDT_Noti_Bot
                 }
             }
 
-            // 이스터에그 (아테나 대사 출력)
-            if (userDirector.getUserInfo(senderKey).UserKey != 0 && varMessage.ReplyToMessage != null && varMessage.ReplyToMessage.From.FirstName.Contains("아테나") == true)
-            {
-                // 등록된 유저가 시도했을 경우 출력
-                await Bot.SendTextMessageAsync(varMessage.Chat.Id, EasterEgg.getEasterEgg(), ParseMode.Default, false, false, iMessageID);
-                return;
-            }
-
             // 입장 메시지 일 경우
             if (varMessage.Type == MessageType.ChatMembersAdded)
             {
@@ -448,29 +471,69 @@ namespace CDT_Noti_Bot
             // 명령어가 아닐 경우 아래는 태울 필요 없다.
             if (isCommand == false)
             {
+                // 메뉴 선택
+                if (naturalLanguage.isExistMenu(strMassage) == true)
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, naturalLanguage.getMenu(), ParseMode.Default, false, false, iMessageID);
+                    return;
+                }
+
+                // 날씨
+                Tuple<string, string> weatherTuple = naturalLanguage.weatherCall(strMassage);
+                if (weatherTuple.Item1 != "" && weatherTuple.Item2 != "")
+                {
+                    strCommend = "/날씨";
+                    strContents = weatherTuple.Item2;
+                }
+
+                //// 따라 웃기
+                //string laughMessage = naturalLanguage.laughCall(strMassage);
+                //if (laughMessage != "")
+                //{
+                //    await Bot.SendTextMessageAsync(varMessage.Chat.Id, laughMessage);
+                //    return;
+                //}
+
+                // 대답하기
+                if (varMessage.ReplyToMessage != null && varMessage.ReplyToMessage.From.FirstName.Contains("아테나") == true)
+                {
+                    string reply = naturalLanguage.replyCall(strMassage);
+                    if (reply != "")
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, reply, ParseMode.Default, false, false, iMessageID);
+
+                    return;
+                }
+
+                //// 이스터에그 (아테나 대사 출력)
+                //if (varMessage.ReplyToMessage != null && varMessage.ReplyToMessage.From.FirstName.Contains("아테나") == true)
+                //{
+                //    // 등록된 유저가 시도했을 경우 출력
+                //    await Bot.SendTextMessageAsync(varMessage.Chat.Id, EasterEgg.getEasterEgg(), ParseMode.Default, false, false, iMessageID);
+                //    return;
+                //}
+
                 // 아테나가 언급되면 자연어 명령
                 if (strMassage.Contains("아테나"))
                 {
-                    if (EasterEgg.isExistMenu(strMassage) == true)
-                    {
-                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, EasterEgg.getMenu(), ParseMode.Default, false, false, iMessageID);
-                    }
-                    else
-                    {
-                        string[] natural = naturalLanguage.DetectionCommand(strMassage).Split(' ');
-                        if (natural.Count() >= 1)
-                            strCommend = natural[0].ToString();
-                        if (natural.Count() >= 2)
-                            strContents = natural[1].ToString();
-                    }
-                }
-                else
-                {
-                    if (EasterEgg.isExistMenu(strMassage) == true)
-                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, EasterEgg.getMenu(), ParseMode.Default, false, false, iMessageID);
-                }
+                    string[] natural = naturalLanguage.FunctionCommand(strMassage).Split(' ');
+                    bool isFirst = true;
 
-                return;
+                    strCommend = natural[0].ToString();
+
+                    for (int i = 1; i <natural.Count(); i++)
+                    {
+                        if (isFirst == true)
+                        {
+                            strContents += natural[i].ToString();
+                            isFirst = false;
+                        }
+                        else
+                        {
+                            strContents += " " + natural[i].ToString();
+                        }
+
+                    }
+                }
             }
 
             string strPrint = "";
@@ -2648,11 +2711,11 @@ namespace CDT_Noti_Bot
             {
                 if (strContents == "")
                 {
-                    strPrint += "[SYSTEM] 지역을 추가해주세요.\n- 가능지역 : 서울, 경기, 부산, 대구, 광주, 인천, 대전, 울산, 세종, 제주";
+                    strPrint += "[SYSTEM] 지역을 추가해주세요.\n- 가능지역 : 서울, 경기, 부산, 대구, 광주, 인천, 대전, 울산, 세종, 제주\n(ex: /날씨 제주)";
                 }
                 else
                 {
-                    Tuple<string, string> city = getCity(strContents);
+                    Tuple<string, string> city = CWeather.getCity(strContents);
 
                     if (city.Item1 == "" || city.Item2 == "")
                     {
@@ -2853,67 +2916,6 @@ namespace CDT_Noti_Bot
             }
 
             strPrint = "";
-        }
-
-        public Tuple<string, string> getCity(string city)
-        {
-            string eng = "";
-            string kor = "";
-
-            if (city.Contains("서울") == true)
-            {
-                eng = "seoul";
-                kor = "서울";
-            }
-            else if (city.Contains("경기") == true)
-            {
-                eng = "gyeonggi-do";
-                kor = "경기";
-            }
-            else if (city.Contains("부산") == true)
-            {
-                eng = "busan";
-                kor = "부산";
-            }
-            else if (city.Contains("대구") == true)
-            {
-                eng = "daegu";
-                kor = "대구";
-            }
-            else if (city.Contains("광주") == true)
-            {
-                eng = "gwangju";
-                kor = "광주";
-            }
-            else if (city.Contains("인천") == true)
-            {
-                eng = "incheon";
-                kor = "인천";
-            }
-            else if (city.Contains("대전") == true)
-            {
-                eng = "daejeon";
-                kor = "대전";
-            }
-            else if (city.Contains("울산") == true)
-            {
-                eng = "ulsan";
-                kor = "울산";
-            }
-            else if (city.Contains("세종") == true)
-            {
-                eng = "sejong";
-                kor = "세종";
-            }
-            else if (city.Contains("제주") == true)
-            {
-                eng = "jeju";
-                kor = "제주";
-            }
-
-            Tuple<string, string> tuple = Tuple.Create(eng, kor);
-
-            return tuple;
         }
     }
 }

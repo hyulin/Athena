@@ -92,24 +92,25 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CBotClient.cs" />
-    <Compile Include="CCalendar.cs" />
-    <Compile Include="CCalendarDirector.cs" />
-    <Compile Include="CEasterEgg.cs" />
-    <Compile Include="CNaturalLanguage.cs" />
-    <Compile Include="CSystemInfo.cs" />
-    <Compile Include="CUser.cs" />
-    <Compile Include="CUserDirector.cs" />
-    <Compile Include="CVoteDirector.cs" />
-    <Compile Include="CVoteItem.cs" />
-    <Compile Include="CVoteRanking.cs" />
+    <Compile Include="CWeather.cs" />
+    <Compile Include="System\CBotClient.cs" />
+    <Compile Include="Calendar\CCalendar.cs" />
+    <Compile Include="Calendar\CCalendarDirector.cs" />
+    <Compile Include="EasterEgg\CEasterEgg.cs" />
+    <Compile Include="NaturalLanguage\CNaturalLanguage.cs" />
+    <Compile Include="System\CSystemInfo.cs" />
+    <Compile Include="User\CUser.cs" />
+    <Compile Include="User\CUserDirector.cs" />
+    <Compile Include="Vote\CVoteDirector.cs" />
+    <Compile Include="Vote\CVoteItem.cs" />
+    <Compile Include="Vote\CVoteRanking.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="CNotice.cs" />
+    <Compile Include="Notice\CNotice.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">
