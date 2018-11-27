@@ -59,7 +59,7 @@ namespace CDT_Noti_Bot
             if (message.Contains("저녁") && message.Contains("먹"))
                 return true;
 
-            if (message.Contains("배고픈데") || message.Contains("배고프다") || message.Contains("배고프네요") || message.Contains("배고픔"))
+            if (message.Contains("배고픈데") || message.Contains("배고프") || message.Contains("배고픔"))
                 return true;
             
             if (message.Contains("메뉴") == true)
