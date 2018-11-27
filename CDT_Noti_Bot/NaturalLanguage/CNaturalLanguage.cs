@@ -38,6 +38,8 @@ namespace CDT_Noti_Bot
 
         string[] choiceWord = { "이랑", "랑", "," };
 
+        string[] offWork = { "퇴근합니다", "퇴근~", "퇴근!", "퇴근하겠" };
+
         // 메뉴 추천 감지
         public bool isExistMenu(string message)
         {
@@ -209,6 +211,36 @@ namespace CDT_Noti_Bot
             }
 
             return reply;
+        }
+
+        public string offWorkCall(string message)
+        {
+            string output = "";
+
+            foreach (var word in offWork)
+            {
+                if (message.Contains(word) == true)
+                {
+                    Random random = new Random();
+                    int randomNum = random.Next(5);
+
+                    switch (randomNum)
+                    {
+                        case 0:
+                            return "수고하셨습니다ㅎㅎ";
+                        case 1:
+                            return "수고 많으셨어요. :)";
+                        case 2:
+                            return "고생하셨습니다~";
+                        case 3:
+                            return "고생 많으셨어요~";
+                        case 4:
+                            return "";
+                    }
+                }
+            }
+
+            return output;
         }
 
         // 클랜 기능 감지

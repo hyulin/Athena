@@ -496,6 +496,16 @@ namespace CDT_Noti_Bot
                     return;
                 }
 
+                // 퇴근 응답
+                if (strMassage.Contains("퇴근") == true)
+                {
+                    string offWork = naturalLanguage.offWorkCall(strMassage);
+                    if (offWork != "")
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, offWork, ParseMode.Default, false, false, iMessageID);
+
+                    return;
+                }
+
                 //// 이스터에그 (아테나 대사 출력)
                 //if (varMessage.ReplyToMessage != null && varMessage.ReplyToMessage.From.FirstName.Contains("아테나") == true)
                 //{
