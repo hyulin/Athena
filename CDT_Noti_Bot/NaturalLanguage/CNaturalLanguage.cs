@@ -361,6 +361,14 @@ namespace CDT_Noti_Bot
                         }
                     }
 
+                    foreach (var enter in mindCommand)
+                    {
+                        if (word.Contains(enter))
+                        {
+                            return "/조회 " + battleTag.Trim();
+                        }
+                    }
+
                 }
             }            
 
