@@ -38,7 +38,7 @@ namespace CDT_Noti_Bot
 
         string[] choiceWord = { "이랑", "랑", "," };
 
-        string[] offWork = { "퇴근합니다", "퇴근~", "퇴근!", "퇴근하겠" };
+        string[] offWork = { "퇴근합니다", "퇴근 합니다", "퇴근합니당", "퇴근 합니당", "퇴근합니닷", "퇴근 합니닷", "퇴근~", "퇴근!", "퇴근하겠" };
 
         // 메뉴 추천 감지
         public bool isExistMenu(string message)
