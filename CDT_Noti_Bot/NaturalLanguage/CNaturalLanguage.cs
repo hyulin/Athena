@@ -20,8 +20,8 @@ namespace CDT_Noti_Bot
         string[] guideCommand = { "안내", "가이드" };
         string[] statusCommand = { "상태" };
 
-        string[] enterCommand = { "알려", "보여", "?", "궁금", "해줘" };
-        string[] ofCommand = { "의", "가", "에", "은", "는" };
+        string[] enterCommand = { "알려", "보여", "?", "궁금", "해줘", "뭐야" };
+        string[] ofCommand = { "의", "가", "에", "은", "는", "님의", "님" };
         string[] mindCommand = { "어때", "?", "는요", "어떰", "어떨", "어떠", "어떻", "어떤" };
 
         string[] menu = {
@@ -347,7 +347,6 @@ namespace CDT_Noti_Bot
                     if (battleTag.IndexOf(of) == battleTag.Length - 1)
                     {
                         battleTag = battleTag.Substring(0, battleTag.Length - 1);
-                        break;
                     }
                 }
 

@@ -478,14 +478,6 @@ namespace CDT_Noti_Bot
                     return;
                 }
 
-                // 날씨
-                Tuple<string, string> weatherTuple = naturalLanguage.weatherCall(strMassage);
-                if (weatherTuple.Item1 != "" && weatherTuple.Item2 != "")
-                {
-                    strCommend = "/날씨";
-                    strContents = weatherTuple.Item2;
-                }
-
                 //// 따라 웃기
                 //string laughMessage = naturalLanguage.laughCall(strMassage);
                 //if (laughMessage != "")
@@ -515,23 +507,37 @@ namespace CDT_Noti_Bot
                 // 아테나가 언급되면 자연어 명령
                 if (strMassage.Contains("아테나"))
                 {
-                    string[] natural = naturalLanguage.FunctionCommand(strMassage).Split(' ');
-                    bool isFirst = true;
-
-                    strCommend = natural[0].ToString();
-
-                    for (int i = 1; i <natural.Count(); i++)
+                    // 날씨 감지
+                    if (strMassage.Contains("날씨") == true)
                     {
-                        if (isFirst == true)
+                        Tuple<string, string> weatherTuple = naturalLanguage.weatherCall(strMassage);
+                        if (weatherTuple.Item1 != "" && weatherTuple.Item2 != "")
                         {
-                            strContents += natural[i].ToString();
-                            isFirst = false;
+                            strCommend = "/날씨";
+                            strContents = weatherTuple.Item2;
                         }
-                        else
-                        {
-                            strContents += " " + natural[i].ToString();
-                        }
+                    }
+                    else
+                    {
+                        // 클랜 기능 감지
+                        string[] natural = naturalLanguage.FunctionCommand(strMassage).Split(' ');
+                        bool isFirst = true;
 
+                        strCommend = natural[0].ToString();
+
+                        for (int i = 1; i < natural.Count(); i++)
+                        {
+                            if (isFirst == true)
+                            {
+                                strContents += natural[i].ToString();
+                                isFirst = false;
+                            }
+                            else
+                            {
+                                strContents += " " + natural[i].ToString();
+                            }
+
+                        }
                     }
                 }
             }
