@@ -270,9 +270,9 @@ namespace CDT_Noti_Bot
         {
             string strPrint = "";
 
-            if (isGoodMorning == false)
+            if (DateTime.Now.Hour == 8)
             {
-                if (DateTime.Now.Hour == 8)
+                if (isGoodMorning == false)
                 {
                     isGoodMorning = true;
                     strPrint += "굿모닝~ 오늘도 즐거운 하루 되세요~ :)";
