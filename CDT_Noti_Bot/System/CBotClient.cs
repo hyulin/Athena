@@ -272,30 +272,21 @@ namespace CDT_Noti_Bot
 
             if (isGoodMorning == false)
             {
-                if (DateTime.Now.Hour == 8 && DateTime.Now.Hour == 9)
+                if (DateTime.Now.Hour == 8)
                 {
-                    Random random = new Random();
-                    int randomNum = random.Next(1, 100);
-
-                    if (randomNum == 1)
-                    {
-                        isGoodMorning = true;
-                        strPrint += "굿모닝~ 안녕히 주무셨나요?\n오늘도 즐거운 하루 되세요~ :)";
+                    isGoodMorning = true;
+                    strPrint += "굿모닝~ 오늘도 즐거운 하루 되세요~ :)";
 
 #if DEBUG
-                        Bot.SendTextMessageAsync(-1001312491933, strPrint);  // 운영진방
+                    Bot.SendTextMessageAsync(-1001312491933, strPrint);  // 운영진방
 #else
-                        Bot.SendTextMessageAsync(-1001202203239, strPrint);  // 클랜방
+                    Bot.SendTextMessageAsync(-1001202203239, strPrint);  // 클랜방
 #endif
-                    }
                 }
             }
             else
             {
-                if (DateTime.Now.Hour > 9)
-                {
-                    isGoodMorning = false;
-                }
+                isGoodMorning = false;
             }
 
             // Define request parameters.
