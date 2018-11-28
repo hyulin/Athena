@@ -13,6 +13,7 @@ namespace CDT_Noti_Bot
         string[] notiCommand = { "공지" };
         string[] refCommand = { "조회", "전적", "점수", "티어" };
         string[] videoCommand = { "영상", "방송" };
+        string[] videoSubCommand = { "목록", "리스트", "어떤" };
         string[] serchCommand = { "검색", "모스트", "포지션", "유저" };
         string[] meetingCommand = { "모임", "정모", "참가", "확정", "불참" };
         string[] voteCommand = { "투표", "선거", "설문" };
@@ -53,12 +54,6 @@ namespace CDT_Noti_Bot
                 return true;
 
             if (message.Contains("밥") && message.Contains("먹"))
-                return true;
-
-            if (message.Contains("점심") && message.Contains("먹"))
-                return true;
-
-            if (message.Contains("저녁") && message.Contains("먹"))
                 return true;
 
             if (message.Contains("배고픈데") || message.Contains("배고프네") || message.Contains("배고프다") ||
@@ -213,6 +208,7 @@ namespace CDT_Noti_Bot
             return reply;
         }
 
+        // 퇴근 감지
         public string offWorkCall(string message)
         {
             string output = "";
@@ -402,7 +398,78 @@ namespace CDT_Noti_Bot
                     }
 
                 }
-            }            
+            }
+
+
+
+            //--------------------------------------------------------
+            // 영상 감지
+            //--------------------------------------------------------
+            index = 0;
+            bool isVideoCommand = false;
+            bool isVideoEnter = false;
+            int month = 0;
+            int day = 0;
+
+            foreach (var word in videoCommand)
+            {
+                if (text.Contains(word) == true)
+                {
+                    isVideoCommand = true;
+                    break;
+                }
+            }
+
+            if (isVideoCommand == true)
+            {
+                foreach (var enter in enterCommand)
+                {
+                    if (text.Contains(enter) == true)
+                    {
+                        isVideoEnter = true;
+                        break;
+                    }
+                }
+
+                if (isVideoEnter == false)
+                {
+                    foreach (var enter in mindCommand)
+                    {
+                        if (text.Contains(enter) == true)
+                        {
+                            isVideoEnter = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (isVideoCommand == true && isVideoEnter == true)
+                {
+                    foreach (var word in split)
+                    {
+                        if (word.Contains("월") == true)
+                        {
+                            month = Convert.ToInt32(word.Replace("월", ""));
+                            continue;
+                        }
+
+                        if (word.Contains("일") == true)
+                        {
+                            day = Convert.ToInt32(word.Replace("일", ""));
+                            continue;
+                        }
+                    }
+
+                    if (month > 0 && day > 0)
+                    {
+                        return "/영상 18" + month.ToString("D2") + day.ToString("D2");
+                    }
+                    else
+                    {
+                        return "/영상";
+                    }
+                }
+            }
 
             return retCommand;
         }
