@@ -44,6 +44,9 @@ namespace CDT_Noti_Bot
         // 메뉴 추천 감지
         public bool isExistMenu(string message)
         {
+            if (message.Contains("먹었"))
+                return false;
+
             if (message.Contains("뭐") && message.Contains("먹"))
                 return true;
 
@@ -51,9 +54,6 @@ namespace CDT_Noti_Bot
                 return true;
 
             if (message.Contains("어떤") && message.Contains("먹"))
-                return true;
-
-            if (message.Contains("밥") && message.Contains("먹"))
                 return true;
 
             if (message.Contains("배고픈데") || message.Contains("배고프네") || message.Contains("배고프다") ||
