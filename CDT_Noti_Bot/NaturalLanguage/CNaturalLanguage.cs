@@ -51,25 +51,30 @@ namespace CDT_Noti_Bot
 
         string[] offWork = { "퇴근합니다", "퇴근 합니다", "퇴근합니당", "퇴근 합니당", "퇴근합니닷", "퇴근 합니닷", "퇴근~", "퇴근!", "퇴근하겠" };
 
+        string[] whatWord = { "뭘", "뭐", "어떤", "무엇" };
+        string[] eatWord = { "먹을까", "먹지", "먹어야할", "먹나" };
+        string[] hungryWord = { "배고픈데", "배고프네", "배고프다", "배고파", "배고픔" };
+
         // 메뉴 추천 감지
         public bool isExistMenu(string message)
         {
             if (message.Contains("먹었"))
                 return false;
 
-            if (message.Contains("뭐") && message.Contains("먹"))
-                return true;
+            foreach (var word in whatWord)
+            {
+                if (message.Contains(word) == true)
+                {
+                    foreach (var eat in eatWord)
+                    {
+                        if (message.Contains(eat) == true)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
 
-            if (message.Contains("뭘") && message.Contains("먹"))
-                return true;
-
-            if (message.Contains("어떤") && message.Contains("먹"))
-                return true;
-
-            if (message.Contains("배고픈데") || message.Contains("배고프네") || message.Contains("배고프다") ||
-                message.Contains("배고파") || message.Contains("배고픔"))
-                return true;
-            
             if (message.Contains("메뉴") == true)
             {
                 foreach (var word in enterCommand)
