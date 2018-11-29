@@ -2081,12 +2081,19 @@ namespace CDT_Noti_Bot
             //========================================================================================
             // 스크림
             //========================================================================================
-            else if (strCommend == "/스크림")
+            else if ( (strCommend == "/스크림") || (strCommend == "/오픈디비전") )
             {
+                string sheetName = "";
+
+                if (strCommend == "/스크림")
+                    sheetName = "스크림";
+                else
+                    sheetName = "오픈디비전";
+
                 if (strContents == "")
                 {
                     String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
-                    String range = "스크림!B2:U17";
+                    String range = sheetName + "!B2:U17";
                     SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
                     ValueRange response = request.Execute();
@@ -2139,16 +2146,22 @@ namespace CDT_Noti_Bot
 
                     if (strPrint != "")
                     {
-                        strPrint += "\n스크림 신청은 /스크림 [요일] 로 해주세요.\n(ex: /스크림 토일)\n신청 후 재신청을 하면 덮어씌워지므로\n날짜를 추가하려면 기존 날짜와\n합해서 신청해주세요.\n(ex: /스크림 토일, /스크림 목금토일)";
+                        strPrint += "\n신청은 /" + sheetName + " [요일] 로 해주세요.\n(ex: /" + sheetName + " 토일)";
 
-                        const string scrim = @"Function/Scrim.png";
+                        string scrim = "";
+
+                        if (sheetName == "스크림")
+                            scrim = @"Function/Scrim.png";
+                        else
+                            scrim = @"Function/OpenDivision.png";
+
                         var fileName = scrim.Split(Path.DirectorySeparatorChar).Last();
                         var fileStream = new FileStream(scrim, FileMode.Open, FileAccess.Read, FileShare.Read);
                         await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream, strPrint, ParseMode.Default, false, iMessageID);
                     }
                     else
                     {
-                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 현재 모집 중인 스크림이 없습니다.", ParseMode.Default, false, false, iMessageID);
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 현재 모집 중인 " + sheetName + "이 없습니다.", ParseMode.Default, false, false, iMessageID);
                     }
                 }
                 else // 일정을 입력했을 경우
@@ -2156,7 +2169,7 @@ namespace CDT_Noti_Bot
                     // 타이틀 Load
                     {
                         String sheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
-                        String titleRange = "스크림!B2:B";
+                        String titleRange = sheetName + "!B2:B";
                         SpreadsheetsResource.ValuesResource.GetRequest titleRequest = service.Spreadsheets.Values.Get(sheetId, titleRange);
 
                         ValueRange titleResponse = titleRequest.Execute();
@@ -2169,7 +2182,7 @@ namespace CDT_Noti_Bot
                                 var title = values[0];
                                 if (title.Count == 0 || title[0].ToString() == "")
                                 {
-                                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 현재 모집 중인 스크림이 없습니다.", ParseMode.Default, false, false, iMessageID);
+                                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 현재 모집 중인 " + sheetName + "이 없습니다.", ParseMode.Default, false, false, iMessageID);
                                     return;
                                 }
                             }
@@ -2272,7 +2285,7 @@ namespace CDT_Noti_Bot
                     int index = 0;
                     bool isInput = false;
 
-                    range = "스크림!C6:C";
+                    range = sheetName + "!C6:C17";
                     request = service.Spreadsheets.Values.Get(spreadsheetId, range);
                     response = request.Execute();
                     if (response != null)
@@ -2280,6 +2293,12 @@ namespace CDT_Noti_Bot
                         IList<IList<Object>> values = response.Values;
                         if (values != null && values.Count > 0)
                         {
+                            if (values.Count >= 12)
+                            {
+                                await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[SYSTEM] " + sheetName + " 신청자가 모두 찼습니다.\n운영진에게 문의해주세요.", ParseMode.Default, false, false, iMessageID);
+                                return;
+                            }
+
                             int count = 0;
                             bool isSearch = false;
 
@@ -2306,9 +2325,14 @@ namespace CDT_Noti_Bot
                                 }
                             }
 
+                            if (isInput == false)
+                            {
+                                index = count;
+                            }
+
                             if (isCancel == true && isSearch == false)
                             {
-                                await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 스크림 신청을 하지 않았습니다.", ParseMode.Default, false, false, iMessageID);
+                                await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] " + sheetName + " 신청을 하지 않았습니다.", ParseMode.Default, false, false, iMessageID);
                                 return;
                             }
                         }
@@ -2348,7 +2372,7 @@ namespace CDT_Noti_Bot
                             }
 
                             // Define request parameters.
-                            range = "스크림!C" + (6 + index) + ":U" + (6 + index);
+                            range = sheetName + "!C" + (6 + index) + ":U" + (6 + index);
                             ValueRange valueRange = new ValueRange();
                             valueRange.MajorDimension = "ROWS"; //"ROWS";//COLUMNS 
 
@@ -2386,14 +2410,14 @@ namespace CDT_Noti_Bot
                             }
                             else
                             {
-                                strPrint += "[SYSTEM] 스크림 신청이 완료 됐습니다.";
+                                strPrint += "[SYSTEM] " + sheetName + " 신청이 완료 됐습니다.";
                             }
                         }
                         else
                         {
                             // 스크림 취소
                             // Define request parameters.
-                            range = "스크림!C" + (6 + index) + ":Z" + (6 + index);
+                            range = sheetName + "!C" + (6 + index) + ":Z" + (6 + index);
                             ValueRange valueRange = new ValueRange();
                             valueRange.MajorDimension = "ROWS"; //"ROWS";//COLUMNS 
 
@@ -2410,7 +2434,7 @@ namespace CDT_Noti_Bot
                             }
                             else
                             {
-                                strPrint += "[SYSTEM] 스크림 신청을 취소했습니다.";
+                                strPrint += "[SYSTEM] " + sheetName + " 신청을 취소했습니다.";
                             }
                         }
                     }
