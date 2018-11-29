@@ -465,7 +465,7 @@ namespace CDT_Noti_Bot
                 // 메뉴 선택
                 if (naturalLanguage.isExistMenu(strMassage) == true)
                 {
-                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, naturalLanguage.getMenu(), ParseMode.Default, false, false, iMessageID);
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, naturalLanguage.getMenu(strMassage), ParseMode.Default, false, false, iMessageID);
                     return;
                 }
 

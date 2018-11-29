@@ -25,16 +25,26 @@ namespace CDT_Noti_Bot
         string[] ofCommand = { "의", "가", "에", "은", "는", "님의", "님" };
         string[] mindCommand = { "어때", "?", "는요", "어떰", "어떨", "어떠", "어떻", "어떤" };
 
-        string[] menu = {
+        string[] morningMenu = { " 토스트", "맥모닝", "빵과 커피", "백반", "삼각김밥", "김밥", "샐러드", "선식" };
+        string[] lunchMenu = {
             "백반", "떡볶이", "순대", "김밥", "짜장면", "짬뽕", "볶음밥", "김치찌개", "육개장", "된장찌개", "제육볶음",
             "설렁탕", "회덮밥", "냉면", "돈까스", "함박스테이크", "사골국밥", "순대국밥", "갈비탕", "라면", "라멘", "카레",
             "치킨", "피자", "파스타", "육회비빔밥", "비빔밥", "보쌈", "족발", "막국수", "냉모밀", "소바", "스시", "햄버거",
             "한솥", "삼겹살", "소고기", "곱창", "삼계탕", "양념갈비", "스테이크", "생선구이", "훈제오리", "샐러드", "만두"
         };
+        string[] dinnerMenu = {
+            "백반", "떡볶이", "순대", "김밥", "짜장면", "짬뽕", "볶음밥", "김치찌개", "육개장", "된장찌개", "제육볶음",
+            "설렁탕", "회덮밥", "냉면", "돈까스", "함박스테이크", "사골국밥", "순대국밥", "갈비탕", "라면", "라멘", "카레",
+            "치킨", "피자", "파스타", "육회비빔밥", "비빔밥", "보쌈", "족발", "막국수", "냉모밀", "소바", "스시", "햄버거",
+            "한솥", "삼겹살", "소고기", "곱창", "삼계탕", "양념갈비", "스테이크", "생선구이", "훈제오리", "샐러드", "만두",
+        };
+        string[] nightMenu = {
+            "라면", "치킨", "피자", "보쌈", "족발", "햄버거", "떡볶이", "만두"
+        };
 
         string[] enterMenu = {
             "어떠세요?", "추천합니다.", "땡기네요.", "가보시죠.", "ㄱㄱ", "각이네요", "좋네요.",
-            "어떤가요?", "좋을 듯.", "가시죠.", "?", "!", "너로 정했다!", "기대합니다."
+            "어떤가요?", "좋을 듯.", "가시죠.", "?", "!", "기대합니다."
         };
 
         string[] choiceWord = { "이랑", "랑", "," };
@@ -75,15 +85,59 @@ namespace CDT_Noti_Bot
         }
 
         // 메뉴 추천
-        public string getMenu()
+        public string getMenu(string message)
         {
             Random menuRandom = new Random();
             Random enterRandom = new Random();
 
-            int menuNum = menuRandom.Next(0, menu.Count());
-            int enterNum = enterRandom.Next(0, enterMenu.Count());
-
-            return menu.ElementAt(menuNum) + " " + enterMenu.ElementAt(enterNum);
+            if (message.Contains("아침") == true)
+            {
+                int menuNum = menuRandom.Next(0, morningMenu.Count());
+                int enterNum = enterRandom.Next(0, enterMenu.Count());
+                return "아침은 " + morningMenu.ElementAt(menuNum) + " " + enterMenu.ElementAt(enterNum);
+            }
+            else if (message.Contains("점심") == true)
+            {
+                int menuNum = menuRandom.Next(0, lunchMenu.Count());
+                int enterNum = enterRandom.Next(0, enterMenu.Count());
+                return "점심은 " + lunchMenu.ElementAt(menuNum) + " " + enterMenu.ElementAt(enterNum);
+            }
+            else if (message.Contains("저녁") == true)
+            {
+                int menuNum = menuRandom.Next(0, dinnerMenu.Count());
+                int enterNum = enterRandom.Next(0, enterMenu.Count());
+                return "저녁은 " + dinnerMenu.ElementAt(menuNum) + " " + enterMenu.ElementAt(enterNum);
+            }
+            else if (message.Contains("야식") == true)
+            {
+                int menuNum = menuRandom.Next(0, nightMenu.Count());
+                int enterNum = enterRandom.Next(0, enterMenu.Count());
+                return "야식은 " + nightMenu.ElementAt(menuNum) + " " + enterMenu.ElementAt(enterNum);
+            }
+            else if (DateTime.Now.Hour >= 6 && DateTime.Now.Hour <= 9)
+            {
+                int menuNum = menuRandom.Next(0, morningMenu.Count());
+                int enterNum = enterRandom.Next(0, enterMenu.Count());
+                return "아침은 " + morningMenu.ElementAt(menuNum) + " " + enterMenu.ElementAt(enterNum);
+            }
+            else if (DateTime.Now.Hour >= 10 && DateTime.Now.Hour <= 14)
+            {
+                int menuNum = menuRandom.Next(0, lunchMenu.Count());
+                int enterNum = enterRandom.Next(0, enterMenu.Count());
+                return "점심은 " + lunchMenu.ElementAt(menuNum) + " " + enterMenu.ElementAt(enterNum);
+            }
+            else if (DateTime.Now.Hour >= 15 && DateTime.Now.Hour <= 22)
+            {
+                int menuNum = menuRandom.Next(0, dinnerMenu.Count());
+                int enterNum = enterRandom.Next(0, enterMenu.Count());
+                return "저녁은 " + dinnerMenu.ElementAt(menuNum) + " " + enterMenu.ElementAt(enterNum);
+            }
+            else
+            {
+                int menuNum = menuRandom.Next(0, nightMenu.Count());
+                int enterNum = enterRandom.Next(0, enterMenu.Count());
+                return "야식은 " + nightMenu.ElementAt(menuNum) + " " + enterMenu.ElementAt(enterNum);
+            }
         }
 
         // 날씨 감지
