@@ -1,6 +1,6 @@
 ﻿namespace Athena
 {
-    partial class Form1
+    partial class Athena
     {
         /// <summary>
         /// 필수 디자이너 변수입니다.
@@ -40,15 +40,15 @@
             this.label1.TabIndex = 0;
             this.label1.Text = "Running............";
             // 
-            // Form1
+            // Athena
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(298, 149);
             this.Controls.Add(this.label1);
-            this.Name = "Form1";
-            this.Text = "Clien Delicious Team Bot";
-            this.Load += new System.EventHandler(this.Form1_Load);
+            this.Name = "Athena";
+            this.Text = "Athena";
+            this.Load += new System.EventHandler(this.Athena_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

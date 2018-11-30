@@ -10,18 +10,18 @@ using System.Threading.Tasks;
 
 namespace Athena
 {
-    public partial class Form1 : Form
+    public partial class Athena : Form
     {
         CBotClient BotClient = new CBotClient();
 
-        public Form1()
+        public Athena()
         {
             BotClient.InitBotClient();
 
             InitializeComponent();
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private void Athena_Load(object sender, EventArgs e)
         {
             BotClient.telegramAPIAsync();
 
