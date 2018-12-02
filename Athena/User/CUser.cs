@@ -30,6 +30,8 @@ namespace Athena
 
     class CUser
     {
+        protected int MessageCount { get; set; }
+
         public long UserKey { get; set; }
         public string Name { get; set; }
         public USER_TYPE UserType { get; set; }
@@ -40,5 +42,26 @@ namespace Athena
         public string OtherPick { get; set; }
         public string Time { get; set; }
         public string Info { get; set; }
+
+        Queue<CMessage> MessageQueue = new Queue<CMessage>();
+
+        public void addMessage(CMessage message)
+        {
+            if (MessageCount < 10)
+            {
+                MessageCount++;
+                MessageQueue.Enqueue(message);
+            }
+            else
+            {
+                MessageQueue.Dequeue();
+                MessageQueue.Enqueue(message);
+            }
+        }
+
+        public Queue<CMessage> getMessage()
+        {
+            return MessageQueue;
+        }
     }
 }

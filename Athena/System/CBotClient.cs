@@ -360,10 +360,12 @@ namespace Athena
                 return;
             }
 
+            // 메시지 정보 추출
             string strFirstName = varMessage.From.FirstName;
             string strLastName = varMessage.From.LastName;
             int iMessageID = varMessage.MessageId;
             long senderKey = varMessage.From.Id;
+            DateTime time = convertTime;
 
             // CDT 관련방 아니면 동작하지 않도록 수정
             if (varMessage.Chat.Id != -1001202203239 &&     // 본방
@@ -381,6 +383,10 @@ namespace Athena
             string strCommend = "";
             string strContents = "";
             bool isCommand = false;
+
+            // 입력된 메시지를 각 유저 정보에 입력
+            if (senderKey != 0 && strMassage != "")
+                userDirector.addMessage(senderKey, strMassage, time);
 
             // 명령어인지 아닌지 구분
             if (strMassage.Substring(0, 1) == "/")

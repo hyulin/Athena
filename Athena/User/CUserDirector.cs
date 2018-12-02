@@ -56,5 +56,16 @@ namespace Athena
         {
             return userCount;
         }
+
+        public void addMessage(long userKey, string message, DateTime time)
+        {
+            CMessage userMessage = new CMessage();
+            CUser userInfo = getUserInfo(userKey);
+
+            userMessage.Message = message;
+            userMessage.Time = time;
+
+            userInfo.addMessage(userMessage);
+        }
     }
 }

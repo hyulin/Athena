@@ -92,25 +92,26 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CWeather.cs" />
+    <Compile Include="ClanFunction\CWeather.cs" />
     <Compile Include="System\CBotClient.cs" />
-    <Compile Include="Calendar\CCalendar.cs" />
-    <Compile Include="Calendar\CCalendarDirector.cs" />
+    <Compile Include="ClanFunction\Calendar\CCalendar.cs" />
+    <Compile Include="ClanFunction\Calendar\CCalendarDirector.cs" />
     <Compile Include="EasterEgg\CEasterEgg.cs" />
     <Compile Include="NaturalLanguage\CNaturalLanguage.cs" />
     <Compile Include="System\CSystemInfo.cs" />
+    <Compile Include="User\CMessage.cs" />
     <Compile Include="User\CUser.cs" />
     <Compile Include="User\CUserDirector.cs" />
-    <Compile Include="Vote\CVoteDirector.cs" />
-    <Compile Include="Vote\CVoteItem.cs" />
-    <Compile Include="Vote\CVoteRanking.cs" />
+    <Compile Include="ClanFunction\Vote\CVoteDirector.cs" />
+    <Compile Include="ClanFunction\Vote\CVoteItem.cs" />
+    <Compile Include="ClanFunction\Vote\CVoteRanking.cs" />
     <Compile Include="Athena.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Athena.Designer.cs">
       <DependentUpon>Athena.cs</DependentUpon>
     </Compile>
-    <Compile Include="Notice\CNotice.cs" />
+    <Compile Include="ClanFunction\CNotice.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Athena.resx">
