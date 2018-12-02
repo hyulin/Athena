@@ -465,13 +465,14 @@ namespace Athena
                 }
             }
 
-            // 명령어가 아닐 경우 아래는 태울 필요 없다.
+            // 명령어가 아닐 경우
             if (isCommand == false)
             {
                 // 메뉴 선택
                 if (naturalLanguage.isExistMenu(strMassage) == true)
                 {
                     await Bot.SendTextMessageAsync(varMessage.Chat.Id, naturalLanguage.getMenu(strMassage), ParseMode.Default, false, false, iMessageID);
+                    CLog.WriteLog(varMessage.Chat.Id, senderKey, strUserName, strMassage, strCommend, strContents);
                     return;
                 }
 
@@ -490,6 +491,7 @@ namespace Athena
                     if (reply != "")
                         await Bot.SendTextMessageAsync(varMessage.Chat.Id, reply, ParseMode.Default, false, false, iMessageID);
 
+                    CLog.WriteLog(varMessage.Chat.Id, senderKey, strUserName, strMassage, strCommend, strContents);
                     return;
                 }
 
@@ -500,6 +502,7 @@ namespace Athena
                     if (offWork != "")
                         await Bot.SendTextMessageAsync(varMessage.Chat.Id, offWork, ParseMode.Default, false, false, iMessageID);
 
+                    CLog.WriteLog(varMessage.Chat.Id, senderKey, strUserName, strMassage, strCommend, strContents);
                     return;
                 }
 
@@ -546,6 +549,8 @@ namespace Athena
 
                         }
                     }
+
+                    CLog.WriteLog(varMessage.Chat.Id, senderKey, strUserName, strMassage, strCommend, strContents);
                 }
             }
 
@@ -2961,6 +2966,9 @@ namespace Athena
 
                 await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
             }
+
+            if (isCommand == true)
+                CLog.WriteLog(varMessage.Chat.Id, senderKey, strUserName, strMassage, strCommend, strContents);
 
             strPrint = "";
         }

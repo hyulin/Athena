@@ -98,6 +98,7 @@
     <Compile Include="ClanFunction\Calendar\CCalendarDirector.cs" />
     <Compile Include="EasterEgg\CEasterEgg.cs" />
     <Compile Include="NaturalLanguage\CNaturalLanguage.cs" />
+    <Compile Include="System\CLog.cs" />
     <Compile Include="System\CSystemInfo.cs" />
     <Compile Include="User\CMessage.cs" />
     <Compile Include="User\CUser.cs" />
