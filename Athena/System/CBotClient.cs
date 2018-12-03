@@ -360,24 +360,6 @@ namespace Athena
                 return;
             }
 
-            // 메시지 정보 추출
-            string strFirstName = varMessage.From.FirstName;
-            string strLastName = varMessage.From.LastName;
-            int iMessageID = varMessage.MessageId;
-            long senderKey = varMessage.From.Id;
-            DateTime time = convertTime;
-
-            // CDT 관련방 아니면 동작하지 않도록 수정
-            if (varMessage.Chat.Id != -1001202203239 &&     // 본방
-                varMessage.Chat.Id != -1001312491933 &&     // 운영진방
-                varMessage.Chat.Id != -1001389956706 &&     // 사전안내방
-                varMessage.Chat.Username != "hyulin")
-            {
-                await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 사용할 수 없는 대화방입니다.", ParseMode.Default, false, false, iMessageID);
-                CLog.WriteLog(varMessage.Chat.Id, senderKey, "", "[ERROR] 사용할 수 없는 대화방입니다.", "", "");
-                return;
-            }
-
             // 입장 메시지 일 경우
             if (varMessage.Type == MessageType.ChatMembersAdded)
             {
@@ -429,6 +411,24 @@ namespace Athena
                 {
                     return;
                 }
+            }
+
+            // 메시지 정보 추출
+            string strFirstName = varMessage.From.FirstName;
+            string strLastName = varMessage.From.LastName;
+            int iMessageID = varMessage.MessageId;
+            long senderKey = varMessage.From.Id;
+            DateTime time = convertTime;
+
+            // CDT 관련방 아니면 동작하지 않도록 수정
+            if (varMessage.Chat.Id != -1001202203239 &&     // 본방
+                varMessage.Chat.Id != -1001312491933 &&     // 운영진방
+                varMessage.Chat.Id != -1001389956706 &&     // 사전안내방
+                varMessage.Chat.Username != "hyulin")
+            {
+                await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 사용할 수 없는 대화방입니다.", ParseMode.Default, false, false, iMessageID);
+                CLog.WriteLog(varMessage.Chat.Id, senderKey, "", "[ERROR] 사용할 수 없는 대화방입니다.", "", "");
+                return;
             }
 
             // 명령어, 서브명령어 분리
@@ -2923,10 +2923,10 @@ namespace Athena
             {
                 await Bot.SendChatActionAsync(varMessage.Chat.Id, ChatAction.UploadPhoto);
 
-                const string strCDTInfo01 = @"CDT_Info/01.jpg";
-                const string strCDTInfo02 = @"CDT_Info/02.jpg";
-                const string strCDTInfo03 = @"CDT_Info/03.jpg";
-                const string strCDTInfo04 = @"CDT_Info/04.jpg";
+                const string strCDTInfo01 = @"CDT_Info/CDT_Info_1.png";
+                const string strCDTInfo02 = @"CDT_Info/CDT_Info_2.png";
+                const string strCDTInfo03 = @"CDT_Info/CDT_Info_3.png";
+                const string strCDTInfo04 = @"CDT_Info/CDT_Info_4.png";
 
                 var fileName01 = strCDTInfo01.Split(Path.DirectorySeparatorChar).Last();
                 var fileName02 = strCDTInfo02.Split(Path.DirectorySeparatorChar).Last();
