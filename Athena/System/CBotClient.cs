@@ -378,42 +378,6 @@ namespace Athena
                 return;
             }
 
-            // 명령어, 서브명령어 분리
-            string strMassage = varMessage.Text;
-            string strUserName = varMessage.From.FirstName + varMessage.From.LastName;
-            string strCommend = "";
-            string strContents = "";
-            bool isCommand = false;
-
-            // 입력된 메시지를 각 유저 정보에 입력
-            if (senderKey != 0 && strMassage != "")
-                userDirector.addMessage(senderKey, strMassage, time);
-
-            // 명령어인지 아닌지 구분
-            if (strMassage.Substring(0, 1) == "/")
-            {
-                isCommand = true;
-
-                // 명령어와 서브명령어 구분
-                if (strMassage.IndexOf(" ") == -1)
-                {
-                    strCommend = strMassage;
-                }
-                else
-                {
-                    strCommend = strMassage.Substring(0, strMassage.IndexOf(" "));
-                    strContents = strMassage.Substring(strMassage.IndexOf(" ") + 1, strMassage.Count() - strMassage.IndexOf(" ") - 1);
-                }
-
-                // 미등록 유저는 사용할 수 없다.
-                if (strCommend != "/등록" && userDirector.getUserInfo(senderKey).UserKey == 0)
-                {
-                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 아테나에 등록되지 않은 유저입니다.\n등록을 하시려면 /등록 명령어를 참고해주세요.", ParseMode.Default, false, false, iMessageID);
-                    CLog.WriteLog(varMessage.Chat.Id, senderKey, strUserName, "[ERROR] 아테나에 등록되지 않은 유저입니다.\n등록을 하시려면 /등록 명령어를 참고해주세요.", strCommend, strContents);
-                    return;
-                }
-            }
-
             // 입장 메시지 일 경우
             if (varMessage.Type == MessageType.ChatMembersAdded)
             {
@@ -463,6 +427,42 @@ namespace Athena
                 }
                 else
                 {
+                    return;
+                }
+            }
+
+            // 명령어, 서브명령어 분리
+            string strMassage = varMessage.Text;
+            string strUserName = varMessage.From.FirstName + varMessage.From.LastName;
+            string strCommend = "";
+            string strContents = "";
+            bool isCommand = false;
+
+            // 입력된 메시지를 각 유저 정보에 입력
+            if (senderKey != 0 && strMassage != "")
+                userDirector.addMessage(senderKey, strMassage, time);
+
+            // 명령어인지 아닌지 구분
+            if (strMassage.Substring(0, 1) == "/")
+            {
+                isCommand = true;
+
+                // 명령어와 서브명령어 구분
+                if (strMassage.IndexOf(" ") == -1)
+                {
+                    strCommend = strMassage;
+                }
+                else
+                {
+                    strCommend = strMassage.Substring(0, strMassage.IndexOf(" "));
+                    strContents = strMassage.Substring(strMassage.IndexOf(" ") + 1, strMassage.Count() - strMassage.IndexOf(" ") - 1);
+                }
+
+                // 미등록 유저는 사용할 수 없다.
+                if (strCommend != "/등록" && userDirector.getUserInfo(senderKey).UserKey == 0)
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 아테나에 등록되지 않은 유저입니다.\n등록을 하시려면 /등록 명령어를 참고해주세요.", ParseMode.Default, false, false, iMessageID);
+                    CLog.WriteLog(varMessage.Chat.Id, senderKey, strUserName, "[ERROR] 아테나에 등록되지 않은 유저입니다.\n등록을 하시려면 /등록 명령어를 참고해주세요.", strCommend, strContents);
                     return;
                 }
             }

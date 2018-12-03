@@ -30,3 +30,4 @@ C:\Project\Athena\Athena\obj\x64\Release\Athena.exe
 C:\Project\Athena\Athena\obj\x64\Release\Athena.pdb
 C:\Project\Athena\Athena\obj\x64\Release\Athena.csproj.CoreCompileInputs.cache
 C:\Project\Athena\Athena\obj\x64\Release\Athena.csproj.CopyComplete
+C:\Project\Athena\Athena\obj\x64\Release\Athena.csprojAssemblyReference.cache
