@@ -374,6 +374,7 @@ namespace Athena
                 varMessage.Chat.Username != "hyulin")
             {
                 await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 사용할 수 없는 대화방입니다.", ParseMode.Default, false, false, iMessageID);
+                CLog.WriteLog(varMessage.Chat.Id, senderKey, "", "[ERROR] 사용할 수 없는 대화방입니다.", "", "");
                 return;
             }
 
@@ -408,6 +409,7 @@ namespace Athena
                 if (strCommend != "/등록" && userDirector.getUserInfo(senderKey).UserKey == 0)
                 {
                     await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 아테나에 등록되지 않은 유저입니다.\n등록을 하시려면 /등록 명령어를 참고해주세요.", ParseMode.Default, false, false, iMessageID);
+                    CLog.WriteLog(varMessage.Chat.Id, senderKey, strUserName, "[ERROR] 아테나에 등록되지 않은 유저입니다.\n등록을 하시려면 /등록 명령어를 참고해주세요.", strCommend, strContents);
                     return;
                 }
             }
@@ -471,8 +473,9 @@ namespace Athena
                 // 메뉴 선택
                 if (naturalLanguage.isExistMenu(strMassage) == true)
                 {
-                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, naturalLanguage.getMenu(strMassage), ParseMode.Default, false, false, iMessageID);
                     CLog.WriteLog(varMessage.Chat.Id, senderKey, strUserName, strMassage, strCommend, strContents);
+
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, naturalLanguage.getMenu(strMassage), ParseMode.Default, false, false, iMessageID);
                     return;
                 }
 
@@ -487,22 +490,24 @@ namespace Athena
                 // 대답하기
                 if (varMessage.ReplyToMessage != null && varMessage.ReplyToMessage.From.FirstName.Contains("아테나") == true)
                 {
+                    CLog.WriteLog(varMessage.Chat.Id, senderKey, strUserName, strMassage, strCommend, strContents);
+
                     string reply = naturalLanguage.replyCall(strMassage);
                     if (reply != "")
                         await Bot.SendTextMessageAsync(varMessage.Chat.Id, reply, ParseMode.Default, false, false, iMessageID);
 
-                    CLog.WriteLog(varMessage.Chat.Id, senderKey, strUserName, strMassage, strCommend, strContents);
                     return;
                 }
 
                 // 퇴근 응답
                 if (strMassage.Contains("퇴근") == true)
                 {
+                    CLog.WriteLog(varMessage.Chat.Id, senderKey, strUserName, strMassage, strCommend, strContents);
+
                     string offWork = naturalLanguage.offWorkCall(strMassage);
                     if (offWork != "")
                         await Bot.SendTextMessageAsync(varMessage.Chat.Id, offWork, ParseMode.Default, false, false, iMessageID);
 
-                    CLog.WriteLog(varMessage.Chat.Id, senderKey, strUserName, strMassage, strCommend, strContents);
                     return;
                 }
 
@@ -517,6 +522,8 @@ namespace Athena
                 // 아테나가 언급되면 자연어 명령
                 if (strMassage.Contains("아테나"))
                 {
+                    CLog.WriteLog(varMessage.Chat.Id, senderKey, strUserName, strMassage, strCommend, strContents);
+
                     // 날씨 감지
                     if (strMassage.Contains("날씨") == true)
                     {
@@ -549,9 +556,11 @@ namespace Athena
 
                         }
                     }
-
-                    CLog.WriteLog(varMessage.Chat.Id, senderKey, strUserName, strMassage, strCommend, strContents);
                 }
+            }
+            else
+            {
+                CLog.WriteLog(varMessage.Chat.Id, senderKey, strUserName, strMassage, strCommend, strContents);
             }
 
             string strPrint = "";
@@ -2966,9 +2975,6 @@ namespace Athena
 
                 await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
             }
-
-            if (isCommand == true)
-                CLog.WriteLog(varMessage.Chat.Id, senderKey, strUserName, strMassage, strCommend, strContents);
 
             strPrint = "";
         }
