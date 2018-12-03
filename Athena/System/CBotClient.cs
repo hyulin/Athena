@@ -438,8 +438,8 @@ namespace Athena
             string strContents = "";
             bool isCommand = false;
 
-            // 입력된 메시지를 각 유저 정보에 입력
-            if (senderKey != 0 && strMassage != "")
+            // 본방에 입력된 메시지를 각 유저 정보에 입력
+            if (senderKey != 0 && strMassage != "" && varMessage.Chat.Id == -1001202203239)
                 userDirector.addMessage(senderKey, strMassage, time);
 
             // 명령어인지 아닌지 구분
@@ -461,8 +461,8 @@ namespace Athena
                 // 미등록 유저는 사용할 수 없다.
                 if (strCommend != "/등록" && userDirector.getUserInfo(senderKey).UserKey == 0)
                 {
-                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 아테나에 등록되지 않은 유저입니다.\n등록을 하시려면 /등록 명령어를 참고해주세요.", ParseMode.Default, false, false, iMessageID);
-                    CLog.WriteLog(varMessage.Chat.Id, senderKey, strUserName, "[ERROR] 아테나에 등록되지 않은 유저입니다.\n등록을 하시려면 /등록 명령어를 참고해주세요.", strCommend, strContents);
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 아테나에 등록되지 않은 유저입니다.\n등록을 하시려면 /등록 [본계정배틀태그]를 입력해주세요.", ParseMode.Default, false, false, iMessageID);
+                    CLog.WriteLog(varMessage.Chat.Id, senderKey, strUserName, "[ERROR] 아테나에 등록되지 않은 유저입니다.\n등록을 하시려면 /등록 [본계정배틀태그]를 입력해주세요.", strCommend, strContents);
                     return;
                 }
             }
