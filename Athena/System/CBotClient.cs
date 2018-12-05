@@ -363,58 +363,6 @@ namespace Athena
                 return;
             }
 
-            // 메시지 정보 추출
-            string strFirstName = varMessage.From.FirstName;
-            string strLastName = varMessage.From.LastName;
-            int iMessageID = varMessage.MessageId;
-            long senderKey = varMessage.From.Id;
-            DateTime time = convertTime;
-
-            // CDT 관련방 아니면 동작하지 않도록 수정
-            if (varMessage.Chat.Id != -1001202203239 &&     // 본방
-                varMessage.Chat.Id != -1001312491933 &&     // 운영진방
-                varMessage.Chat.Id != -1001389956706 &&     // 사전안내방
-                varMessage.Chat.Username != "hyulin")
-            {
-                await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 사용할 수 없는 대화방입니다.", ParseMode.Default, false, false, iMessageID);
-                return;
-            }
-
-            // 명령어, 서브명령어 분리
-            string strMassage = varMessage.Text;
-            string strUserName = varMessage.From.FirstName + varMessage.From.LastName;
-            string strCommend = "";
-            string strContents = "";
-            bool isCommand = false;
-
-            // 입력된 메시지를 각 유저 정보에 입력
-            if (senderKey != 0 && strMassage != "")
-                userDirector.addMessage(senderKey, strMassage, time);
-            
-            // 명령어인지 아닌지 구분
-            if (strMassage.Substring(0, 1) == "/")
-            {
-                isCommand = true;
-
-                // 명령어와 서브명령어 구분
-                if (strMassage.IndexOf(" ") == -1)
-                {
-                    strCommend = strMassage;
-                }
-                else
-                {
-                    strCommend = strMassage.Substring(0, strMassage.IndexOf(" "));
-                    strContents = strMassage.Substring(strMassage.IndexOf(" ") + 1, strMassage.Count() - strMassage.IndexOf(" ") - 1);
-                }
-
-                // 미등록 유저는 사용할 수 없다.
-                if (strCommend != "/등록" && userDirector.getUserInfo(senderKey).UserKey == 0)
-                {
-                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 아테나에 등록되지 않은 유저입니다.\n등록을 하시려면 /등록 명령어를 참고해주세요.", ParseMode.Default, false, false, iMessageID);
-                    return;
-                }
-            }
-
             // 입장 메시지 일 경우
             if (varMessage.Type == MessageType.ChatMembersAdded)
             {
@@ -468,6 +416,60 @@ namespace Athena
                 }
             }
 
+            // 메시지 정보 추출
+            string strFirstName = varMessage.From.FirstName;
+            string strLastName = varMessage.From.LastName;
+            int iMessageID = varMessage.MessageId;
+            long senderKey = varMessage.From.Id;
+            DateTime time = convertTime;
+
+            // CDT 관련방 아니면 동작하지 않도록 수정
+            if (varMessage.Chat.Id != -1001202203239 &&     // 본방
+                varMessage.Chat.Id != -1001312491933 &&     // 운영진방
+                varMessage.Chat.Id != -1001389956706 &&     // 사전안내방
+                varMessage.Chat.Username != "hyulin")
+            {
+                await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 사용할 수 없는 대화방입니다.", ParseMode.Default, false, false, iMessageID);
+                CLog.WriteLog(varMessage.Chat.Id, senderKey, "", "[ERROR] 사용할 수 없는 대화방입니다.", "", "");
+                return;
+            }
+
+            // 명령어, 서브명령어 분리
+            string strMassage = varMessage.Text;
+            string strUserName = varMessage.From.FirstName + varMessage.From.LastName;
+            string strCommend = "";
+            string strContents = "";
+            bool isCommand = false;
+
+            // 입력된 메시지를 각 유저 정보에 입력
+            if (senderKey != 0 && strMassage != "")
+                userDirector.addMessage(senderKey, strMassage, time);
+
+            // 명령어인지 아닌지 구분
+            if (strMassage.Substring(0, 1) == "/")
+            {
+                isCommand = true;
+
+                // 명령어와 서브명령어 구분
+                if (strMassage.IndexOf(" ") == -1)
+                {
+                    strCommend = strMassage;
+                }
+                else
+                {
+                    strCommend = strMassage.Substring(0, strMassage.IndexOf(" "));
+                    strContents = strMassage.Substring(strMassage.IndexOf(" ") + 1, strMassage.Count() - strMassage.IndexOf(" ") - 1);
+                }
+
+                // 미등록 유저는 사용할 수 없다.
+                if (strCommend != "/등록" && userDirector.getUserInfo(senderKey).UserKey == 0)
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 아테나에 등록되지 않은 유저입니다.\n등록을 하시려면 /등록 명령어를 참고해주세요.", ParseMode.Default, false, false, iMessageID);
+                    CLog.WriteLog(varMessage.Chat.Id, senderKey, strUserName, "[ERROR] 아테나에 등록되지 않은 유저입니다.\n등록을 하시려면 /등록 명령어를 참고해주세요.", strCommend, strContents);
+                    return;
+                }
+            }
+
             // 명령어가 아닐 경우
             if (isCommand == false)
             {
@@ -491,6 +493,10 @@ namespace Athena
                         CLog.WriteLog(varMessage.Chat.Id, senderKey, strUserName, strMassage, strCommend, strContents);
                     }
                 }
+            }
+            else
+            {
+                CLog.WriteLog(varMessage.Chat.Id, senderKey, strUserName, strMassage, strCommend, strContents);
             }
 
             string strPrint = "";
@@ -2853,10 +2859,10 @@ namespace Athena
             {
                 await Bot.SendChatActionAsync(varMessage.Chat.Id, ChatAction.UploadPhoto);
 
-                const string strCDTInfo01 = @"CDT_Info/01.jpg";
-                const string strCDTInfo02 = @"CDT_Info/02.jpg";
-                const string strCDTInfo03 = @"CDT_Info/03.jpg";
-                const string strCDTInfo04 = @"CDT_Info/04.jpg";
+                const string strCDTInfo01 = @"CDT_Info/CDT_Info_1.png";
+                const string strCDTInfo02 = @"CDT_Info/CDT_Info_2.png";
+                const string strCDTInfo03 = @"CDT_Info/CDT_Info_3.png";
+                const string strCDTInfo04 = @"CDT_Info/CDT_Info_4.png";
 
                 var fileName01 = strCDTInfo01.Split(Path.DirectorySeparatorChar).Last();
                 var fileName02 = strCDTInfo02.Split(Path.DirectorySeparatorChar).Last();
@@ -2905,9 +2911,6 @@ namespace Athena
 
                 await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
             }
-
-            if (isCommand == true)
-                CLog.WriteLog(varMessage.Chat.Id, senderKey, strUserName, strMassage, strCommend, strContents);
 
             strPrint = "";
         }
