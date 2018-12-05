@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+// Twitter Korean Processor
+using Moda.Korean.TwitterKoreanProcessorCS;
+
 namespace Athena
 {
     class CNaturalLanguage
@@ -21,7 +24,7 @@ namespace Athena
         string[] guideCommand = { "안내", "가이드" };
         string[] statusCommand = { "상태" };
 
-        string[] enterCommand = { "알려", "보여", "?", "궁금", "해줘", "뭐야" };
+        string[] enterCommand = { "알려", "보여", "?", "궁금", "해줘", "뭐야", "있나", "있어" };
         string[] ofCommand = { "의", "가", "에", "은", "는", "님의", "님" };
         string[] mindCommand = { "어때", "?", "는요", "어떰", "어떨", "어떠", "어떻", "어떤" };
 
@@ -54,6 +57,215 @@ namespace Athena
         string[] whatWord = { "뭘", "뭐", "어떤", "무엇" };
         string[] eatWord = { "먹을까", "먹지", "먹어야할", "먹나" };
         string[] hungryWord = { "배고픈데", "배고프네", "배고프다", "배고파", "배고픔" };
+
+        ////////////////////////////////////////////////////////////////
+        // 형태소 분석
+        ////////////////////////////////////////////////////////////////
+        public Tuple<string, string, bool> morphemeProcessor(string message, Queue<CMessage> queue)
+        {
+            Tuple<string, string, bool> emptyTuple = Tuple.Create("", "", false);
+
+            string normalize = TwitterKoreanProcessorCS.Normalize(message);
+            var morpheme = TwitterKoreanProcessorCS.Tokenize(normalize);
+            List<KoreanToken> result = new List<KoreanToken>();
+            foreach (var token in morpheme)
+            {
+                result.Add(token);
+            }
+
+            string command = "";
+            string contents = "";
+
+            //--------------------------------------------------------------------------
+            // 클랜 기능 감지
+            //--------------------------------------------------------------------------
+            string[] natural = FunctionCommand(normalize).Split(' ');
+            bool isFirst = true;
+
+            command = natural[0].ToString();
+
+            for (int i = 1; i < natural.Count(); i++)
+            {
+                if (isFirst == true)
+                {
+                    contents += natural[i].ToString();
+                    isFirst = false;
+                }
+                else
+                {
+                    contents += " " + natural[i].ToString();
+                }
+            }
+
+            if (command != "")
+                return Tuple.Create(command, contents, true);
+
+            //--------------------------------------------------------------------------
+            // 영상 조회
+            //--------------------------------------------------------------------------
+            if (normalize.Contains("영상") == true || normalize.Contains("방송") == true)
+            {
+                bool isVideo = false;
+
+                foreach (var word in enterCommand)
+                {
+                    if (normalize.Contains(word) == true)
+                        isVideo = true;
+                }
+
+                if (isVideo == true && normalize.Contains("오늘") == true)
+                {
+                    int day = 0;
+                    if (System.DateTime.Now.Hour < 6)
+                        day = System.DateTime.Now.Day - 1;
+                    else
+                        day = System.DateTime.Now.Day;
+
+                    string date = (System.DateTime.Now.Year - 2000).ToString("D2") + System.DateTime.Now.Month.ToString("D2") + day.ToString("D2");
+
+                    Tuple<string, string, bool> tuple = Tuple.Create("/영상", date, true);
+                    return tuple;
+                }
+                else if (isVideo == true && normalize.Contains("어제") == true)
+                {
+                    int day = 0;
+                    if (System.DateTime.Now.Hour < 6)
+                        day = System.DateTime.Now.Day - 2;
+                    else
+                        day = System.DateTime.Now.Day - 1;
+
+                    string date = (System.DateTime.Now.Year - 2000).ToString("D2") + System.DateTime.Now.Month.ToString("D2") + day.ToString("D2");
+
+                    Tuple<string, string, bool> tuple = Tuple.Create("/영상", date, true);
+                    return tuple;
+                }
+                else if (isVideo == true)
+                {
+                    Tuple<string, string, bool> tuple = Tuple.Create("/영상", "", true);
+                    return tuple;
+                }
+            }
+
+            //--------------------------------------------------------------------------
+            // 메뉴 조회
+            //--------------------------------------------------------------------------
+            if (isExistMenu(message) == true)
+            {
+                return Tuple.Create(getMenu(message), "", false);
+            }
+
+            //--------------------------------------------------------------------------
+            // 퇴근 응답
+            //--------------------------------------------------------------------------
+            if (message.Contains("퇴근") == true)
+            {
+                string offWork = offWorkCall(message);
+                if (offWork != "")
+                    return Tuple.Create(offWork, "", false);
+            }
+
+            //--------------------------------------------------------------------------
+            // 날씨 감지
+            //--------------------------------------------------------------------------
+            if (message.Contains("날씨") == true)
+            {
+                Tuple<string, string> weatherTuple = weatherCall(message);
+                if (weatherTuple.Item1 != "" && weatherTuple.Item2 != "")
+                    return Tuple.Create("/날씨", weatherTuple.Item2, true);
+            }
+
+            //--------------------------------------------------------------------------
+            // 그 외
+            //--------------------------------------------------------------------------
+            foreach (var word in result)
+            {
+                Random random = new Random();
+                int num = random.Next(10);
+
+                // 알 수 없는 단어일 경우
+                if (word.Unknown == true)
+                {
+                    switch (num)
+                    {
+                        case 0:
+                            return Tuple.Create("? 그게 무슨 말이에요?", "", false);
+                        case 1:
+                            return Tuple.Create("? 처음 듣는 말이네요.", "", false);
+                        case 2:
+                            return Tuple.Create("? 무슨 말인지 모르겠어요.", "", false);
+                    }
+
+                    continue;
+                }
+
+                // 감탄사
+                if (word.Pos.ToString() == "Exclamation")
+                {
+                    switch (num)
+                    {
+                        case 0:
+                            return Tuple.Create("와, 정말 놀랍네요.", "", false);
+                        case 1:
+                            return Tuple.Create("저도 놀라워요.", "", false);
+                        case 2:
+                            return Tuple.Create("대박이네요.", "", false);
+                    }
+                }
+
+                foreach (var etc in result)
+                {
+                    if (etc.Pos.ToString() == "Noun")
+                    {
+                        Random etcRandom = new Random();
+                        int etcNumber = etcRandom.Next(10);
+                        if (etcNumber == 1)
+                        {
+                            // 이전 대화내용 참고 기능
+                            foreach (var queMsg in queue)
+                            {
+                                if (queMsg.Message.Contains(etc.Text.ToString()) == true)
+                                {
+                                    Random queRandom = new Random();
+                                    int queNumber = queRandom.Next(5);
+
+                                    switch (etcNumber)
+                                    {
+                                        case 0:
+                                            return Tuple.Create("저번에 " + etc.Text.ToString() + "에 대해서 말씀하신 적 있어요. 관심있으신가봐요.", "", false);
+                                        case 1:
+                                            return Tuple.Create("저번에 말씀하신 " + etc.Text.ToString() + " 어떤가요?", "", false);
+                                        case 2:
+                                            return Tuple.Create("얼마 전에 비슷한 말씀을 하셨었죠.", "", false);
+                                        case 3:
+                                            return Tuple.Create("자주 언급을 하시니 저도 " + etc.Text.ToString() + "에 대해서 관심을 가져볼까 해요.", "", false);
+                                        case 4:
+                                            return Tuple.Create("아, " + etc.Text.ToString() + "에 대해서 저번에 말씀하셨었어요.", "", false);
+                                    }
+                                }
+                            }
+                            
+                            // 그냥 언급
+                            etcNumber = etcRandom.Next(5);
+                            switch (etcNumber)
+                            {
+                                case 0:
+                                    return Tuple.Create(etc.Text.ToString() + " 좋아하시나봐요.", "", false);
+                                case 1:
+                                    return Tuple.Create(etc.Text.ToString() + ", 저도 궁금하네요.", "", false);
+                                case 2:
+                                    return Tuple.Create(etc.Text.ToString() + " 어때요?", "", false);
+                                case 3:
+                                    return Tuple.Create(etc.Text.ToString() + " 좋나요?", "", false);
+                                case 4:
+                                    return Tuple.Create(etc.Text.ToString() + " 흥미롭네요.", "", false);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return emptyTuple;
+        }
 
         // 메뉴 추천 감지
         public bool isExistMenu(string message)
@@ -525,7 +737,7 @@ namespace Athena
                     }
                     else
                     {
-                        return "/영상";
+                        return "";
                     }
                 }
             }

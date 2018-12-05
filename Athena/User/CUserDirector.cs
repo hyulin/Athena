@@ -67,5 +67,12 @@ namespace Athena
 
             userInfo.addMessage(userMessage);
         }
+
+        public Queue<CMessage> getMessage(long userKey)
+        {
+            CUser userInfo = getUserInfo(userKey);
+
+            return userInfo.getMessage();
+        }
     }
 }

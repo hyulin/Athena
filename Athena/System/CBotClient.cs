@@ -31,6 +31,9 @@ using Google.Apis.Util.Store;
 // HtmlAgilityPack
 using HtmlAgilityPack;
 
+// Twitter Korean Processor
+using Moda.Korean.TwitterKoreanProcessorCS;
+
 namespace Athena
 {
     class CBotClient
@@ -387,7 +390,7 @@ namespace Athena
             // 입력된 메시지를 각 유저 정보에 입력
             if (senderKey != 0 && strMassage != "")
                 userDirector.addMessage(senderKey, strMassage, time);
-
+            
             // 명령어인지 아닌지 구분
             if (strMassage.Substring(0, 1) == "/")
             {
@@ -468,89 +471,25 @@ namespace Athena
             // 명령어가 아닐 경우
             if (isCommand == false)
             {
-                // 메뉴 선택
-                if (naturalLanguage.isExistMenu(strMassage) == true)
+                Tuple<string, string, bool> tuple = naturalLanguage.morphemeProcessor(strMassage, userDirector.getMessage(senderKey));
+
+                if (tuple.Item3 == false)
                 {
-                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, naturalLanguage.getMenu(strMassage), ParseMode.Default, false, false, iMessageID);
-                    CLog.WriteLog(varMessage.Chat.Id, senderKey, strUserName, strMassage, strCommend, strContents);
-                    return;
-                }
-
-                //// 따라 웃기
-                //string laughMessage = naturalLanguage.laughCall(strMassage);
-                //if (laughMessage != "")
-                //{
-                //    await Bot.SendTextMessageAsync(varMessage.Chat.Id, laughMessage);
-                //    return;
-                //}
-
-                // 대답하기
-                if (varMessage.ReplyToMessage != null && varMessage.ReplyToMessage.From.FirstName.Contains("아테나") == true)
-                {
-                    string reply = naturalLanguage.replyCall(strMassage);
-                    if (reply != "")
-                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, reply, ParseMode.Default, false, false, iMessageID);
-
-                    CLog.WriteLog(varMessage.Chat.Id, senderKey, strUserName, strMassage, strCommend, strContents);
-                    return;
-                }
-
-                // 퇴근 응답
-                if (strMassage.Contains("퇴근") == true)
-                {
-                    string offWork = naturalLanguage.offWorkCall(strMassage);
-                    if (offWork != "")
-                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, offWork, ParseMode.Default, false, false, iMessageID);
-
-                    CLog.WriteLog(varMessage.Chat.Id, senderKey, strUserName, strMassage, strCommend, strContents);
-                    return;
-                }
-
-                //// 이스터에그 (아테나 대사 출력)
-                //if (varMessage.ReplyToMessage != null && varMessage.ReplyToMessage.From.FirstName.Contains("아테나") == true)
-                //{
-                //    // 등록된 유저가 시도했을 경우 출력
-                //    await Bot.SendTextMessageAsync(varMessage.Chat.Id, EasterEgg.getEasterEgg(), ParseMode.Default, false, false, iMessageID);
-                //    return;
-                //}
-
-                // 아테나가 언급되면 자연어 명령
-                if (strMassage.Contains("아테나"))
-                {
-                    // 날씨 감지
-                    if (strMassage.Contains("날씨") == true)
+                    if (tuple.Item1.ToString() != "")
                     {
-                        Tuple<string, string> weatherTuple = naturalLanguage.weatherCall(strMassage);
-                        if (weatherTuple.Item1 != "" && weatherTuple.Item2 != "")
-                        {
-                            strCommend = "/날씨";
-                            strContents = weatherTuple.Item2;
-                        }
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, tuple.Item1.ToString(), ParseMode.Default, false, false, iMessageID);
+                        CLog.WriteLog(varMessage.Chat.Id, senderKey, strUserName, strMassage, tuple.Item1.ToString(), "");
                     }
-                    else
+                }
+                else
+                {
+                    if (tuple.Item1.ToString() != "")
                     {
-                        // 클랜 기능 감지
-                        string[] natural = naturalLanguage.FunctionCommand(strMassage).Split(' ');
-                        bool isFirst = true;
+                        strCommend = tuple.Item1;
+                        strContents = tuple.Item2;
 
-                        strCommend = natural[0].ToString();
-
-                        for (int i = 1; i < natural.Count(); i++)
-                        {
-                            if (isFirst == true)
-                            {
-                                strContents += natural[i].ToString();
-                                isFirst = false;
-                            }
-                            else
-                            {
-                                strContents += " " + natural[i].ToString();
-                            }
-
-                        }
+                        CLog.WriteLog(varMessage.Chat.Id, senderKey, strUserName, strMassage, strCommend, strContents);
                     }
-
-                    CLog.WriteLog(varMessage.Chat.Id, senderKey, strUserName, strMassage, strCommend, strContents);
                 }
             }
 
