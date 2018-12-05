@@ -214,7 +214,7 @@ namespace Athena
 
                 foreach (var etc in result)
                 {
-                    if (etc.Pos.ToString() == "Noun")
+                    if (etc.Pos.ToString() == "Noun" || etc.Pos.ToString() == "ProperNoun")
                     {
                         Random etcRandom = new Random();
                         int etcNumber = etcRandom.Next(10);
