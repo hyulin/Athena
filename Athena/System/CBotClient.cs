@@ -475,7 +475,8 @@ namespace Athena
             {
                 Tuple<string, string, bool> tuple = naturalLanguage.morphemeProcessor(strMassage, userDirector.getMessage(senderKey));
 
-                if (tuple.Item3 == false)
+                // 대화
+                if (tuple.Item1 != "" && tuple.Item3 == false)
                 {
                     if (tuple.Item1.ToString() != "")
                     {
@@ -483,7 +484,7 @@ namespace Athena
                         CLog.WriteLog(varMessage.Chat.Id, senderKey, strUserName, strMassage, tuple.Item1.ToString(), "");
                     }
                 }
-                else
+                else if (tuple.Item3 == true)
                 {
                     if (tuple.Item1.ToString() != "")
                     {
@@ -491,6 +492,21 @@ namespace Athena
                         strContents = tuple.Item2;
 
                         CLog.WriteLog(varMessage.Chat.Id, senderKey, strUserName, strMassage, strCommend, strContents);
+                    }
+                }
+                else if (tuple.Item1 == "" && tuple.Item2 == "" && tuple.Item3 == false)
+                {
+                    if (varMessage.ReplyToMessage != null)
+                    {
+#if !DEBUG
+                        if (varMessage.ReplyToMessage.From.Username.ToString().Contains("CDT_Noti_Bot") == true)
+#else
+                        if (varMessage.ReplyToMessage.From.Username.ToString().Contains("CDT_Noti_Test_Bot") == true)
+#endif
+                        {
+                            await Bot.SendTextMessageAsync(varMessage.Chat.Id, naturalLanguage.replyCall(strMassage), ParseMode.Default, false, false, iMessageID);
+                            CLog.WriteLog(varMessage.Chat.Id, senderKey, strUserName, strMassage, tuple.Item1.ToString(), "");
+                        }
                     }
                 }
             }

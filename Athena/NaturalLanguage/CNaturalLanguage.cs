@@ -67,11 +67,7 @@ namespace Athena
 
             string normalize = TwitterKoreanProcessorCS.Normalize(message);
             var morpheme = TwitterKoreanProcessorCS.Tokenize(normalize);
-            List<KoreanToken> result = new List<KoreanToken>();
-            foreach (var token in morpheme)
-            {
-                result.Add(token);
-            }
+            var morphemeString = TwitterKoreanProcessorCS.TokensToStrings(morpheme);
 
             string command = "";
             string contents = "";
@@ -177,7 +173,7 @@ namespace Athena
             //--------------------------------------------------------------------------
             // 그 외
             //--------------------------------------------------------------------------
-            foreach (var word in result)
+            foreach (var word in morpheme)
             {
                 Random random = new Random();
                 int num = random.Next(10);
@@ -188,14 +184,12 @@ namespace Athena
                     switch (num)
                     {
                         case 0:
-                            return Tuple.Create("? 그게 무슨 말이에요?", "", false);
+                            return Tuple.Create(word.Text.ToString() + "? 그게 무슨 말이에요?", "", false);
                         case 1:
-                            return Tuple.Create("? 처음 듣는 말이네요.", "", false);
+                            return Tuple.Create(word.Text.ToString() + "? 처음 듣는 말이네요.", "", false);
                         case 2:
-                            return Tuple.Create("? 무슨 말인지 모르겠어요.", "", false);
+                            return Tuple.Create(word.Text.ToString() + "? 무슨 말인지 모르겠어요.", "", false);
                     }
-
-                    continue;
                 }
 
                 // 감탄사
@@ -211,70 +205,80 @@ namespace Athena
                             return Tuple.Create("대박이네요.", "", false);
                     }
                 }
+            }
 
-                foreach (var etc in result)
+            string mention = "";
+            int seed = 0;
+
+            foreach (var word in morpheme)
+            {
+                if (word.Pos.ToString() == "Noun" || word.Pos.ToString() == "ProperNoun")
                 {
-                    if (etc.Pos.ToString() == "Noun" || etc.Pos.ToString() == "ProperNoun")
+                    Random etcRandom = new Random(unchecked((int)DateTime.Now.Ticks) + seed++);
+                    int etcNumber = etcRandom.Next(1, 10);
+                    if (etcNumber == 1)
                     {
-                        Random etcRandom = new Random();
-                        int etcNumber = etcRandom.Next(10);
-                        if (etcNumber == 1)
-                        {
-                            // 이전 대화내용 참고 기능
-                            foreach (var queMsg in queue)
-                            {
-                                string time = "";
-
-                                if (queMsg.Time.Minute >= System.DateTime.Now.Minute)
-                                    continue;
-
-                                if ((queMsg.Time.Year == System.DateTime.Now.Year) &&
-                                    (queMsg.Time.Month == System.DateTime.Now.Month) &&
-                                    (queMsg.Time.Day == System.DateTime.Now.Day))
-                                    time = "아까";
-                                else
-                                    time = "저번에";
-                                
-
-                                if (queMsg.Message.Contains(etc.Text.ToString()) == true)
-                                {
-                                    Random queRandom = new Random();
-                                    int queNumber = queRandom.Next(5);
-
-                                    switch (etcNumber)
-                                    {
-                                        case 0:
-                                            return Tuple.Create(time + " " + etc.Text.ToString() + "에 대해서 말씀하신 적 있어요. 관심있으신가봐요.", "", false);
-                                        case 1:
-                                            return Tuple.Create(time + " 말씀하신 " + etc.Text.ToString() + " 어떤가요?", "", false);
-                                        case 2:
-                                            return Tuple.Create(time + " 비슷한 말씀을 하셨었죠.", "", false);
-                                        case 3:
-                                            return Tuple.Create("자주 언급을 하시니 저도 " + etc.Text.ToString() + "에 대해서 관심을 가져볼까 해요.", "", false);
-                                        case 4:
-                                            return Tuple.Create("아, " + etc.Text.ToString() + "에 대해서 " + time + " 말씀하셨었어요. 흥미롭네요.", "", false);
-                                    }
-                                }
-                            }
-                            
-                            // 그냥 언급
-                            etcNumber = etcRandom.Next(5);
-                            switch (etcNumber)
-                            {
-                                case 0:
-                                    return Tuple.Create(etc.Text.ToString() + " 좋아하시나봐요.", "", false);
-                                case 1:
-                                    return Tuple.Create(etc.Text.ToString() + ", 저도 궁금하네요.", "", false);
-                                case 2:
-                                    return Tuple.Create(etc.Text.ToString() + " 어때요?", "", false);
-                                case 3:
-                                    return Tuple.Create(etc.Text.ToString() + " 좋나요?", "", false);
-                                case 4:
-                                    return Tuple.Create(etc.Text.ToString() + ". 흥미롭네요.", "", false);
-                            }
-                        }
+                        mention = word.Text.ToString();
+                        break;
                     }
                 }
+            }
+
+            if (mention == "")
+                return emptyTuple;
+
+            // 이전 대화내용 참고 기능
+            foreach (var queMsg in queue)
+            {
+                string time = "";
+
+                if (queMsg.Time.Minute >= System.DateTime.Now.Minute)
+                    continue;
+
+                if ((queMsg.Time.Year == System.DateTime.Now.Year) &&
+                    (queMsg.Time.Month == System.DateTime.Now.Month) &&
+                    (queMsg.Time.Day == System.DateTime.Now.Day))
+                    time = "아까";
+                else
+                    time = "저번에";
+                                
+
+                if (queMsg.Message.Contains(mention) == true)
+                {
+                    Random queRandom = new Random();
+                    int queNumber = queRandom.Next(5);
+
+                    switch (queNumber)
+                    {
+                        case 0:
+                            return Tuple.Create(time + " " + mention + "에 대해서 말씀하신 적 있어요. 관심있으신가봐요.", "", false);
+                        case 1:
+                            return Tuple.Create(time + " 말씀하신 " + mention + " 어떤가요?", "", false);
+                        case 2:
+                            return Tuple.Create(time + " " + mention + "에 대해 비슷한 말씀을 하셨었죠.", "", false);
+                        case 3:
+                            return Tuple.Create("자주 언급을 하시니 저도 " + mention + "에 대해서 관심을 가져볼까 해요.", "", false);
+                        case 4:
+                            return Tuple.Create("아, " + mention + "에 대해서 " + time + " 말씀하셨었어요. 흥미롭네요.", "", false);
+                    }
+                }
+            }
+
+            // 그냥 언급
+            Random mentionRandom = new Random();
+            int mentionNumber = mentionRandom.Next(5);
+            switch (mentionNumber)
+            {
+                case 0:
+                    return Tuple.Create(mention + " 좋아하시나봐요.", "", false);
+                case 1:
+                    return Tuple.Create(mention + ", 저도 궁금하네요.", "", false);
+                case 2:
+                    return Tuple.Create(mention + " 어때요?", "", false);
+                case 3:
+                    return Tuple.Create(mention + " 좋나요?", "", false);
+                case 4:
+                    return Tuple.Create(mention + ". 흥미롭네요.", "", false);
             }
 
             return emptyTuple;
@@ -590,7 +594,7 @@ namespace Athena
             //--------------------------------------------------------
             // 뽑기 감지
             //--------------------------------------------------------
-            if (text.Contains("중에") == true)
+            if (text.Contains("중에") == true && text.Contains("나중에") == false)
             {
                 string contents = "";
                 
