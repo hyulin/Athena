@@ -1193,6 +1193,16 @@ namespace Athena
                         {
                             if (row.Count > 0)
                             {
+                                if (row[0].ToString() == "모임이름" && row[1].ToString() == "")
+                                {
+                                    strPrint = "[SYSTEM] 현재 예정된 모임이 없습니다.";
+                                    const string meeting = @"Function/Meeting.jpg";
+                                    var fileName = meeting.Split(Path.DirectorySeparatorChar).Last();
+                                    var fileStream = new FileStream(meeting, FileMode.Open, FileAccess.Read, FileShare.Read);
+                                    await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream, strPrint, ParseMode.Default, false, iMessageID);
+                                    return;
+                                }
+
                                 if (row[0].ToString() == "프로그램" && row[1].ToString() != "")
                                 {
                                     strPrint += "* " + row[0].ToString() + "\n";
@@ -1205,15 +1215,6 @@ namespace Athena
                                 else if (row[0].ToString() != "" && row[1].ToString() != "")
                                 {
                                     strPrint += "* " + row[0].ToString() + " : " + row[1].ToString() + "\n";
-                                }
-                                else
-                                {
-                                    strPrint = "[SYSTEM] 현재 예정된 모임이 없습니다.";
-                                    const string meeting = @"Function/Meeting.jpg";
-                                    var fileName = meeting.Split(Path.DirectorySeparatorChar).Last();
-                                    var fileStream = new FileStream(meeting, FileMode.Open, FileAccess.Read, FileShare.Read);
-                                    await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream, strPrint, ParseMode.Default, false, iMessageID);
-                                    return;
                                 }
                             }
                         }
