@@ -270,7 +270,7 @@ namespace Athena
                                 case 3:
                                     return Tuple.Create(etc.Text.ToString() + " 좋나요?", "", false);
                                 case 4:
-                                    return Tuple.Create(etc.Text.ToString() + " 흥미롭네요.", "", false);
+                                    return Tuple.Create(etc.Text.ToString() + ". 흥미롭네요.", "", false);
                             }
                         }
                     }
