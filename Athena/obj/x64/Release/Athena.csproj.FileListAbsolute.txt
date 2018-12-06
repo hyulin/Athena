@@ -28,7 +28,6 @@ C:\Project\Athena\Athena\obj\x64\Release\Athena.Properties.Resources.resources
 C:\Project\Athena\Athena\obj\x64\Release\Athena.csproj.GenerateResource.cache
 C:\Project\Athena\Athena\obj\x64\Release\Athena.exe
 C:\Project\Athena\Athena\obj\x64\Release\Athena.pdb
-C:\Project\Athena\Athena\obj\x64\Release\Athena.csprojResolveAssemblyReference.cache
 C:\Project\Athena\Athena\bin\x64\Release\IKVM.AWT.WinForms.dll
 C:\Project\Athena\Athena\bin\x64\Release\IKVM.OpenJDK.Beans.dll
 C:\Project\Athena\Athena\bin\x64\Release\IKVM.OpenJDK.Charsets.dll
@@ -55,3 +54,6 @@ C:\Project\Athena\Athena\bin\x64\Release\IKVM.OpenJDK.XML.XPath.dll
 C:\Project\Athena\Athena\bin\x64\Release\IKVM.Runtime.dll
 C:\Project\Athena\Athena\bin\x64\Release\IKVM.Runtime.JNI.dll
 C:\Project\Athena\Athena\bin\x64\Release\twitter-korean-processor.dll
+C:\Project\Athena\Athena\obj\x64\Release\Athena.csprojAssemblyReference.cache
+C:\Project\Athena\Athena\obj\x64\Release\Athena.csproj.CoreCompileInputs.cache
+C:\Project\Athena\Athena\obj\x64\Release\Athena.csproj.CopyComplete

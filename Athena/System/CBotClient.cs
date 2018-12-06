@@ -504,7 +504,7 @@ namespace Athena
             //========================================================================================
             // 도움말
             //========================================================================================
-            if (strCommend == "/도움말" || strCommend == "/help" || strCommend == "/help@Athena")
+            if (strCommend == "/도움말" || strCommend == "/help" || strCommend == "/help@CDT_Noti_Bot")
             {
                 strPrint += "==================================\n";
                 strPrint += "[ 아테나 v1.5 ]\n[ Clien Delicious Team Notice Bot ]\n\n";

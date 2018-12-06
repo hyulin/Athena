@@ -223,6 +223,19 @@ namespace Athena
                             // 이전 대화내용 참고 기능
                             foreach (var queMsg in queue)
                             {
+                                string time = "";
+
+                                if (queMsg.Time.Minute >= System.DateTime.Now.Minute)
+                                    continue;
+
+                                if ((queMsg.Time.Year == System.DateTime.Now.Year) &&
+                                    (queMsg.Time.Month == System.DateTime.Now.Month) &&
+                                    (queMsg.Time.Day == System.DateTime.Now.Day))
+                                    time = "아까";
+                                else
+                                    time = "저번에";
+                                
+
                                 if (queMsg.Message.Contains(etc.Text.ToString()) == true)
                                 {
                                     Random queRandom = new Random();
@@ -231,15 +244,15 @@ namespace Athena
                                     switch (etcNumber)
                                     {
                                         case 0:
-                                            return Tuple.Create("저번에 " + etc.Text.ToString() + "에 대해서 말씀하신 적 있어요. 관심있으신가봐요.", "", false);
+                                            return Tuple.Create(time + " " + etc.Text.ToString() + "에 대해서 말씀하신 적 있어요. 관심있으신가봐요.", "", false);
                                         case 1:
-                                            return Tuple.Create("저번에 말씀하신 " + etc.Text.ToString() + " 어떤가요?", "", false);
+                                            return Tuple.Create(time + " 말씀하신 " + etc.Text.ToString() + " 어떤가요?", "", false);
                                         case 2:
-                                            return Tuple.Create("얼마 전에 비슷한 말씀을 하셨었죠.", "", false);
+                                            return Tuple.Create(time + " 비슷한 말씀을 하셨었죠.", "", false);
                                         case 3:
                                             return Tuple.Create("자주 언급을 하시니 저도 " + etc.Text.ToString() + "에 대해서 관심을 가져볼까 해요.", "", false);
                                         case 4:
-                                            return Tuple.Create("아, " + etc.Text.ToString() + "에 대해서 저번에 말씀하셨었어요.", "", false);
+                                            return Tuple.Create("아, " + etc.Text.ToString() + "에 대해서 " + time + " 말씀하셨었어요. 흥미롭네요.", "", false);
                                     }
                                 }
                             }
