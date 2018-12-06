@@ -462,7 +462,7 @@ namespace Athena
                 }
 
                 // 미등록 유저는 사용할 수 없다.
-                if (strCommend != "/등록" && userDirector.getUserInfo(senderKey).UserKey == 0)
+                if (strCommend != "/등록" && strCommend != "/안내" && userDirector.getUserInfo(senderKey).UserKey == 0)
                 {
                     await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 아테나에 등록되지 않은 유저입니다.\n등록을 하시려면 /등록 [본계정배틀태그]를 입력해주세요.", ParseMode.Default, false, false, iMessageID);
                     CLog.WriteLog(varMessage.Chat.Id, senderKey, strUserName, "[ERROR] 아테나에 등록되지 않은 유저입니다.\n등록을 하시려면 /등록 [본계정배틀태그]를 입력해주세요.", strCommend, strContents);
@@ -470,8 +470,8 @@ namespace Athena
                 }
             }
 
-            // 명령어가 아닐 경우
-            if (isCommand == false)
+            // 명령어가 아닐 경우와 사전안내방이 아닌 경우
+            if (isCommand == false && varMessage.Chat.Id != -1001389956706)
             {
                 Tuple<string, string, bool> tuple = naturalLanguage.morphemeProcessor(strMassage, userDirector.getMessage(senderKey));
 
