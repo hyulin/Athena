@@ -14,7 +14,7 @@ namespace Athena
         //string[] command = {"공지", "조회", "영상", "검색", "모임", "투표", "기록", "안내", "상태"};
 
         string[] notiCommand = { "공지" };
-        string[] refCommand = { "조회", "전적", "점수", "티어" };
+        string[] refCommand = { "조회", "전적", "점수", "티어", "몇 점", "몇점" };
         string[] videoCommand = { "영상", "방송" };
         string[] videoSubCommand = { "목록", "리스트", "어떤" };
         string[] serchCommand = { "검색", "모스트", "포지션", "유저" };
@@ -24,9 +24,9 @@ namespace Athena
         string[] guideCommand = { "안내", "가이드" };
         string[] statusCommand = { "상태" };
 
-        string[] enterCommand = { "알려", "보여", "?", "궁금", "해줘", "뭐야", "있나", "있어" };
+        string[] enterCommand = { "알려", "보여", "?", "궁금", "해줘", "뭐야", "있나", "있어", "인가요", "에요", "예요" };
         string[] ofCommand = { "의", "가", "에", "은", "는", "님의", "님" };
-        string[] mindCommand = { "어때", "?", "는요", "어떰", "어떨", "어떠", "어떻", "어떤" };
+        string[] mindCommand = { "어때", "?", "는요", "어떰", "어떨", "어떠", "어떻", "어떤", "어찌" };
 
         string[] morningMenu = { " 토스트", "맥모닝", "빵과 커피", "백반", "삼각김밥", "김밥", "샐러드", "선식" };
         string[] lunchMenu = {
