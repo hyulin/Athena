@@ -145,8 +145,8 @@ namespace Athena
                         CUser user = new CUser();
                         user = setUserInfo(row, Convert.ToInt64(row[10].ToString()));
 
-                        // 휴린, 냉각콜라, 만슬, 청포도일 경우
-                        if ( (user.UserKey == 23842788) || (user.UserKey == 50872681) || (user.UserKey == 474057213) || (user.UserKey == 35432635) )
+                        // 휴린, 냉각콜라, 만슬일 경우
+                        if ( (user.UserKey == 23842788) || (user.UserKey == 50872681) || (user.UserKey == 474057213) )
                         {
                             // 유저 타입을 관리자로
                             user.UserType = USER_TYPE.USER_TYPE_ADMIN;
@@ -192,8 +192,8 @@ namespace Athena
             user.Time = row[8].ToString();
             user.Info = row[9].ToString();
 
-            // 휴린, 냉각콜라, 만슬, 청포도일 경우
-            if ((user.UserKey == 23842788) || (user.UserKey == 50872681) || (user.UserKey == 474057213) || (user.UserKey == 35432635))
+            // 휴린, 냉각콜라, 만슬일 경우
+            if ((user.UserKey == 23842788) || (user.UserKey == 50872681) || (user.UserKey == 474057213))
             {
                 // 유저 타입을 관리자로
                 user.UserType = USER_TYPE.USER_TYPE_ADMIN;
@@ -384,12 +384,6 @@ namespace Athena
                     strInfo += "운영자 냉각콜라(@Seungman),\n";
                     strInfo += "운영자 만슬(@mans3ul)에게 문의해주세요.\n";
                     strInfo += "\n";
-                    strInfo += "우리 클랜의 모든 일정관리 및 운영은\n";
-                    strInfo += "통합문서를 통해 확인 하실 수 있습니다.\n";
-                    strInfo += "(https://goo.gl/nurbLT [딜리셔스.kr])\n";
-                    strInfo += "통합 문서에 대해 문의사항이 있으실 때는\n";
-                    strInfo += "운영자 청포도(@leetk321)에게 문의해주세요.\n";
-                    strInfo += "\n";
                     strInfo += "클랜원들의 편의를 위한\n";
                     strInfo += "저, 아테나의 기능을 확인하시려면\n";
                     strInfo += "/도움말 을 입력해주세요.\n";
@@ -397,6 +391,10 @@ namespace Athena
                     strInfo += "앞으로 더 추가될 예정입니다.\n";
                     strInfo += "아테나에 대해 문의사항이 있으실 때는\n";
                     strInfo += "운영자 휴린(@hyulin)에게 문의해주세요.\n";
+                    strInfo += "\n";
+                    strInfo += "우리 클랜의 모든 일정관리 및 운영은\n";
+                    strInfo += "통합문서를 통해 확인 하실 수 있습니다.\n";
+                    strInfo += "(https://goo.gl/nurbLT [딜리셔스.kr])\n";
                     strInfo += "\n";
                     strInfo += "저희 CDT에서 즐거운 오버워치 생활,\n";
                     strInfo += "그리고 더 나아가 즐거운 라이프를\n";
@@ -523,7 +521,7 @@ namespace Athena
             if (strCommend == "/도움말" || strCommend == "/help" || strCommend == "/help@CDT_Noti_Bot")
             {
                 strPrint += "==================================\n";
-                strPrint += "[ 아테나 v1.5 ]\n[ Clien Delicious Team Notice Bot ]\n\n";
+                strPrint += "[ 아테나 v2.0 ]\n[ Clien Delicious Team Notice Bot ]\n\n";
                 strPrint += "/공지 : 클랜 공지사항을 출력합니다.\n";
                 strPrint += "/일정 : 이번 달 클랜 일정을 확인합니다.\n";
                 strPrint += "/등록 [본 계정 배틀태그] : 아테나에 등록 합니다.\n";
