@@ -720,7 +720,7 @@ namespace Athena
 
                 // Define request parameters.
                 String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
-                String range = "클랜 공지!I15:Q27";
+                String range = "클랜 공지!I13:Q27";
                 SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
                 ValueRange response = request.Execute();
