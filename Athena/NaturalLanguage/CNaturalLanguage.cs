@@ -215,7 +215,7 @@ namespace Athena
                 if (word.Pos.ToString() == "Noun" || word.Pos.ToString() == "ProperNoun")
                 {
                     Random etcRandom = new Random(unchecked((int)DateTime.Now.Ticks) + seed++);
-                    int etcNumber = etcRandom.Next(1, 10);
+                    int etcNumber = etcRandom.Next(20);
                     if (etcNumber == 1)
                     {
                         mention = word.Text.ToString();
