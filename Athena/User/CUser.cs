@@ -47,7 +47,7 @@ namespace Athena
 
         public void addMessage(CMessage message)
         {
-            if (MessageCount < 10)
+            if (MessageCount < 100)
             {
                 MessageCount++;
                 MessageQueue.Enqueue(message);
