@@ -669,7 +669,8 @@ namespace Athena
 
             if (isRefCommand == true)
             {
-                battleTagIndex--;
+                if (battleTagIndex > 0)
+                    battleTagIndex--;
 
                 string battleTag = split[battleTagIndex];
 

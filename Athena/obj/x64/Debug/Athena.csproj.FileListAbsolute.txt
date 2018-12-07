@@ -52,8 +52,6 @@ C:\Project\Athena\Athena\bin\x64\Debug\Telegram.Bot.xml
 C:\Project\Athena\Athena\obj\x64\Debug\Athena.Athena.resources
 C:\Project\Athena\Athena\obj\x64\Debug\Athena.Properties.Resources.resources
 C:\Project\Athena\Athena\obj\x64\Debug\Athena.csproj.GenerateResource.cache
-C:\Project\Athena\Athena\obj\x64\Debug\Athena.csproj.CoreCompileInputs.cache
-C:\Project\Athena\Athena\obj\x64\Debug\Athena.csproj.CopyComplete
 C:\Project\Athena\Athena\obj\x64\Debug\Athena.exe
 C:\Project\Athena\Athena\obj\x64\Debug\Athena.pdb
-C:\Project\Athena\Athena\obj\x64\Debug\Athena.csprojAssemblyReference.cache
+C:\Project\Athena\Athena\obj\x64\Debug\Athena.csprojResolveAssemblyReference.cache
