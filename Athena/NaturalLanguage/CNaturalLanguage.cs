@@ -24,7 +24,7 @@ namespace Athena
         string[] guideCommand = { "안내", "가이드" };
         string[] statusCommand = { "상태" };
 
-        string[] enterCommand = { "알려", "보여", "?", "궁금", "해줘", "뭐야", "있나", "있어", "인가요", "에요", "예요", "없나", "없어" };
+        string[] enterCommand = { "알려", "보여", "?", "궁금", "해줘", "뭐야", "있나요", "있어요", "인가요", "에요", "예요", "없나요", "없어요" };
         string[] ofCommand = { "의", "가", "에", "은", "는", "님의", "님" };
         string[] mindCommand = { "어때", "?", "는요", "어떰", "어떨", "어떠", "어떻", "어떤", "어찌" };
 
@@ -215,7 +215,7 @@ namespace Athena
                 if (word.Pos.ToString() == "Noun" || word.Pos.ToString() == "ProperNoun")
                 {
                     Random etcRandom = new Random(unchecked((int)DateTime.Now.Ticks) + seed++);
-                    int etcNumber = etcRandom.Next(20);
+                    int etcNumber = etcRandom.Next(30);
                     if (etcNumber == 1)
                     {
                         mention = word.Text.ToString();

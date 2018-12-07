@@ -54,6 +54,4 @@ C:\Project\Athena\Athena\bin\x64\Release\IKVM.OpenJDK.XML.XPath.dll
 C:\Project\Athena\Athena\bin\x64\Release\IKVM.Runtime.dll
 C:\Project\Athena\Athena\bin\x64\Release\IKVM.Runtime.JNI.dll
 C:\Project\Athena\Athena\bin\x64\Release\twitter-korean-processor.dll
-C:\Project\Athena\Athena\obj\x64\Release\Athena.csprojAssemblyReference.cache
-C:\Project\Athena\Athena\obj\x64\Release\Athena.csproj.CoreCompileInputs.cache
-C:\Project\Athena\Athena\obj\x64\Release\Athena.csproj.CopyComplete
+C:\Project\Athena\Athena\obj\x64\Release\Athena.csprojResolveAssemblyReference.cache
