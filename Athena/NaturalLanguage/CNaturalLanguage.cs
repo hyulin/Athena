@@ -61,7 +61,7 @@ namespace Athena
         ////////////////////////////////////////////////////////////////
         // 형태소 분석
         ////////////////////////////////////////////////////////////////
-        public Tuple<string, string, bool> morphemeProcessor(string message, Queue<CMessage> queue)
+        public Tuple<string, string, bool> morphemeProcessor(string message, Queue<CMessage> queue, bool isMainRoom)
         {
             Tuple<string, string, bool> emptyTuple = Tuple.Create("", "", false);
 
@@ -170,13 +170,22 @@ namespace Athena
                     return Tuple.Create("/날씨", weatherTuple.Item2, true);
             }
 
+            // 본 방이 아니면 여기서 반환
+            if (isMainRoom == false)
+                return emptyTuple;
+
+            // 1/30 확률로 대답
+            Random ansRandom = new Random(unchecked((int)DateTime.Now.Ticks));
+            if (ansRandom.Next(20) != 1)
+                return emptyTuple;
+
             //--------------------------------------------------------------------------
             // 그 외
             //--------------------------------------------------------------------------
             foreach (var word in morpheme)
             {
                 Random random = new Random();
-                int num = random.Next(10);
+                int num = random.Next(3);
 
                 // 알 수 없는 단어일 경우
                 if (word.Unknown == true)
@@ -209,20 +218,23 @@ namespace Athena
 
             string mention = "";
             int seed = 0;
+            List<int> lstIndex = new List<int>();
 
+            int nounIndex = 0;
             foreach (var word in morpheme)
             {
                 if (word.Pos.ToString() == "Noun" || word.Pos.ToString() == "ProperNoun")
-                {
-                    Random etcRandom = new Random(unchecked((int)DateTime.Now.Ticks) + seed++);
-                    int etcNumber = etcRandom.Next(30);
-                    if (etcNumber == 1)
-                    {
-                        mention = word.Text.ToString();
-                        break;
-                    }
-                }
+                    lstIndex.Add(nounIndex);
+
+                nounIndex++;
             }
+
+            Random wordRandom = new Random(unchecked((int)DateTime.Now.Ticks) + seed++);
+            int index = wordRandom.Next(lstIndex.Count());
+
+            var outputWord = morpheme.ElementAt(lstIndex.ElementAt(index));
+            if (outputWord.Pos.ToString() == "Noun" || outputWord.Pos.ToString() == "ProperNoun")
+                mention = outputWord.Text.ToString();
 
             if (mention == "")
                 return emptyTuple;
