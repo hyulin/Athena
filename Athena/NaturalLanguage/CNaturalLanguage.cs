@@ -170,21 +170,22 @@ namespace Athena
                     return Tuple.Create("/날씨", weatherTuple.Item2, true);
             }
 
+            //--------------------------------------------------------------------------
+            // 그 외
+            //--------------------------------------------------------------------------
+            int seed = 0;
             // 본 방이 아니면 여기서 반환
             if (isMainRoom == false)
                 return emptyTuple;
 
-            // 1/30 확률로 대답
-            Random ansRandom = new Random(unchecked((int)DateTime.Now.Ticks));
+            // 1/20 확률로 대답
+            Random ansRandom = new Random(unchecked((int)DateTime.Now.Ticks) + seed);
             if (ansRandom.Next(20) != 1)
                 return emptyTuple;
-
-            //--------------------------------------------------------------------------
-            // 그 외
-            //--------------------------------------------------------------------------
+            
             foreach (var word in morpheme)
             {
-                Random random = new Random();
+                Random random = new Random(unchecked((int)DateTime.Now.Ticks) + seed++);
                 int num = random.Next(3);
 
                 // 알 수 없는 단어일 경우
@@ -217,7 +218,6 @@ namespace Athena
             }
 
             string mention = "";
-            int seed = 0;
             List<int> lstIndex = new List<int>();
 
             int nounIndex = 0;
@@ -257,7 +257,7 @@ namespace Athena
 
                 if (queMsg.Message.Contains(mention) == true)
                 {
-                    Random queRandom = new Random();
+                    Random queRandom = new Random(unchecked((int)DateTime.Now.Ticks) + seed++);
                     int queNumber = queRandom.Next(5);
 
                     switch (queNumber)
@@ -277,7 +277,7 @@ namespace Athena
             }
 
             // 그냥 언급
-            Random mentionRandom = new Random();
+            Random mentionRandom = new Random(unchecked((int)DateTime.Now.Ticks) + seed++);
             int mentionNumber = mentionRandom.Next(5);
             switch (mentionNumber)
             {
@@ -333,8 +333,9 @@ namespace Athena
         // 메뉴 추천
         public string getMenu(string message)
         {
-            Random menuRandom = new Random();
-            Random enterRandom = new Random();
+            int seed = 10;
+            Random menuRandom = new Random(unchecked((int)DateTime.Now.Ticks) + seed++);
+            Random enterRandom = new Random(unchecked((int)DateTime.Now.Ticks) + seed++);
 
             if (message.Contains("아침") == true)
             {
@@ -512,12 +513,13 @@ namespace Athena
         public string offWorkCall(string message)
         {
             string output = "";
+            int seed = 20;
 
             foreach (var word in offWork)
             {
                 if (message.Contains(word) == true)
                 {
-                    Random random = new Random();
+                    Random random = new Random(unchecked((int)DateTime.Now.Ticks) + seed++);
                     int randomNum = random.Next(5);
 
                     switch (randomNum)
