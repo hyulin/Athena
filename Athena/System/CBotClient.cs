@@ -470,8 +470,8 @@ namespace Athena
                 }
             }
 
-            // 명령어가 아닐 경우와 사전안내방이 아닌 경우
-            if (isCommand == false && varMessage.Chat.Id != -1001389956706)
+            // 명령어가 아닐 경우와 본방인 경우
+            if (isCommand == false && varMessage.Chat.Id == -1001202203239)
             {
                 Tuple<string, string, bool> tuple = naturalLanguage.morphemeProcessor(strMassage, userDirector.getMessage(senderKey));
 
