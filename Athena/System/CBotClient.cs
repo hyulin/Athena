@@ -52,7 +52,6 @@ namespace Athena
         CNaturalLanguage naturalLanguage = new CNaturalLanguage();
 
         bool isGoodMorning = false;
-        //bool isGoodNight = false;
 
         // Bot Token
 #if DEBUG
@@ -499,12 +498,12 @@ namespace Athena
                 }
                 else if (tuple.Item1 == "" && tuple.Item2 == "" && tuple.Item3 == false)
                 {
-                    if (varMessage.ReplyToMessage != null)
+                    if (varMessage.ReplyToMessage != null && varMessage.ReplyToMessage.From.Username != null)
                     {
-#if !DEBUG
-                        if (varMessage.ReplyToMessage.From.Username.ToString().Contains("CDT_Noti_Bot") == true)
-#else
+#if DEBUG
                         if (varMessage.ReplyToMessage.From.Username.ToString().Contains("CDT_Noti_Test_Bot") == true)
+#else
+                        if (varMessage.ReplyToMessage.From.Username.ToString().Contains("CDT_Noti_Bot") == true)
 #endif
                         {
                             await Bot.SendTextMessageAsync(varMessage.Chat.Id, naturalLanguage.replyCall(strMassage), ParseMode.Default, false, false, iMessageID);

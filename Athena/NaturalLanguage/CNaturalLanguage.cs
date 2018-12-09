@@ -179,7 +179,7 @@ namespace Athena
                 return emptyTuple;
 
             // 1/20 확률로 대답
-            Random ansRandom = new Random(unchecked((int)DateTime.Now.Ticks) + seed);
+            Random ansRandom = new Random(unchecked((int)DateTime.Now.Ticks) + seed++);
             if (ansRandom.Next(20) != 1)
                 return emptyTuple;
             
@@ -219,22 +219,18 @@ namespace Athena
 
             string mention = "";
             List<int> lstIndex = new List<int>();
-
-            int nounIndex = 0;
+            
             foreach (var word in morpheme)
             {
                 if (word.Pos.ToString() == "Noun" || word.Pos.ToString() == "ProperNoun")
-                    lstIndex.Add(nounIndex);
-
-                nounIndex++;
+                    lstIndex.Add(word.Offset);
             }
 
             Random wordRandom = new Random(unchecked((int)DateTime.Now.Ticks) + seed++);
             int index = wordRandom.Next(lstIndex.Count());
 
             var outputWord = morpheme.ElementAt(lstIndex.ElementAt(index));
-            if (outputWord.Pos.ToString() == "Noun" || outputWord.Pos.ToString() == "ProperNoun")
-                mention = outputWord.Text.ToString();
+            mention = outputWord.Text.ToString();
 
             if (mention == "")
                 return emptyTuple;
