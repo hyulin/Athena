@@ -53,8 +53,11 @@ namespace Athena
         string[] choiceWord = { "이랑", "랑", "," };
 
         string[] offWork = { "퇴근합니다", "퇴근 합니다", "퇴근합니당", "퇴근 합니당", "퇴근합니닷", "퇴근 합니닷", "퇴근~", "퇴근!", "퇴근하겠" };
+        string[] makeWord = { "만들", "만든", "제작", "개발" };
 
-        string[] whatWord = { "뭘", "뭐", "어떤", "무엇" };
+        string[] whatWord = { "뭘", "뭐", "어떤", "무엇", "어느", "어떻게" };
+        string[] whoWord = { "누구", "어느", "누가" };
+        string[] devWord = { "아빠", "아버지", "개발자" };
         string[] eatWord = { "먹을까", "먹지", "먹어야할", "먹나" };
         string[] hungryWord = { "배고픈데", "배고프네", "배고프다", "배고파", "배고픔" };
 
@@ -168,6 +171,16 @@ namespace Athena
                 Tuple<string, string> weatherTuple = weatherCall(message);
                 if (weatherTuple.Item1 != "" && weatherTuple.Item2 != "")
                     return Tuple.Create("/날씨", weatherTuple.Item2, true);
+            }
+
+            //--------------------------------------------------------------------------
+            // 아테나 정보
+            //--------------------------------------------------------------------------
+            if (message.Contains("아테나") == true)
+            {
+                string athenaInfo = AthenaInfo(message);
+                if (athenaInfo != "")
+                    return Tuple.Create(athenaInfo, "", false);
             }
 
             //--------------------------------------------------------------------------
@@ -423,6 +436,106 @@ namespace Athena
             }
             
             return emptyTuple;
+        }
+
+        // 아테나 정보
+        public string AthenaInfo(string message)
+        {
+            string output = "";
+            bool isContinue = false;
+
+            // 만든 사람
+            {
+                foreach (var word in whoWord)
+                {
+                    if (message.Contains(word) == true)
+                    {
+                        isContinue = true;
+                        break;
+                    }
+                }
+
+                foreach (var word in devWord)
+                {
+                    if (message.Contains(word) == true)
+                    {
+                        isContinue = true;
+                        break;
+                    }
+                }
+
+                if (isContinue == true)
+                {
+                    isContinue = false;
+
+                    foreach (var enter in enterCommand)
+                    {
+                        if (message.Contains(enter) == true)
+                        {
+                            isContinue = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (isContinue == true)
+                {
+                    Random whoRandom = new Random(unchecked((int)DateTime.Now.Ticks));
+                    int whoNumber = whoRandom.Next(3);
+
+                    switch (whoNumber)
+                    {
+                        case 0:
+                            return "저를 만드신 분은 휴린님이십니다.";
+                        case 1:
+                            return "휴린님이요!";
+                        case 2:
+                            return "저희 아버지는 휴린님입니다ㅎㅎ";
+                    }
+
+                    return "";
+                }
+            }
+
+            // 어떻게 만들었나
+            {
+                foreach (var word in whatWord)
+                {
+                    if (message.Contains(word) == true)
+                    {
+                        isContinue = true;
+                        break;
+                    }
+                }
+
+                if (isContinue == true)
+                {
+                    foreach (var word in makeWord)
+                    {
+                        if (message.Contains(word) == true)
+                        {
+                            isContinue = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (isContinue == true)
+                {
+                    output += "";
+                    output += "저는 이렇게 만들어졌어요~\n";
+                    output += "- Microsoft Visual Studio 2017\n";
+                    output += "- C# .NET Framework 4.7\n";
+                    output += "- Telegram Bot API\n";
+                    output += "- Google Apis (Google Sheet)\n";
+                    output += "- HtmlAgilityPack\n";
+                    output += "- Newtonsoft Json\n";
+                    output += "- TwitterKoreanProcessorCS\n";
+                    output += "- Elasticsearch .NET\n";
+                }
+            }
+
+            return output;
         }
 
         // 웃기 감지
