@@ -54,11 +54,11 @@ namespace Athena
         bool isGoodMorning = false;
 
         // Bot Token
-//#if DEBUG
-//        const string strBotToken = "624245556:AAHJQ3bwdUB6IRf1KhQ2eAg4UDWB5RTiXzI";     // 테스트 봇 토큰
-//#else
+#if DEBUG
+        const string strBotToken = "624245556:AAHJQ3bwdUB6IRf1KhQ2eAg4UDWB5RTiXzI";     // 테스트 봇 토큰
+#else
         const string strBotToken = "648012085:AAHxJwmDWlznWTFMNQ92hJyVwsB_ggJ9ED8";     // 봇 토큰
-//#endif
+#endif
 
         private Telegram.Bot.TelegramBotClient Bot = new Telegram.Bot.TelegramBotClient(strBotToken);
 
@@ -279,11 +279,11 @@ namespace Athena
                     isGoodMorning = true;
                     strPrint += "굿모닝~ 오늘도 즐거운 하루 되세요~ :)";
 
-//#if DEBUG
-//                    Bot.SendTextMessageAsync(-1001312491933, strPrint);  // 운영진방
-//#else
+#if DEBUG
+                    Bot.SendTextMessageAsync(-1001312491933, strPrint);  // 운영진방
+#else
                     Bot.SendTextMessageAsync(-1001202203239, strPrint);  // 클랜방
-//#endif
+#endif
                 }
             }
             else
@@ -336,11 +336,11 @@ namespace Athena
                         strPrint = "[ERROR] 시트를 업데이트 할 수 없습니다.";
                     }
 
-//#if DEBUG
-//                    Bot.SendTextMessageAsync(-1001312491933, strPrint);  // 운영진방
-//#else
+#if DEBUG
+                    Bot.SendTextMessageAsync(-1001312491933, strPrint);  // 운영진방
+#else
                     Bot.SendTextMessageAsync(-1001202203239, strPrint);  // 클랜방
-//#endif
+#endif
                 }
             }
         }
@@ -439,12 +439,12 @@ namespace Athena
             bool isCommand = false;
 
             // 본방에 입력된 메시지를 각 유저 정보에 입력
-//#if DEBUG
-//            userDirector.addMessage(senderKey, strMassage, time);
-//#else
+#if DEBUG
+            userDirector.addMessage(senderKey, strMassage, time);
+#else
             if (senderKey != 0 && strMassage != "" && varMessage.Chat.Id == -1001202203239)
                 userDirector.addMessage(senderKey, strMassage, time);
-//#endif
+#endif
 
             // 명령어인지 아닌지 구분
             if (strMassage.Substring(0, 1) == "/")
@@ -504,11 +504,11 @@ namespace Athena
                 {
                     if (varMessage.ReplyToMessage != null && varMessage.ReplyToMessage.From.Username != null)
                     {
-//#if DEBUG
-//                        if (varMessage.ReplyToMessage.From.Username.ToString().Contains("CDT_Noti_Test_Bot") == true)
-//#else
+#if DEBUG
+                        if (varMessage.ReplyToMessage.From.Username.ToString().Contains("CDT_Noti_Test_Bot") == true)
+#else
                         if (varMessage.ReplyToMessage.From.Username.ToString().Contains("CDT_Noti_Bot") == true)
-//#endif
+#endif
                         {
                             await Bot.SendTextMessageAsync(varMessage.Chat.Id, naturalLanguage.replyCall(strMassage), ParseMode.Default, false, false, iMessageID);
                             CLog.WriteLog(varMessage.Chat.Id, senderKey, strUserName, strMassage, tuple.Item1.ToString(), "");
