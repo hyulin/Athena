@@ -57,7 +57,7 @@ namespace Athena
 
         string[] whatWord = { "뭘", "뭐", "어떤", "무엇", "어느", "어떻게" };
         string[] whoWord = { "누구", "어느", "누가" };
-        string[] devWord = { "아빠", "아버지", "개발자" };
+        string[] devWord = { "아빠", "아버지", "아부지", "개발자" };
         string[] eatWord = { "먹을까", "먹지", "먹어야할", "먹나" };
         string[] hungryWord = { "배고픈데", "배고프네", "배고프다", "배고파", "배고픔" };
         string[] otherWord = { "다른", "딴", "말고" };
@@ -233,12 +233,15 @@ namespace Athena
             }
 
             string mention = "";
+            int arrIndex = 0;
             List<int> lstIndex = new List<int>();
             
             foreach (var word in morpheme)
             {
                 if (word.Pos.ToString() == "Noun" || word.Pos.ToString() == "ProperNoun")
-                    lstIndex.Add(word.Offset);
+                    lstIndex.Add(arrIndex);
+
+                arrIndex++;
             }
 
             Random wordRandom = new Random(unchecked((int)DateTime.Now.Ticks) + seed++);
@@ -513,6 +516,11 @@ namespace Athena
 
             // 만든 사람
             {
+                // 엄마 예외처리
+                if (message.Contains("엄마") == true || message.Contains("어머니") == true ||
+                    message.Contains("어무니") == true || message.Contains("엄니") == true)
+                    return "";
+
                 foreach (var word in whoWord)
                 {
                     if (message.Contains(word) == true)
