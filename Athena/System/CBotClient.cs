@@ -439,8 +439,12 @@ namespace Athena
             bool isCommand = false;
 
             // 본방에 입력된 메시지를 각 유저 정보에 입력
+#if DEBUG
+            userDirector.addMessage(senderKey, strMassage, time);
+#else
             if (senderKey != 0 && strMassage != "" && varMessage.Chat.Id == -1001202203239)
                 userDirector.addMessage(senderKey, strMassage, time);
+#endif
 
             // 명령어인지 아닌지 구분
             if (strMassage.Substring(0, 1) == "/")

@@ -60,6 +60,7 @@ namespace Athena
         string[] devWord = { "아빠", "아버지", "개발자" };
         string[] eatWord = { "먹을까", "먹지", "먹어야할", "먹나" };
         string[] hungryWord = { "배고픈데", "배고프네", "배고프다", "배고파", "배고픔" };
+        string[] otherWord = { "다른", "딴", "말고" };
 
         ////////////////////////////////////////////////////////////////
         // 형태소 분석
@@ -148,9 +149,10 @@ namespace Athena
             //--------------------------------------------------------------------------
             // 메뉴 조회
             //--------------------------------------------------------------------------
-            if (isExistMenu(message) == true)
+            Tuple<bool, bool> existMenu = isExistMenu(message, queue);
+            if (existMenu.Item1 == true)
             {
-                return Tuple.Create(getMenu(message), "", false);
+                return Tuple.Create(getMenu(message, existMenu.Item2), "", false);
             }
 
             //--------------------------------------------------------------------------
@@ -306,10 +308,10 @@ namespace Athena
         }
 
         // 메뉴 추천 감지
-        public bool isExistMenu(string message)
+        public Tuple<bool, bool> isExistMenu(string message, Queue<CMessage> queue)
         {
             if (message.Contains("먹었"))
-                return false;
+                return Tuple.Create(false, false);
 
             foreach (var word in whatWord)
             {
@@ -319,7 +321,7 @@ namespace Athena
                     {
                         if (message.Contains(eat) == true)
                         {
-                            return true;
+                            return Tuple.Create(true, false);
                         }
                     }
                 }
@@ -331,68 +333,133 @@ namespace Athena
                 {
                     if (message.Contains(word) == true)
                     {
-                        return true;
+                        return Tuple.Create(true, false);
                     }
                 }
             }
 
-            return false;
+            bool isOther = false;
+            foreach (var word in otherWord)
+            {
+                if (message.Contains(word) == true)
+                {
+                    isOther = true;
+                    break;
+                }
+            }
+
+            if (isOther == true)
+            {
+                var reverse = queue.Reverse();
+
+                int index = 0;
+                foreach (var rev in reverse)
+                {
+                    if (index >= 5)
+                        break;
+
+                    foreach (var word in whatWord)
+                    {
+                        if (rev.Message.Contains(word) == true)
+                        {
+                            foreach (var eat in eatWord)
+                            {
+                                if (rev.Message.Contains(eat) == true)
+                                {
+                                    return Tuple.Create(true, true);
+                                }
+                            }
+                        }
+                    }
+
+                    if (rev.Message.Contains("메뉴") == true)
+                    {
+                        foreach (var word in enterCommand)
+                        {
+                            if (rev.Message.Contains(word) == true)
+                            {
+                                return Tuple.Create(true, true);
+                            }
+                        }
+                    }
+
+                    foreach (var word in otherWord)
+                    {
+                        if (rev.Message.Contains(word) == true)
+                        {
+                            return Tuple.Create(true, true);
+                        }
+                    }
+
+                    index++;
+                }
+            }
+
+            return Tuple.Create(false, false);
         }
 
         // 메뉴 추천
-        public string getMenu(string message)
+        public string getMenu(string message, bool isOther)
         {
             int seed = 10;
             Random menuRandom = new Random(unchecked((int)DateTime.Now.Ticks) + seed++);
             Random enterRandom = new Random(unchecked((int)DateTime.Now.Ticks) + seed++);
 
+            string breakfast = "아침은 ";
+            string lunch = "점심은 ";
+            string dinner = "저녁은 ";
+            string snack = "야식은 ";
+
+            if (isOther == true)
+                breakfast = lunch = dinner = snack = "그럼 ";
+
             if (message.Contains("아침") == true)
             {
                 int menuNum = menuRandom.Next(0, morningMenu.Count());
                 int enterNum = enterRandom.Next(0, enterMenu.Count());
-                return "아침은 " + morningMenu.ElementAt(menuNum) + " " + enterMenu.ElementAt(enterNum);
+                return breakfast + morningMenu.ElementAt(menuNum) + " " + enterMenu.ElementAt(enterNum);
             }
             else if (message.Contains("점심") == true)
             {
                 int menuNum = menuRandom.Next(0, lunchMenu.Count());
                 int enterNum = enterRandom.Next(0, enterMenu.Count());
-                return "점심은 " + lunchMenu.ElementAt(menuNum) + " " + enterMenu.ElementAt(enterNum);
+                return lunch + lunchMenu.ElementAt(menuNum) + " " + enterMenu.ElementAt(enterNum);
             }
             else if (message.Contains("저녁") == true)
             {
                 int menuNum = menuRandom.Next(0, dinnerMenu.Count());
                 int enterNum = enterRandom.Next(0, enterMenu.Count());
-                return "저녁은 " + dinnerMenu.ElementAt(menuNum) + " " + enterMenu.ElementAt(enterNum);
+                return dinner + dinnerMenu.ElementAt(menuNum) + " " + enterMenu.ElementAt(enterNum);
             }
             else if (message.Contains("야식") == true)
             {
                 int menuNum = menuRandom.Next(0, nightMenu.Count());
                 int enterNum = enterRandom.Next(0, enterMenu.Count());
-                return "야식은 " + nightMenu.ElementAt(menuNum) + " " + enterMenu.ElementAt(enterNum);
+                return snack + nightMenu.ElementAt(menuNum) + " " + enterMenu.ElementAt(enterNum);
             }
             else if (DateTime.Now.Hour >= 6 && DateTime.Now.Hour <= 9)
             {
                 int menuNum = menuRandom.Next(0, morningMenu.Count());
                 int enterNum = enterRandom.Next(0, enterMenu.Count());
-                return "아침은 " + morningMenu.ElementAt(menuNum) + " " + enterMenu.ElementAt(enterNum);
+                return breakfast + morningMenu.ElementAt(menuNum) + " " + enterMenu.ElementAt(enterNum);
             }
             else if (DateTime.Now.Hour >= 10 && DateTime.Now.Hour <= 14)
             {
                 int menuNum = menuRandom.Next(0, lunchMenu.Count());
                 int enterNum = enterRandom.Next(0, enterMenu.Count());
-                return "점심은 " + lunchMenu.ElementAt(menuNum) + " " + enterMenu.ElementAt(enterNum);
+                return lunch + lunchMenu.ElementAt(menuNum) + " " + enterMenu.ElementAt(enterNum);
             }
             else if (DateTime.Now.Hour >= 15 && DateTime.Now.Hour <= 22)
             {
                 int menuNum = menuRandom.Next(0, dinnerMenu.Count());
                 int enterNum = enterRandom.Next(0, enterMenu.Count());
-                return "저녁은 " + dinnerMenu.ElementAt(menuNum) + " " + enterMenu.ElementAt(enterNum);
+                return dinner + dinnerMenu.ElementAt(menuNum) + " " + enterMenu.ElementAt(enterNum);
             }
             else
             {
                 int menuNum = menuRandom.Next(0, nightMenu.Count());
                 int enterNum = enterRandom.Next(0, enterMenu.Count());
-                return "야식은 " + nightMenu.ElementAt(menuNum) + " " + enterMenu.ElementAt(enterNum);
+                return snack + nightMenu.ElementAt(menuNum) + " " + enterMenu.ElementAt(enterNum);
             }
         }
 
