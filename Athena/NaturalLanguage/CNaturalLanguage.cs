@@ -355,7 +355,7 @@ namespace Athena
                 int index = 0;
                 foreach (var rev in reverse)
                 {
-                    if (index >= 5)
+                    if (index >= 3)
                         break;
 
                     foreach (var word in whatWord)
