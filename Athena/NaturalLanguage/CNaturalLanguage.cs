@@ -197,7 +197,7 @@ namespace Athena
             Random ansRandom = new Random(unchecked((int)DateTime.Now.Ticks) + seed++);
             if (ansRandom.Next(20) != 1)
                 return emptyTuple;
-            
+
             foreach (var word in morpheme)
             {
                 Random random = new Random(unchecked((int)DateTime.Now.Ticks) + seed++);
@@ -243,6 +243,9 @@ namespace Athena
 
                 arrIndex++;
             }
+
+            if (lstIndex.Count() == 0)
+                return emptyTuple;
 
             Random wordRandom = new Random(unchecked((int)DateTime.Now.Ticks) + seed++);
             int index = wordRandom.Next(lstIndex.Count());
@@ -792,7 +795,7 @@ namespace Athena
             //--------------------------------------------------------
             // 뽑기 감지
             //--------------------------------------------------------
-            if (text.Contains("중에") == true && text.Contains("나중에") == false)
+            if (text.Contains("중에") == true && text.Contains("나중에") == false && text.Contains("도중에") == false)
             {
                 string contents = "";
                 
@@ -819,7 +822,9 @@ namespace Athena
                     }
                 }
 
-                return "/뽑기" + contents;
+                if (contents != "")
+                    return "/뽑기" + contents;
+                
             }
 
 
