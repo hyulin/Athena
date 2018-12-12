@@ -486,6 +486,8 @@ namespace Athena
 
             if (isQuestion == false)
             {
+                // isQuestion = false;
+
                 foreach (var word in enterCommand)
                 {
                     if (message.Contains(word) == true)
@@ -582,6 +584,8 @@ namespace Athena
 
                 if (isContinue == true)
                 {
+                    isContinue = false;
+
                     foreach (var word in makeWord)
                     {
                         if (message.Contains(word) == true)
