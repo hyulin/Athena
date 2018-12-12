@@ -51,6 +51,7 @@ namespace Athena
         };
 
         string[] choiceWord = { "이랑", "랑", "," };
+        string[] pickWord = { "골라", "뽑아", "좋을", "나을" };
 
         string[] offWork = { "퇴근합니다", "퇴근 합니다", "퇴근합니당", "퇴근 합니당", "퇴근합니닷", "퇴근 합니닷", "퇴근~", "퇴근!", "퇴근하겠" };
         string[] makeWord = { "만들", "만든", "제작", "개발" };
@@ -357,11 +358,12 @@ namespace Athena
             if (isOther == true)
             {
                 var reverse = queue.Reverse();
-
                 int index = 0;
+                isOther = false;
+
                 foreach (var rev in reverse)
                 {
-                    if (index >= 3)
+                    if (index >= 5)
                         break;
 
                     foreach (var word in whatWord)
@@ -386,14 +388,6 @@ namespace Athena
                             {
                                 return Tuple.Create(true, true);
                             }
-                        }
-                    }
-
-                    foreach (var word in otherWord)
-                    {
-                        if (rev.Message.Contains(word) == true)
-                        {
-                            return Tuple.Create(true, true);
                         }
                     }
 
@@ -798,33 +792,45 @@ namespace Athena
             if (text.Contains("중에") == true && text.Contains("나중에") == false && text.Contains("도중에") == false)
             {
                 string contents = "";
-                
-                foreach (var word in split)
+                bool isQuestion = false;
+
+                foreach (var word in pickWord)
                 {
-                    if (word.Contains("아테나") == true)
-                        continue;
-
-                    if (word.Contains("중에") == true)
-                        break;
-
-                    string[] spliteItem = word.Split(',');
-
-                    foreach (var item in spliteItem)
+                    if (text.Contains(word) == true)
                     {
-                        string replaceItem = item;
-
-                        foreach (var choice in choiceWord)
-                        {
-                            replaceItem = replaceItem.Replace(choice, "");
-                        }
-
-                        contents += " " + replaceItem;
+                        isQuestion = true;
+                        break;
                     }
                 }
 
-                if (contents != "")
-                    return "/뽑기" + contents;
-                
+                if (isQuestion == true)
+                {
+                    foreach (var word in split)
+                    {
+                        if (word.Contains("아테나") == true)
+                            continue;
+
+                        if (word.Contains("중에") == true)
+                            break;
+
+                        string[] spliteItem = word.Split(',');
+
+                        foreach (var item in spliteItem)
+                        {
+                            string replaceItem = item;
+
+                            foreach (var choice in choiceWord)
+                            {
+                                replaceItem = replaceItem.Replace(choice, "");
+                            }
+
+                            contents += " " + replaceItem;
+                        }
+                    }
+
+                    if (contents != "")
+                        return "/뽑기" + contents;
+                }
             }
 
 
