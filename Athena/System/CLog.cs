@@ -15,7 +15,7 @@ namespace Athena
 
             if (chatID == -1001202203239)
                 chatName = "클랜방";
-            else if (chatID == -1001312491933)
+            else if (chatID == -1001219697643)
                 chatName = "운영진방";
             else if (chatID == -1001389956706)
                 chatName = "사전안내방";

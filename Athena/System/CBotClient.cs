@@ -280,7 +280,7 @@ namespace Athena
                     strPrint += "굿모닝~ 오늘도 즐거운 하루 되세요~ :)";
 
 #if DEBUG
-                    Bot.SendTextMessageAsync(-1001312491933, strPrint);  // 운영진방
+                    Bot.SendTextMessageAsync(-1001219697643, strPrint);  // 운영진방
 #else
                     Bot.SendTextMessageAsync(-1001202203239, strPrint);  // 클랜방
 #endif
@@ -337,7 +337,7 @@ namespace Athena
                     }
 
 #if DEBUG
-                    Bot.SendTextMessageAsync(-1001312491933, strPrint);  // 운영진방
+                    Bot.SendTextMessageAsync(-1001219697643, strPrint);  // 운영진방
 #else
                     Bot.SendTextMessageAsync(-1001202203239, strPrint);  // 클랜방
 #endif
@@ -380,9 +380,11 @@ namespace Athena
                     strInfo += "\n";
                     strInfo += "클랜 생활에 불편하신 점이 있으시거나\n";
                     strInfo += "건의사항, 문의사항이 있으실 때는\n";
-                    strInfo += "운영자 냉각콜라(@Seungman),\n";
-                    strInfo += "운영자 만슬(@mans3ul)에게 문의해주세요.\n";
-                    strInfo += "\n";
+                    strInfo += "냉각콜라(@Seungman),\n";
+                    strInfo += "휴린(@hyulin),\n";
+                    strInfo += "만슬(@mans3ul),\n";
+                    strInfo += "LUMINOX(@urusaikara)에게\n";
+                    strInfo += "문의해주세요.\n\n";
                     strInfo += "클랜원들의 편의를 위한\n";
                     strInfo += "저, 아테나의 기능을 확인하시려면\n";
                     strInfo += "/도움말 을 입력해주세요.\n";
@@ -422,7 +424,7 @@ namespace Athena
 
             // CDT 관련방 아니면 동작하지 않도록 수정
             if (varMessage.Chat.Id != -1001202203239 &&     // 본방
-                varMessage.Chat.Id != -1001312491933 &&     // 운영진방
+                varMessage.Chat.Id != -1001219697643 &&     // 운영진방
                 varMessage.Chat.Id != -1001389956706 &&     // 사전안내방
                 varMessage.Chat.Username != "hyulin")
             {
