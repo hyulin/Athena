@@ -144,8 +144,9 @@ namespace Athena
                         CUser user = new CUser();
                         user = setUserInfo(row, Convert.ToInt64(row[10].ToString()));
 
-                        // 휴린, 냉각콜라, 만슬일 경우
-                        if ( (user.UserKey == 23842788) || (user.UserKey == 50872681) || (user.UserKey == 474057213) )
+                        // 휴린, 냉각콜라, 만슬, 루미녹스일 경우
+                        if ((user.UserKey == 23842788) || (user.UserKey == 50872681) ||
+                            (user.UserKey == 474057213) || (user.UserKey == 83970696))
                         {
                             // 유저 타입을 관리자로
                             user.UserType = USER_TYPE.USER_TYPE_ADMIN;
@@ -191,8 +192,9 @@ namespace Athena
             user.Time = row[8].ToString();
             user.Info = row[9].ToString();
 
-            // 휴린, 냉각콜라, 만슬일 경우
-            if ((user.UserKey == 23842788) || (user.UserKey == 50872681) || (user.UserKey == 474057213))
+            // 휴린, 냉각콜라, 만슬, 루미녹스일 경우
+            if ((user.UserKey == 23842788) || (user.UserKey == 50872681) ||
+                (user.UserKey == 474057213) || (user.UserKey == 83970696))
             {
                 // 유저 타입을 관리자로
                 user.UserType = USER_TYPE.USER_TYPE_ADMIN;
