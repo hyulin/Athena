@@ -2750,12 +2750,13 @@ namespace Athena
                     return;
                 }
 
+                // 현재 경로
                 if (strContents == "")
                 {
-                    nasInfo.CurrentPath = @"D:\CDT\";
                     await Bot.SendTextMessageAsync(varMessage.Chat.Id, nasInfo.CurrentPath, ParseMode.Default, false, false, iMessageID);
                     return;
                 }
+                // 한 단계 위로 이동
                 else if (strContents == "..")
                 {
                     if (nasInfo.CurrentPath == @"D:\CDT\")
@@ -2768,6 +2769,13 @@ namespace Athena
                     nasInfo.CurrentPath = nasInfo.CurrentPath.Substring(0, nasInfo.CurrentPath.LastIndexOf('\\'));
                     nasInfo.CurrentPath += @"\";
                     await Bot.SendTextMessageAsync(varMessage.Chat.Id, nasInfo.CurrentPath, ParseMode.Default, false, false, iMessageID);
+                }
+                // 최상위 경로로 이동
+                else if (strContents == "\\")
+                {
+                    nasInfo.CurrentPath = @"D:\CDT\";
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, nasInfo.CurrentPath, ParseMode.Default, false, false, iMessageID);
+                    return;
                 }
                 else
                 {
