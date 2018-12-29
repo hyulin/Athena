@@ -50,6 +50,7 @@ namespace Athena
         CEasterEgg EasterEgg = new CEasterEgg();
         CUserDirector userDirector = new CUserDirector();
         CNaturalLanguage naturalLanguage = new CNaturalLanguage();
+        CNasInfo nasInfo = new CNasInfo();
 
         bool isGoodMorning = false;
 
@@ -89,6 +90,10 @@ namespace Athena
 
             // 시트에서 유저 정보를 Load
             loadUserInfo();
+
+
+            // NAS 경로 기본값 설정
+            nasInfo.CurrentPath = @"D:\CDT\";
 
 
             // 타이머 생성 및 시작
@@ -355,7 +360,10 @@ namespace Athena
 
             if (varMessage == null || (varMessage.Type != MessageType.Text && varMessage.Type != MessageType.ChatMembersAdded))
             {
-                return;
+                if (varMessage.Caption != "/up")
+                    return;
+                else
+                    varMessage.Text = "/up";
             }
 
             DateTime convertTime = varMessage.Date.AddHours(9);
@@ -767,12 +775,12 @@ namespace Athena
                         {
                             var row = values[index];
                             var todo = values[index + 1];
-                            
-                            for(int wday = 0; wday < 8/*일주일 7일 + 빈칸 1개*/; wday++)
+
+                            for (int wday = 0; wday < 8/*일주일 7일 + 빈칸 1개*/; wday++)
                             {
                                 CCalendar calendar = new CCalendar();
                                 string weekDay = "";
-                                
+
                                 // 중간에 한 칸이 비어있음
                                 if (wday == 1)
                                     continue;
@@ -1719,8 +1727,8 @@ namespace Athena
                                 {
                                     CVoteRanking ranking = new CVoteRanking();
 
-                                    if ( (value[i].ToString() == "1") || (value[i].ToString() == "2") || (value[i].ToString() == "3") || (value[i].ToString() == "4") ||
-                                        (value[i].ToString() == "5") || (value[i].ToString() == "6") || (value[i].ToString() == "7") || (value[i].ToString() == "8") )
+                                    if ((value[i].ToString() == "1") || (value[i].ToString() == "2") || (value[i].ToString() == "3") || (value[i].ToString() == "4") ||
+                                        (value[i].ToString() == "5") || (value[i].ToString() == "6") || (value[i].ToString() == "7") || (value[i].ToString() == "8"))
                                     {
                                         ranking.setRanking(Convert.ToInt32(value[i].ToString()), value[i + 1].ToString(), value[i + 2].ToString(), Convert.ToInt32(value[i + 3].ToString()), value[i + 4].ToString());
                                         voteDirector.AddRanking(ranking);
@@ -1822,7 +1830,7 @@ namespace Athena
                                 }
 
                                 int voteIndex = Convert.ToInt32(strContents);
-                                if ( (voteIndex <= 0) || (voteIndex > voteDirector.GetItemCount()) )
+                                if ((voteIndex <= 0) || (voteIndex > voteDirector.GetItemCount()))
                                 {
                                     await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 투표 항목을 잘못 선택하셨습니다.", ParseMode.Default, false, false, iMessageID);
                                     return;
@@ -2064,7 +2072,7 @@ namespace Athena
             //========================================================================================
             // 스크림
             //========================================================================================
-            else if ( (strCommend == "/스크림") || (strCommend == "/오픈디비전") )
+            else if ((strCommend == "/스크림") || (strCommend == "/오픈디비전"))
             {
                 string sheetName = "";
 
@@ -2173,7 +2181,7 @@ namespace Athena
                     }
 
                     int size = strContents.Length;
-                    string[] day = {"", "", "", "", "", "", ""};
+                    string[] day = { "", "", "", "", "", "", "" };
                     bool isConfirmDay = false;
                     bool isCancel = false;
 
@@ -2237,7 +2245,7 @@ namespace Athena
                             return;
                         }
                     }
-                    
+
                     String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
                     CUser user = new CUser();
 
@@ -2404,7 +2412,7 @@ namespace Athena
                             ValueRange valueRange = new ValueRange();
                             valueRange.MajorDimension = "ROWS"; //"ROWS";//COLUMNS 
 
-                            var oblist = new List<object>() {"","","","","","","","","","","","","","","","","","","","",""};
+                            var oblist = new List<object>() { "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "" };
                             valueRange.Values = new List<IList<object>> { oblist };
 
                             SpreadsheetsResource.ValuesResource.UpdateRequest updateRequest = service.Spreadsheets.Values.Update(valueRange, spreadsheetId, range);
@@ -2462,7 +2470,7 @@ namespace Athena
                                 var day = values[6];
                                 var count = values[7];
 
-                                for (int i=0; i<7; i++)
+                                for (int i = 0; i < 7; i++)
                                 {
                                     strPrint += "- " + day[i].ToString() + " : " + count[i].ToString() + "명\n";
                                 }
@@ -2618,7 +2626,7 @@ namespace Athena
                                 }
                             }
 
-                            if (isInput == false  && isBlank == false && index == 0)
+                            if (isInput == false && isBlank == false && index == 0)
                             {
                                 index = count;
                             }
@@ -2663,7 +2671,7 @@ namespace Athena
                         ValueRange valueRange = new ValueRange();
                         valueRange.MajorDimension = "ROWS"; //"ROWS";//COLUMNS 
 
-                        var oblist = new List<object>() {"","","","","","","",""};
+                        var oblist = new List<object>() { "", "", "", "", "", "", "", "" };
                         valueRange.Values = new List<IList<object>> { oblist };
 
                         SpreadsheetsResource.ValuesResource.UpdateRequest updateRequest = service.Spreadsheets.Values.Update(valueRange, spreadsheetId, range);
@@ -2688,6 +2696,148 @@ namespace Athena
                     {
                         await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 일정 조사를 할 수 없습니다.", ParseMode.Default, false, false, iMessageID);
                     }
+                }
+            }
+            //========================================================================================
+            // NAS 파일 리스트
+            //========================================================================================
+            else if (strCommend == "/dir")
+            {
+                // 관리자 전용 명령어
+                if ((userDirector.getUserInfo(senderKey).UserType != USER_TYPE.USER_TYPE_ADMIN) ||
+                    (varMessage.Chat.Id != -1001219697643))
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "권한이 없는 유저 또는 대화방입니다.", ParseMode.Default, false, false, iMessageID);
+                    return;
+                }
+
+                String FolderName = nasInfo.CurrentPath;
+                System.IO.DirectoryInfo directory = new System.IO.DirectoryInfo(FolderName);
+                if (directory.Exists == true)
+                {
+                    strPrint += nasInfo.CurrentPath + "\n\n";
+
+                    foreach (var file in directory.GetDirectories())
+                    {
+                        strPrint += "[D] " + file.Name + "\n";
+                    }
+                    foreach (var file in directory.GetFiles())
+                    {
+                        strPrint += file.Name + "\n";
+                    }
+                }
+
+                if (strPrint != "")
+                {
+                    nasInfo.CurrentPath = FolderName;
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
+                }
+                else
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[SYSTEM] 경로가 존재하지 않습니다.\n" + FolderName, ParseMode.Default, false, false, iMessageID);
+                }
+            }
+            //========================================================================================
+            // NAS 폴더 이동
+            //========================================================================================
+            else if (strCommend == "/cd")
+            {
+                // 관리자 전용 명령어
+                if ((userDirector.getUserInfo(senderKey).UserType != USER_TYPE.USER_TYPE_ADMIN) ||
+                    (varMessage.Chat.Id != -1001219697643))
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "권한이 없는 유저 또는 대화방입니다.", ParseMode.Default, false, false, iMessageID);
+                    return;
+                }
+
+                if (strContents == "")
+                {
+                    nasInfo.CurrentPath = @"D:\CDT\";
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, nasInfo.CurrentPath, ParseMode.Default, false, false, iMessageID);
+                    return;
+                }
+                else if (strContents == "..")
+                {
+                    if (nasInfo.CurrentPath == @"D:\CDT\")
+                    {
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "최상위 경로입니다.", ParseMode.Default, false, false, iMessageID);
+                        return;
+                    }
+
+                    nasInfo.CurrentPath = nasInfo.CurrentPath.Substring(0, nasInfo.CurrentPath.LastIndexOf('\\'));
+                    nasInfo.CurrentPath = nasInfo.CurrentPath.Substring(0, nasInfo.CurrentPath.LastIndexOf('\\'));
+                    nasInfo.CurrentPath += @"\";
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, nasInfo.CurrentPath, ParseMode.Default, false, false, iMessageID);
+                }
+                else
+                {
+                    String FolderName = nasInfo.CurrentPath + strContents + @"\";
+                    System.IO.DirectoryInfo directory = new System.IO.DirectoryInfo(FolderName);
+                    if (directory.Exists == true)
+                    {
+                        nasInfo.CurrentPath = FolderName;
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, nasInfo.CurrentPath, ParseMode.Default, false, false, iMessageID);
+                    }
+                    else
+                    {
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[SYSTEM] 경로가 존재하지 않습니다.\n" + FolderName, ParseMode.Default, false, false, iMessageID);
+                    }
+                }
+            }
+            //========================================================================================
+            // NAS 파일 다운로드
+            //========================================================================================
+            else if (strCommend == "/down")
+            {
+                // 관리자 전용 명령어
+                if ((userDirector.getUserInfo(senderKey).UserType != USER_TYPE.USER_TYPE_ADMIN) ||
+                    (varMessage.Chat.Id != -1001219697643))
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "권한이 없는 유저 또는 대화방입니다.", ParseMode.Default, false, false, iMessageID);
+                    return;
+                }
+
+                if (strContents == "")
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 파일명을 입력해주세요.", ParseMode.Default, false, false, iMessageID);
+                    return;
+                }
+
+                string FileName = nasInfo.CurrentPath + strContents;
+                System.IO.FileInfo file = new System.IO.FileInfo(FileName);
+                if (file.Exists == true)
+                {
+                    var fileStream = new FileStream(FileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    var stream = new Telegram.Bot.Types.InputFiles.InputOnlineFile(fileStream, strContents);
+
+                    await Bot.SendDocumentAsync(varMessage.Chat.Id, stream);
+                }
+                else
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[SYSTEM] 파일이 존재하지 않습니다.\n" + FileName, ParseMode.Default, false, false, iMessageID);
+                }
+            }
+            //========================================================================================
+            // NAS 파일 다운로드
+            //========================================================================================
+            else if (strCommend == "/up")
+            {
+                // 관리자 전용 명령어
+                if ((userDirector.getUserInfo(senderKey).UserType != USER_TYPE.USER_TYPE_ADMIN) ||
+                    (varMessage.Chat.Id != -1001219697643))
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "권한이 없는 유저 또는 대화방입니다.", ParseMode.Default, false, false, iMessageID);
+                    return;
+                }
+
+                // Download File
+                var file = await Bot.GetFileAsync(varMessage.Document.FileId);                
+                var fileName = nasInfo.CurrentPath + varMessage.Document.FileName;
+
+                using (var saveStream = new FileStream(fileName, FileMode.CreateNew, FileAccess.Write))
+                {
+                    await Bot.DownloadFileAsync(file.FilePath, saveStream);
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[SYSTEM] 파일 업로드 완료.\n" + fileName, ParseMode.Default, false, false, iMessageID);
                 }
             }
             //========================================================================================

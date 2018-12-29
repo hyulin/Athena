@@ -54,4 +54,3 @@ C:\Project\Athena\Athena\obj\x64\Debug\Athena.Properties.Resources.resources
 C:\Project\Athena\Athena\obj\x64\Debug\Athena.csproj.GenerateResource.cache
 C:\Project\Athena\Athena\obj\x64\Debug\Athena.exe
 C:\Project\Athena\Athena\obj\x64\Debug\Athena.pdb
-C:\Project\Athena\Athena\obj\x64\Debug\Athena.csprojResolveAssemblyReference.cache

@@ -171,6 +171,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClanFunction\CWeather.cs" />
+    <Compile Include="ClanFunction\NAS\CNasInfo.cs" />
     <Compile Include="System\CBotClient.cs" />
     <Compile Include="ClanFunction\Calendar\CCalendar.cs" />
     <Compile Include="ClanFunction\Calendar\CCalendarDirector.cs" />
