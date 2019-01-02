@@ -1037,30 +1037,30 @@ namespace Athena
                 // Define request parameters.
                 String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
 
-                if (strContents == "")
-                {
-                    String range = "경기 URL (2019)!B5:G";
-                    SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
-                    ValueRange response = request.Execute();
-                    if (response != null)
-                    {
-                        IList<IList<Object>> values = response.Values;
-                        if (values != null && values.Count > 0)
-                        {
-                            foreach (var row in values)
-                            {
-                                if (row.Count() == 6 && row[0].ToString() != "")
-                                {
-                                    strPrint += "[" + row[0].ToString() + "] " + row[1].ToString() + "\n";
-                                }
-                            }
-                        }
-                    }
+                //if (strContents == "")
+                //{
+                //    String range = "경기 URL (2019)!B5:G";
+                //    SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+                //    ValueRange response = request.Execute();
+                //    if (response != null)
+                //    {
+                //        IList<IList<Object>> values = response.Values;
+                //        if (values != null && values.Count > 0)
+                //        {
+                //            foreach (var row in values)
+                //            {
+                //                if (row.Count() == 6 && row[0].ToString() != "")
+                //                {
+                //                    strPrint += "[" + row[0].ToString() + "] " + row[1].ToString() + "\n";
+                //                }
+                //            }
+                //        }
+                //    }
 
-                    strPrint += "\n/영상 날짜로 영상 주소를 조회하실 수 있습니다.\n";
-                    strPrint += "(ex: /영상 181006)";
-                }
-                else if (strContents.Length == 6)
+                //    strPrint += "\n/영상 날짜로 영상 주소를 조회하실 수 있습니다.\n";
+                //    strPrint += "(ex: /영상 181006)";
+                //}
+                if (strContents.Length == 6)
                 {
                     string year = "";
                     string month = "";
@@ -1109,6 +1109,9 @@ namespace Athena
                             }
                         }
                     }
+
+                    strPrint += "\n/영상 날짜로 영상 주소를 조회하실 수 있습니다.\n";
+                    strPrint += "(ex: /영상 20181006)";
                 }
                 else if (strContents.Length == 8)
                 {

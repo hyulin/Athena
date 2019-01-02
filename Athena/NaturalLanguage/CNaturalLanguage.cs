@@ -122,7 +122,7 @@ namespace Athena
                     else
                         day = System.DateTime.Now.Day;
 
-                    string date = (System.DateTime.Now.Year - 2000).ToString("D2") + System.DateTime.Now.Month.ToString("D2") + day.ToString("D2");
+                    string date = System.DateTime.Now.Year.ToString("D4") + System.DateTime.Now.Month.ToString("D2") + day.ToString("D2");
 
                     Tuple<string, string, bool> tuple = Tuple.Create("/영상", date, true);
                     return tuple;
@@ -135,14 +135,14 @@ namespace Athena
                     else
                         day = System.DateTime.Now.Day - 1;
 
-                    string date = (System.DateTime.Now.Year - 2000).ToString("D2") + System.DateTime.Now.Month.ToString("D2") + day.ToString("D2");
+                    string date = System.DateTime.Now.Year.ToString("D4") + System.DateTime.Now.Month.ToString("D2") + day.ToString("D2");
 
                     Tuple<string, string, bool> tuple = Tuple.Create("/영상", date, true);
                     return tuple;
                 }
                 else if (isVideo == true)
                 {
-                    Tuple<string, string, bool> tuple = Tuple.Create("/영상", "", true);
+                    Tuple<string, string, bool> tuple = Tuple.Create("/영상", System.DateTime.Now.Year.ToString("D4") + System.DateTime.Now.Month.ToString("D2"), true);
                     return tuple;
                 }
             }
@@ -964,7 +964,7 @@ namespace Athena
 
                     if (month > 0 && day > 0)
                     {
-                        return "/영상 18" + month.ToString("D2") + day.ToString("D2");
+                        return "/영상 " + System.DateTime.Now.Year.ToString() + month.ToString("D2") + day.ToString("D2");
                     }
                     else
                     {
