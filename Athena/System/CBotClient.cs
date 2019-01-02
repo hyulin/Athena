@@ -1036,11 +1036,11 @@ namespace Athena
             {
                 // Define request parameters.
                 String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
-                String range = "경기 URL!B5:G";
-                SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
                 if (strContents == "")
                 {
+                    String range = "경기 URL (2019)!B5:G";
+                    SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
                     ValueRange response = request.Execute();
                     if (response != null)
                     {
@@ -1060,15 +1060,67 @@ namespace Athena
                     strPrint += "\n/영상 날짜로 영상 주소를 조회하실 수 있습니다.\n";
                     strPrint += "(ex: /영상 181006)";
                 }
-                else
+                else if (strContents.Length == 6)
                 {
-                    string year = "20" + strContents.Substring(0, 2);
-                    string month = strContents.Substring(2, 2);
-                    string day = strContents.Substring(4, 2);
-                    string date = year + "." + month + "." + day;
+                    string year = "";
+                    string month = "";
+                    bool[] isPass = new bool[3];
+
+                    if (strContents.Length >= 4)
+                    {
+                        year = strContents.Substring(0, 4);
+                        isPass[0] = false;
+                    }
+                    else
+                    {
+                        isPass[0] = true;
+                    }
+
+                    if (strContents.Length >= 6)
+                    {
+                        month = strContents.Substring(4, 2);
+                        isPass[1] = false;
+                    }
+                    else
+                    {
+                        isPass[1] = true;
+                    }
+
+                    String range = range = "경기 URL (" + year + ")!B5:G";
+                    SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+                    ValueRange response = request.Execute();
+                    if (response != null)
+                    {
+                        IList<IList<Object>> values = response.Values;
+                        if (values != null && values.Count > 0)
+                        {
+                            foreach (var row in values)
+                            {
+                                if (row.Count() == 6 && row[0].ToString() != "")
+                                {
+                                    string[] splitDate = row[0].ToString().Split('.');
+
+                                    if (isPass[0] == false && splitDate[0] == year)
+                                    {
+                                        if (isPass[1] == false && splitDate[1] == month)
+                                            strPrint += "[" + row[0].ToString() + "] " + row[1].ToString() + "\n";
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                else if (strContents.Length == 8)
+                {
+                    string year = strContents.Substring(0, 4);
+                    string month = strContents.Substring(4, 2);
+                    string day = strContents.Substring(6, 2);
                     bool bContinue = false;
                     string user = "";
+                    string date = year + "." + month + "." + day;
 
+                    String range = range = "경기 URL (" + year + ")!B5:G";
+                    SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
                     ValueRange response = request.Execute();
                     if (response != null)
                     {
@@ -1125,6 +1177,11 @@ namespace Athena
                             }
                         }
                     }
+                }
+                else
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 날짜를 잘못 입력했습니다.\n(ex: /영상 201812 , /영상 20181215)", ParseMode.Default, false, false, iMessageID);
+                    return;
                 }
 
                 if (strPrint != "")
