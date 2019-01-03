@@ -491,10 +491,6 @@ namespace Athena
                 if (varMessage.Chat.Id == -1001202203239)
                     isMainRoom = true;
 
-                // 해당 유저에게 대답하지 않음
-                if (senderKey == 204241414)
-                    return;
-
                 Tuple<string, string, bool> tuple = naturalLanguage.morphemeProcessor(strMassage, userDirector.getMessage(senderKey), isMainRoom);
 
                 // 대화
@@ -526,7 +522,7 @@ namespace Athena
                         if (varMessage.ReplyToMessage.From.Username.ToString().Contains("CDT_Noti_Bot") == true)
 #endif
                         {
-                            await Bot.SendTextMessageAsync(varMessage.Chat.Id, naturalLanguage.replyCall(strMassage, senderKey), ParseMode.Default, false, false, iMessageID);
+                            await Bot.SendTextMessageAsync(varMessage.Chat.Id, naturalLanguage.replyCall(strMassage), ParseMode.Default, false, false, iMessageID);
                             CLog.WriteLog(varMessage.Chat.Id, senderKey, strUserName, strMassage, tuple.Item1.ToString(), "");
                         }
                     }

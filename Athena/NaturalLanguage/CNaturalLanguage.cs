@@ -650,34 +650,12 @@ namespace Athena
         }
 
         // 대답하기
-        public string replyCall(string message, long senderKey)
+        public string replyCall(string message)
         {
             string reply = "";
 
             Random random = new Random();
-            int randomNum = 0;
-
-            // 해당 유저에게 차가운 대답
-            if (senderKey == 204241414)
-            {
-                randomNum = random.Next(3);
-                switch (randomNum)
-                {
-                    case 0:
-                        reply = "말 시키지 마세요.";
-                        break;
-                    case 1:
-                        reply = "왜 자꾸 말 시키세요?";
-                        break;
-                    case 2:
-                        reply = "얘기하고 싶지 않네요.";
-                        break;
-                }
-
-                return reply;
-            }
-
-            randomNum = random.Next(10);
+            int randomNum = random.Next(10);
             switch (randomNum)
             {
                 case 0:
