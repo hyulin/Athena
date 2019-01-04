@@ -40,6 +40,9 @@ namespace Athena
         // 유저 정보 갱신
         public bool reflechUserInfo(long userKey, CUser user)
         {
+            if (userInfo.ContainsKey(userKey) == false)
+                return false;
+
             userInfo[userKey].Name = user.Name;
             userInfo[userKey].MainBattleTag = user.MainBattleTag;
             userInfo[userKey].SubBattleTag = user.SubBattleTag;

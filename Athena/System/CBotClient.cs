@@ -656,14 +656,20 @@ namespace Athena
                             if (searchCount == 0)
                             {
                                 strPrint += "[ERROR] 배틀태그를 검색할 수 없습니다.";
+                                await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
+                                return;
                             }
                             else if (searchCount > 1)
                             {
                                 strPrint += "[ERROR] 검색 결과가 2개 이상입니다. 배틀태그를 확인해주세요.";
+                                await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
+                                return;
                             }
                             else if (searchCount < 0)
                             {
                                 strPrint += "[ERROR] 알 수 없는 문제";
+                                await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
+                                return;
                             }
                             else if (isReflesh == true)
                             {
@@ -671,36 +677,33 @@ namespace Athena
                                 {
                                     strPrint += "[SUCCESS] 갱신 완료됐습니다.";
                                 }
-                                else
-                                {
-                                    strPrint += "[ERROR] 갱신을 실패했습니다.";
-                                }
+                            }
+                            
+                            range = "클랜원 목록!M" + (7 + searchIndex);
+
+                            // Define request parameters.
+                            ValueRange valueRange = new ValueRange();
+                            valueRange.MajorDimension = "COLUMNS"; //"ROWS";//COLUMNS 
+
+                            var oblist = new List<object>() { senderKey };
+                            valueRange.Values = new List<IList<object>> { oblist };
+
+                            SpreadsheetsResource.ValuesResource.UpdateRequest updateRequest = service.Spreadsheets.Values.Update(valueRange, spreadsheetId, range);
+
+                            updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.RAW;
+                            UpdateValuesResponse updateResponse = updateRequest.Execute();
+
+                            if (updateResponse == null)
+                            {
+                                strPrint += "[ERROR] 시트를 업데이트 할 수 없습니다.";
                             }
                             else
                             {
-                                range = "클랜원 목록!M" + (7 + searchIndex);
-
-                                // Define request parameters.
-                                ValueRange valueRange = new ValueRange();
-                                valueRange.MajorDimension = "COLUMNS"; //"ROWS";//COLUMNS 
-
-                                var oblist = new List<object>() { senderKey };
-                                valueRange.Values = new List<IList<object>> { oblist };
-
-                                SpreadsheetsResource.ValuesResource.UpdateRequest updateRequest = service.Spreadsheets.Values.Update(valueRange, spreadsheetId, range);
-
-                                updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.RAW;
-                                UpdateValuesResponse updateResponse = updateRequest.Execute();
-
-                                if (updateResponse == null)
-                                {
-                                    strPrint += "[ERROR] 시트를 업데이트 할 수 없습니다.";
-                                }
-                                else
-                                {
+                                if (strPrint == "")
                                     strPrint += "[SUCCESS] 등록이 완료됐습니다.";
+
+                                if (isReflesh == false)
                                     userDirector.addUserInfo(senderKey, user);
-                                }
                             }
                         }
                     }
@@ -1034,157 +1037,175 @@ namespace Athena
             //========================================================================================
             else if (strCommend == "/영상")
             {
+                if (strContents == "")
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 날짜를 잘못 입력했습니다.\n(ex: /영상 201812 , /영상 20181215)", ParseMode.Default, false, false, iMessageID);
+                    return;
+                }
+
                 // Define request parameters.
                 String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
-
-                //if (strContents == "")
-                //{
-                //    String range = "경기 URL (2019)!B5:G";
-                //    SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
-                //    ValueRange response = request.Execute();
-                //    if (response != null)
-                //    {
-                //        IList<IList<Object>> values = response.Values;
-                //        if (values != null && values.Count > 0)
-                //        {
-                //            foreach (var row in values)
-                //            {
-                //                if (row.Count() == 6 && row[0].ToString() != "")
-                //                {
-                //                    strPrint += "[" + row[0].ToString() + "] " + row[1].ToString() + "\n";
-                //                }
-                //            }
-                //        }
-                //    }
-
-                //    strPrint += "\n/영상 날짜로 영상 주소를 조회하실 수 있습니다.\n";
-                //    strPrint += "(ex: /영상 181006)";
-                //}
-                if (strContents.Length == 6)
+                
+                if (strContents.Contains("20") == false)
                 {
-                    string year = "";
-                    string month = "";
-                    bool[] isPass = new bool[3];
-
-                    if (strContents.Length >= 4)
+                    int yearIdx = 2018;
+                    while (yearIdx != 0)
                     {
-                        year = strContents.Substring(0, 4);
-                        isPass[0] = false;
-                    }
-                    else
-                    {
-                        isPass[0] = true;
-                    }
-
-                    if (strContents.Length >= 6)
-                    {
-                        month = strContents.Substring(4, 2);
-                        isPass[1] = false;
-                    }
-                    else
-                    {
-                        isPass[1] = true;
-                    }
-
-                    String range = range = "경기 URL (" + year + ")!B5:G";
-                    SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
-                    ValueRange response = request.Execute();
-                    if (response != null)
-                    {
-                        IList<IList<Object>> values = response.Values;
-                        if (values != null && values.Count > 0)
+                        String range = "경기 URL (" + yearIdx++ + ")!B5:G";
+                        SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+                        try
                         {
-                            foreach (var row in values)
+                            ValueRange response = request.Execute();
+                            if (response != null)
                             {
-                                if (row.Count() == 6 && row[0].ToString() != "")
+                                IList<IList<Object>> values = response.Values;
+                                if (values != null && values.Count > 0)
                                 {
+                                    foreach (var row in values)
+                                    {
+                                        if (row.Count() != 6 || row[0].ToString() == "")
+                                            continue;
+
+                                        if (row[1].ToString().Contains(strContents) == true)
+                                        {
+                                            strPrint += "[" + row[0].ToString() + "] " + row[1].ToString() + "\n";
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        catch
+                        {
+                            yearIdx = 0;
+                        }
+                    }
+                }
+                else
+                {
+                    if (strContents.Length == 4 || strContents.Length == 6)
+                    {
+                        string year = "";
+                        string month = "";
+                        bool[] isPass = new bool[3];
+
+                        if (strContents.Length >= 4)
+                        {
+                            year = strContents.Substring(0, 4);
+                            isPass[0] = false;
+                        }
+                        else
+                        {
+                            isPass[0] = true;
+                        }
+
+                        if (strContents.Length >= 6)
+                        {
+                            month = strContents.Substring(4, 2);
+                            isPass[1] = false;
+                        }
+                        else
+                        {
+                            isPass[1] = true;
+                        }
+
+                        String range = "경기 URL (" + year + ")!B5:G";
+                        SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+                        ValueRange response = request.Execute();
+                        if (response != null)
+                        {
+                            IList<IList<Object>> values = response.Values;
+                            if (values != null && values.Count > 0)
+                            {
+                                foreach (var row in values)
+                                {
+                                    if (row.Count() != 6 || row[0].ToString() == "")
+                                        continue;
+
                                     string[] splitDate = row[0].ToString().Split('.');
 
                                     if (isPass[0] == false && splitDate[0] == year)
                                     {
                                         if (isPass[1] == false && splitDate[1] == month)
                                             strPrint += "[" + row[0].ToString() + "] " + row[1].ToString() + "\n";
+
+                                        if (isPass[1] == true)
+                                            strPrint += "[" + row[0].ToString() + "] " + row[1].ToString() + "\n";
                                     }
                                 }
                             }
                         }
+
+                        strPrint += "\n/영상 날짜로 영상 주소를 조회하실 수 있습니다.\n";
+                        strPrint += "(ex: /영상 20181006)";
                     }
-
-                    strPrint += "\n/영상 날짜로 영상 주소를 조회하실 수 있습니다.\n";
-                    strPrint += "(ex: /영상 20181006)";
-                }
-                else if (strContents.Length == 8)
-                {
-                    string year = strContents.Substring(0, 4);
-                    string month = strContents.Substring(4, 2);
-                    string day = strContents.Substring(6, 2);
-                    bool bContinue = false;
-                    string user = "";
-                    string date = year + "." + month + "." + day;
-
-                    String range = range = "경기 URL (" + year + ")!B5:G";
-                    SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
-                    ValueRange response = request.Execute();
-                    if (response != null)
+                    else if (strContents.Length == 8)
                     {
-                        IList<IList<Object>> values = response.Values;
-                        if (values != null && values.Count > 0)
+                        string year = strContents.Substring(0, 4);
+                        string month = strContents.Substring(4, 2);
+                        string day = strContents.Substring(6, 2);
+                        bool bContinue = false;
+                        string user = "";
+                        string date = year + "." + month + "." + day;
+
+                        String range = "경기 URL (" + year + ")!B5:G";
+                        SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+                        ValueRange response = request.Execute();
+                        if (response != null)
                         {
-                            foreach (var row in values)
+                            IList<IList<Object>> values = response.Values;
+                            if (values != null && values.Count > 0)
                             {
-                                if (row.Count >= 6)
+                                foreach (var row in values)
                                 {
-                                    if (row[0].ToString() == date)
+                                    if (row.Count >= 6)
                                     {
-                                        bContinue = true;
-                                    }
-                                    else if (row[0].ToString() != "" && bContinue == true)
-                                    {
-                                        bContinue = false;
-                                    }
-
-                                    if (bContinue == true)
-                                    {
-                                        if (row[1].ToString() != "")
+                                        if (row[0].ToString() == date)
                                         {
-                                            strPrint += "[ " + row[1].ToString() + " ]" + "\n";
+                                            bContinue = true;
+                                        }
+                                        else if (row[0].ToString() != "" && bContinue == true)
+                                        {
+                                            bContinue = false;
                                         }
 
-                                        if (row[3].ToString() == "")
+                                        if (bContinue == true)
                                         {
-                                            if (row[4].ToString() != "")
+                                            if (row[1].ToString() != "")
                                             {
-                                                strPrint += user + " (" + row[4].ToString() + ")" + " : " + row[5].ToString() + "\n";
+                                                strPrint += "[ " + row[1].ToString() + " ]" + "\n";
+                                            }
+
+                                            if (row[3].ToString() == "")
+                                            {
+                                                if (row[4].ToString() != "")
+                                                {
+                                                    strPrint += user + " (" + row[4].ToString() + ")" + " : " + row[5].ToString() + "\n";
+                                                }
+                                                else
+                                                {
+                                                    strPrint += user + " : " + row[5].ToString() + "\n";
+                                                }
+
                                             }
                                             else
                                             {
-                                                strPrint += user + " : " + row[5].ToString() + "\n";
-                                            }
+                                                if (row[4].ToString() != "")
+                                                {
+                                                    strPrint += row[3].ToString() + " (" + row[4].ToString() + ")" + " : " + row[5].ToString() + "\n";
+                                                }
+                                                else
+                                                {
+                                                    strPrint += row[3].ToString() + " : " + row[5].ToString() + "\n";
+                                                }
 
-                                        }
-                                        else
-                                        {
-                                            if (row[4].ToString() != "")
-                                            {
-                                                strPrint += row[3].ToString() + " (" + row[4].ToString() + ")" + " : " + row[5].ToString() + "\n";
+                                                user = row[3].ToString();
                                             }
-                                            else
-                                            {
-                                                strPrint += row[3].ToString() + " : " + row[5].ToString() + "\n";
-                                            }
-
-                                            user = row[3].ToString();
                                         }
                                     }
                                 }
                             }
                         }
                     }
-                }
-                else
-                {
-                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 날짜를 잘못 입력했습니다.\n(ex: /영상 201812 , /영상 20181215)", ParseMode.Default, false, false, iMessageID);
-                    return;
                 }
 
                 if (strPrint != "")
@@ -1192,6 +1213,13 @@ namespace Athena
                     const string video = @"Function/Video.jpg";
                     var fileName = video.Split(Path.DirectorySeparatorChar).Last();
                     var fileStream = new FileStream(video, FileMode.Open, FileAccess.Read, FileShare.Read);
+
+                    if (strPrint.Length > 1000)
+                    {
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
+                        return;
+                    }
+
                     await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream, strPrint, ParseMode.Default, false, iMessageID);
                 }
                 else
