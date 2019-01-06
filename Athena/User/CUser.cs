@@ -31,6 +31,7 @@ namespace Athena
     class CUser
     {
         protected int MessageCount { get; set; }
+        protected int NotiCount { get; set; }
 
         public long UserKey { get; set; }
         public string Name { get; set; }
@@ -42,8 +43,9 @@ namespace Athena
         public string OtherPick { get; set; }
         public string Time { get; set; }
         public string Info { get; set; }
-
+        
         Queue<CMessage> MessageQueue = new Queue<CMessage>();
+        Queue<CPrivateNoti> PrivateNoti = new Queue<CPrivateNoti>();
 
         public void addMessage(CMessage message)
         {
@@ -59,9 +61,28 @@ namespace Athena
             }
         }
 
+        public void addPrivateNoti(CPrivateNoti privateNoti)
+        {
+            if (NotiCount < 10)
+            {
+                NotiCount++;
+                PrivateNoti.Enqueue(privateNoti);
+            }
+            else
+            {
+                PrivateNoti.Dequeue();
+                PrivateNoti.Enqueue(privateNoti);
+            }
+        }
+
         public Queue<CMessage> getMessage()
         {
             return MessageQueue;
+        }
+
+        public Queue<CPrivateNoti> getPrivateNoti()
+        {
+            return PrivateNoti;
         }
     }
 }

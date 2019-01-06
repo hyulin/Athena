@@ -25,6 +25,12 @@ namespace Athena
             userCount++;
         }
 
+        // 전체 유저 정보를 얻어옴
+        public Dictionary<long, CUser> getAllUserInfo()
+        {
+            return userInfo;
+        }
+
         // 유저키로 유저 정보 얻어옴
         public CUser getUserInfo(long userKey)
         {
@@ -76,6 +82,36 @@ namespace Athena
             CUser userInfo = getUserInfo(userKey);
 
             return userInfo.getMessage();
+        }
+
+        public void addPrivateNoti(long userKey, string userID, string notiString, int hour, int min)
+        {
+            CPrivateNoti privateNoti = new CPrivateNoti();
+            CUser userInfo = getUserInfo(userKey);
+
+            privateNoti.Notice = notiString;
+            privateNoti.Hour = hour;
+            privateNoti.Minute = min;
+            privateNoti.UserID = userID;
+
+            userInfo.addPrivateNoti(privateNoti);
+        }
+
+        public Queue<CPrivateNoti> getPrivateNoti(long userKey)
+        {
+            CUser userInfo = getUserInfo(userKey);
+
+            return userInfo.getPrivateNoti();
+        }
+
+        public void DequeueNoti(long userKey)
+        {
+            var notiQueue = getPrivateNoti(userKey);
+
+            if (notiQueue.Count > 0)
+            {
+                notiQueue.Dequeue();
+            }
         }
     }
 }

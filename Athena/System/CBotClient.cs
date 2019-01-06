@@ -277,7 +277,7 @@ namespace Athena
         // 아래 이벤트 핸들러 실행
         public void timer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            string strPrint = "";
+           string strPrint = "";
 
             if (DateTime.Now.Hour == 8)
             {
@@ -296,6 +296,38 @@ namespace Athena
             else
             {
                 isGoodMorning = false;
+            }
+
+            var allUserInfo = userDirector.getAllUserInfo();
+
+            foreach (var elem in allUserInfo)
+            {
+                var privateNoti = elem.Value.getPrivateNoti();
+
+                if (privateNoti.Count > 0)
+                {
+                    foreach (var noti in privateNoti)
+                    {
+                        // 세팅한 시간과 동일하면
+                        if (DateTime.Now.Hour == noti.Hour && DateTime.Now.Minute == noti.Minute)
+                        {
+                            string userNoti = noti.Notice.ToString();
+
+                            strPrint += "[알림] " + userNoti + " / @" + noti.UserID;
+
+                            if (userDirector.getPrivateNoti(elem.Value.UserKey).Count > 0)
+                            {
+                                userDirector.DequeueNoti(elem.Value.UserKey);
+#if DEBUG
+                                Bot.SendTextMessageAsync(-1001219697643, strPrint);  // 운영진방
+#else
+                                Bot.SendTextMessageAsync(-1001202203239, strPrint);  // 클랜방
+#endif
+                                break;
+                            }
+                        }
+                    }
+                }
             }
 
             // Define request parameters.
@@ -428,6 +460,7 @@ namespace Athena
             // 메시지 정보 추출
             string strFirstName = varMessage.From.FirstName;
             string strLastName = varMessage.From.LastName;
+            string strUserID = varMessage.From.Username;
             int iMessageID = varMessage.MessageId;
             long senderKey = varMessage.From.Id;
             DateTime time = convertTime;
@@ -3123,6 +3156,38 @@ namespace Athena
                 else
                 {
                     await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 날씨를 조회할 수 없습니다.", ParseMode.Default, false, false, iMessageID);
+                }
+            }
+            //========================================================================================
+            // 알림
+            //========================================================================================
+            else if (strCommend == "/알림")
+            {
+                if (strContents == "")
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 시간 및 내용을 입력해주세요.", ParseMode.Default, false, false, iMessageID);
+                    return;
+                }
+
+                string[] notiString = strContents.Split(' ');
+
+                int hour = Convert.ToInt32(notiString[0].Substring(0, 2));
+                int min = Convert.ToInt32(notiString[0].Substring(2, 2));
+                
+                if (hour != 0)
+                {
+                    userDirector.addPrivateNoti(senderKey, strUserID, notiString[1].ToString(), hour, min);
+
+                    strPrint += "[SYSTEM] 알림이 적용 되었습니다.";
+                }
+
+                if (strPrint != "")
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
+                }
+                else
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 알림을 적용할 수 없습니다.", ParseMode.Default, false, false, iMessageID);
                 }
             }
             //========================================================================================

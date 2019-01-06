@@ -181,6 +181,7 @@
     <Compile Include="System\CSystemInfo.cs" />
     <Compile Include="TwitterKoreanProcessorCS.cs" />
     <Compile Include="User\CMessage.cs" />
+    <Compile Include="User\CPrivateNoti.cs" />
     <Compile Include="User\CUser.cs" />
     <Compile Include="User\CUserDirector.cs" />
     <Compile Include="ClanFunction\Vote\CVoteDirector.cs" />
