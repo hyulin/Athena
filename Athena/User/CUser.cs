@@ -30,9 +30,6 @@ namespace Athena
 
     class CUser
     {
-        protected int MessageCount { get; set; }
-        protected int NotiCount { get; set; }
-
         public long UserKey { get; set; }
         public string Name { get; set; }
         public USER_TYPE UserType { get; set; }
@@ -49,9 +46,8 @@ namespace Athena
 
         public void addMessage(CMessage message)
         {
-            if (MessageCount < 100)
+            if (MessageQueue.Count < 100)
             {
-                MessageCount++;
                 MessageQueue.Enqueue(message);
             }
             else
@@ -63,9 +59,8 @@ namespace Athena
 
         public void addPrivateNoti(CPrivateNoti privateNoti)
         {
-            if (NotiCount < 10)
+            if (PrivateNoti.Count < 10)
             {
-                NotiCount++;
                 PrivateNoti.Enqueue(privateNoti);
             }
             else
