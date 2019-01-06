@@ -3169,14 +3169,15 @@ namespace Athena
                     return;
                 }
 
-                string[] notiString = strContents.Split(' ');
+                string notiTime = strContents.Substring(0, 4);
+                string notiString = strContents.Substring(5);
 
-                int hour = Convert.ToInt32(notiString[0].Substring(0, 2));
-                int min = Convert.ToInt32(notiString[0].Substring(2, 2));
+                int hour = Convert.ToInt32(notiTime.Substring(0, 2));
+                int min = Convert.ToInt32(notiTime.Substring(2, 2));
                 
                 if (hour != 0)
                 {
-                    userDirector.addPrivateNoti(senderKey, strUserID, notiString[1].ToString(), hour, min);
+                    userDirector.addPrivateNoti(senderKey, strUserID, notiString, hour, min);
 
                     strPrint += "[SYSTEM] 알림이 적용 되었습니다.";
                 }
