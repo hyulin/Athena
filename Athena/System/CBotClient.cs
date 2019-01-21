@@ -317,7 +317,7 @@ namespace Athena
 
                             if (userDirector.getPrivateNoti(elem.Value.UserKey).Count > 0)
                             {
-                                userDirector.DequeueNoti(elem.Value.UserKey);
+                                userDirector.RemoveNoti(elem.Value.UserKey, 0);
 #if DEBUG
                                 Bot.SendTextMessageAsync(-1001219697643, strPrint);  // 운영진방
 #else
@@ -3172,7 +3172,7 @@ namespace Athena
                     }
 
                     strPrint += "[ " + strUserName + "님의 알림 ]\n";
-                    strPrint += "---------------------------------";
+                    strPrint += "--------------------------------------";
 
                     foreach (var elem in userDirector.getPrivateNoti(senderKey))
                     {
@@ -3182,6 +3182,24 @@ namespace Athena
                     await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
                     return;
                 }
+                else if (strContents.Substring(0, 2) == "제거")
+                {
+                    int hour = Convert.ToInt32(strContents.Substring(3, 2));
+                    int min = Convert.ToInt32(strContents.Substring(5, 2));
+                    int index = 0;
+
+                    foreach (var elem in userDirector.getPrivateNoti(senderKey))
+                    {
+                        if (elem.Hour == hour && elem.Minute == min)
+                        {
+                            userDirector.RemoveNoti(senderKey, index);
+                            strPrint += "[SYSTEM] 해당 알림이 제거 되었습니다.";
+                            break;
+                        }
+
+                        index++;
+                    }
+                }
                 else
                 {
                     string notiTime = strContents.Substring(0, 4);
@@ -3190,21 +3208,35 @@ namespace Athena
                     int hour = Convert.ToInt32(notiTime.Substring(0, 2));
                     int min = Convert.ToInt32(notiTime.Substring(2, 2));
 
+                    bool isSearch = false;
+
                     if (hour != 0)
                     {
-                        userDirector.addPrivateNoti(senderKey, strUserID, notiString, hour, min);
+                        foreach (var elem in userDirector.getPrivateNoti(senderKey))
+                        {
+                            if (elem.Hour == hour && elem.Minute == min)
+                            {
+                                strPrint += "[ERROR] 해당 시간에 이미 알림이 있습니다.";
+                                isSearch = true;
+                                break;
+                            }
+                        }
 
-                        strPrint += "[SYSTEM] 알림이 적용 되었습니다.";
+                        if (isSearch == false)
+                        {
+                            userDirector.addPrivateNoti(senderKey, strUserID, notiString, hour, min);
+                            strPrint += "[SYSTEM] 알림이 적용 되었습니다.";
+                        }
                     }
+                }
 
-                    if (strPrint != "")
-                    {
-                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
-                    }
-                    else
-                    {
-                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 알림을 적용할 수 없습니다.", ParseMode.Default, false, false, iMessageID);
-                    }
+                if (strPrint != "")
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
+                }
+                else
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 알림을 적용할 수 없습니다.", ParseMode.Default, false, false, iMessageID);
                 }
             }
             //========================================================================================

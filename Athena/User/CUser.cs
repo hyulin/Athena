@@ -41,19 +41,19 @@ namespace Athena
         public string Time { get; set; }
         public string Info { get; set; }
         
-        Queue<CMessage> MessageQueue = new Queue<CMessage>();
-        Queue<CPrivateNoti> PrivateNoti = new Queue<CPrivateNoti>();
+        List<CMessage> MessageQueue = new List<CMessage>();
+        List<CPrivateNoti> PrivateNoti = new List<CPrivateNoti>();
 
         public void addMessage(CMessage message)
         {
             if (MessageQueue.Count < 100)
             {
-                MessageQueue.Enqueue(message);
+                MessageQueue.Add(message);
             }
             else
             {
-                MessageQueue.Dequeue();
-                MessageQueue.Enqueue(message);
+                MessageQueue.RemoveAt(MessageQueue.Count);
+                MessageQueue.Add(message);
             }
         }
 
@@ -61,21 +61,21 @@ namespace Athena
         {
             if (PrivateNoti.Count < 10)
             {
-                PrivateNoti.Enqueue(privateNoti);
+                PrivateNoti.Add(privateNoti);
             }
             else
             {
-                PrivateNoti.Dequeue();
-                PrivateNoti.Enqueue(privateNoti);
+                PrivateNoti.RemoveAt(PrivateNoti.Count);
+                PrivateNoti.Add(privateNoti);
             }
         }
 
-        public Queue<CMessage> getMessage()
+        public List<CMessage> getMessage()
         {
             return MessageQueue;
         }
 
-        public Queue<CPrivateNoti> getPrivateNoti()
+        public List<CPrivateNoti> getPrivateNoti()
         {
             return PrivateNoti;
         }

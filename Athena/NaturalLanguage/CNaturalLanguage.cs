@@ -66,7 +66,7 @@ namespace Athena
         ////////////////////////////////////////////////////////////////
         // 형태소 분석
         ////////////////////////////////////////////////////////////////
-        public Tuple<string, string, bool> morphemeProcessor(string message, Queue<CMessage> queue, bool isMainRoom)
+        public Tuple<string, string, bool> morphemeProcessor(string message, List<CMessage> list, bool isMainRoom)
         {
             Tuple<string, string, bool> emptyTuple = Tuple.Create("", "", false);
 
@@ -150,7 +150,7 @@ namespace Athena
             //--------------------------------------------------------------------------
             // 메뉴 조회
             //--------------------------------------------------------------------------
-            Tuple<bool, bool> existMenu = isExistMenu(message, queue);
+            Tuple<bool, bool> existMenu = isExistMenu(message, list);
             if (existMenu.Item1 == true)
             {
                 return Tuple.Create(getMenu(message, existMenu.Item2), "", false);
@@ -258,7 +258,7 @@ namespace Athena
                 return emptyTuple;
 
             // 이전 대화내용 참고 기능
-            foreach (var queMsg in queue)
+            foreach (var queMsg in list)
             {
                 string time = "";
 
@@ -315,7 +315,7 @@ namespace Athena
         }
 
         // 메뉴 추천 감지
-        public Tuple<bool, bool> isExistMenu(string message, Queue<CMessage> queue)
+        public Tuple<bool, bool> isExistMenu(string message, List<CMessage> list)
         {
             if (message.Contains("먹었"))
                 return Tuple.Create(false, false);
@@ -357,8 +357,10 @@ namespace Athena
 
             if (isOther == true)
             {
-                var reverse = queue.Reverse();
+                var reverse = list;
                 int index = 0;
+
+                reverse.Reverse();
                 isOther = false;
 
                 foreach (var rev in reverse)

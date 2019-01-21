@@ -77,7 +77,7 @@ namespace Athena
             userInfo.addMessage(userMessage);
         }
 
-        public Queue<CMessage> getMessage(long userKey)
+        public List<CMessage> getMessage(long userKey)
         {
             CUser userInfo = getUserInfo(userKey);
 
@@ -97,21 +97,18 @@ namespace Athena
             userInfo.addPrivateNoti(privateNoti);
         }
 
-        public Queue<CPrivateNoti> getPrivateNoti(long userKey)
+        public List<CPrivateNoti> getPrivateNoti(long userKey)
         {
             CUser userInfo = getUserInfo(userKey);
 
             return userInfo.getPrivateNoti();
         }
 
-        public void DequeueNoti(long userKey)
+        public void RemoveNoti(long userKey, int index)
         {
             var notiQueue = getPrivateNoti(userKey);
 
-            if (notiQueue.Count > 0)
-            {
-                notiQueue.Dequeue();
-            }
+            notiQueue.RemoveAt(index);
         }
     }
 }
