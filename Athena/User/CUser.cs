@@ -52,7 +52,7 @@ namespace Athena
             }
             else
             {
-                MessageQueue.RemoveAt(MessageQueue.Count);
+                MessageQueue.RemoveAt(MessageQueue.Count - 1);
                 MessageQueue.Add(message);
             }
         }
@@ -65,7 +65,7 @@ namespace Athena
             }
             else
             {
-                PrivateNoti.RemoveAt(PrivateNoti.Count);
+                PrivateNoti.RemoveAt(PrivateNoti.Count - 1);
                 PrivateNoti.Add(privateNoti);
             }
         }
