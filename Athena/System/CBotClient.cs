@@ -306,6 +306,8 @@ namespace Athena
 
                 if (privateNoti.Count > 0)
                 {
+                    int index = 0;
+
                     foreach (var noti in privateNoti)
                     {
                         // 세팅한 시간과 동일하면
@@ -317,15 +319,18 @@ namespace Athena
 
                             if (userDirector.getPrivateNoti(elem.Value.UserKey).Count > 0)
                             {
-                                userDirector.RemoveNoti(elem.Value.UserKey, 0);
+                                userDirector.RemoveNoti(elem.Value.UserKey, index);
 #if DEBUG
                                 Bot.SendTextMessageAsync(-1001219697643, strPrint);  // 운영진방
 #else
                                 Bot.SendTextMessageAsync(-1001202203239, strPrint);  // 클랜방
 #endif
+                                index++;
                                 break;
                             }
                         }
+
+                        index++;
                     }
                 }
             }
