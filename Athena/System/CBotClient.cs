@@ -3165,30 +3165,46 @@ namespace Athena
             {
                 if (strContents == "")
                 {
-                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 시간 및 내용을 입력해주세요.", ParseMode.Default, false, false, iMessageID);
-                    return;
-                }
+                    if (userDirector.getPrivateNoti(senderKey).Count == 0)
+                    {
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 설정된 알림이 없습니다.", ParseMode.Default, false, false, iMessageID);
+                        return;
+                    }
 
-                string notiTime = strContents.Substring(0, 4);
-                string notiString = strContents.Substring(5);
+                    strPrint += "[ " + strUserName + "님의 알림 ]\n";
+                    strPrint += "---------------------------------";
 
-                int hour = Convert.ToInt32(notiTime.Substring(0, 2));
-                int min = Convert.ToInt32(notiTime.Substring(2, 2));
-                
-                if (hour != 0)
-                {
-                    userDirector.addPrivateNoti(senderKey, strUserID, notiString, hour, min);
+                    foreach (var elem in userDirector.getPrivateNoti(senderKey))
+                    {
+                        strPrint += "\n(" + elem.Hour + "시 " + elem.Minute + "분) " + elem.Notice;
+                    }
 
-                    strPrint += "[SYSTEM] 알림이 적용 되었습니다.";
-                }
-
-                if (strPrint != "")
-                {
                     await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
+                    return;
                 }
                 else
                 {
-                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 알림을 적용할 수 없습니다.", ParseMode.Default, false, false, iMessageID);
+                    string notiTime = strContents.Substring(0, 4);
+                    string notiString = strContents.Substring(5);
+
+                    int hour = Convert.ToInt32(notiTime.Substring(0, 2));
+                    int min = Convert.ToInt32(notiTime.Substring(2, 2));
+
+                    if (hour != 0)
+                    {
+                        userDirector.addPrivateNoti(senderKey, strUserID, notiString, hour, min);
+
+                        strPrint += "[SYSTEM] 알림이 적용 되었습니다.";
+                    }
+
+                    if (strPrint != "")
+                    {
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
+                    }
+                    else
+                    {
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 알림을 적용할 수 없습니다.", ParseMode.Default, false, false, iMessageID);
+                    }
                 }
             }
             //========================================================================================
