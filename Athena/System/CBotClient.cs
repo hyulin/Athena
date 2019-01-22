@@ -325,6 +325,7 @@ namespace Athena
 #else
                                 Bot.SendTextMessageAsync(-1001202203239, strPrint);  // 클랜방
 #endif
+                                strPrint = "";
                                 index++;
                                 break;
                             }
