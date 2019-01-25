@@ -92,6 +92,10 @@ namespace Athena
             loadUserInfo();
 
 
+            // 백업 파일에서 알림, 메모를 Load
+            loadData();
+
+
             // NAS 경로 기본값 설정
             nasInfo.CurrentPath = @"D:\CDT\";
 
@@ -102,11 +106,11 @@ namespace Athena
             strPrint += "[System Time] " + systemInfo.GetNowTime() + "\n";
             strPrint += "[Running Time] " + systemInfo.GetRunningTime() + "\n";
 
-#if DEBUG
-            Bot.SendTextMessageAsync(-1001219697643, strPrint);  // 운영진방
-#else
-            Bot.SendTextMessageAsync(-1001202203239, strPrint);  // 클랜방
-#endif
+//#if DEBUG
+//            Bot.SendTextMessageAsync(-1001219697643, strPrint);  // 운영진방
+//#else
+//            Bot.SendTextMessageAsync(-1001202203239, strPrint);  // 클랜방
+//#endif
 
 
             // 타이머 생성 및 시작
@@ -177,6 +181,63 @@ namespace Athena
                     }
                 }
             }
+        }
+
+        public void loadData()
+        {
+            string FolderName = @"Data/";
+            System.IO.DirectoryInfo di = new System.IO.DirectoryInfo(FolderName);
+            foreach (System.IO.FileInfo File in di.GetFiles())
+            {
+                if (File.Name.Contains("Noti_") == true)
+                {
+                    string fileName = File.Name.Replace("Noti_", "");
+                    fileName = fileName.Replace(".txt", "");
+
+                    long userKey = Convert.ToInt64(fileName);
+
+                    CUser userInfo = userDirector.getUserInfo(userKey);
+                    
+                    string[] memoValue = System.IO.File.ReadAllLines(FolderName + File.Name);
+                    if (memoValue.Length > 0)
+                    {
+                        foreach (var elem in memoValue)
+                        {
+                            string[] notiData = elem.Split('|');
+
+                            CPrivateNoti noti = new CPrivateNoti();
+                            noti.Hour = Convert.ToInt32(notiData[0]);
+                            noti.Minute = Convert.ToInt32(notiData[1]);
+                            noti.UserID = notiData[2];
+                            noti.Notice = notiData[3];
+
+                            userInfo.addPrivateNoti(noti);
+                        }
+                    }
+                }
+                else if (File.Name.Contains("Memo_") == true)
+                {
+                    string fileName = File.Name.Replace("Memo_", "");
+                    fileName = fileName.Replace(".txt", "");
+
+                    long userKey = Convert.ToInt64(fileName);
+
+                    CUser userInfo = userDirector.getUserInfo(userKey);                    
+                    
+                    string[] memoValue = System.IO.File.ReadAllLines(FolderName + File.Name);
+                    if (memoValue.Length > 0)
+                    {
+                        foreach (var elem in memoValue)
+                        {
+                            CMemo memo = new CMemo();
+                            memo.Memo = elem.ToString();
+                            userInfo.addMemo(memo);
+                        }
+                    }
+                }
+            }
+
+            return;
         }
 
         public CUser setUserInfo(IList<object> row, long userKey)
@@ -3278,7 +3339,7 @@ namespace Athena
                     int index = 1;
                     foreach (var elem in userDirector.getMemo(senderKey))
                     {
-                        strPrint += "\n(" + index + ") " + elem.Memo;
+                        strPrint += "\n(" + index++ + ") " + elem.Memo;
                     }
 
                     await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
@@ -3297,7 +3358,7 @@ namespace Athena
                     }
                     else if (contents[0] != "제거" && contents[0] != "")
                     {
-                        userDirector.addMemo(senderKey, contents[0].ToString());
+                        userDirector.addMemo(senderKey, strContents);
                         strPrint += "[SYSTEM] 해당 메모가 저장 되었습니다.";
                     }
                 }

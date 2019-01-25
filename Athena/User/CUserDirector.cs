@@ -95,6 +95,9 @@ namespace Athena
             privateNoti.UserID = userID;
 
             userInfo.addPrivateNoti(privateNoti);
+
+            // 파일에 백업
+            System.IO.File.AppendAllText(@"Data/" + "Noti_" + userKey + ".txt", hour + "|" + min + "|" + userID + "|" + notiString + "\n", Encoding.UTF8);
         }
 
         public List<CPrivateNoti> getPrivateNoti(long userKey)
@@ -109,6 +112,15 @@ namespace Athena
             var notiQueue = getPrivateNoti(userKey);
 
             notiQueue.RemoveAt(index);
+
+            string backup = "";
+            foreach (var elem in notiQueue)
+            {
+                backup += elem.Hour + "|" + elem.Minute + "|" + elem.UserID + "|" + elem.Notice + "\n";
+            }
+
+            // 파일에 백업
+            System.IO.File.WriteAllText(@"Data/" + "Noti_" + userKey + ".txt", backup, Encoding.UTF8);
         }
 
         public void addMemo(long userKey, string memoString)
@@ -119,6 +131,9 @@ namespace Athena
             memo.Memo = memoString;
 
             userInfo.addMemo(memo);
+
+            // 파일에 백업
+            System.IO.File.AppendAllText(@"Data/" + "Memo_" + userKey + ".txt", memoString + "\n", Encoding.UTF8);
         }
 
         public List<CMemo> getMemo(long userKey)
@@ -133,6 +148,15 @@ namespace Athena
             var memo = getMemo(userKey);
 
             memo.RemoveAt(index);
+
+            string backup = "";
+            foreach (var elem in memo)
+            {
+                backup += elem.Memo + "\n";
+            }
+
+            // 파일에 백업
+            System.IO.File.WriteAllText(@"Data/" + "Memo_" + userKey + ".txt", backup, Encoding.UTF8);
         }
     }
 }
