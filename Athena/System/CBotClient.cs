@@ -96,6 +96,19 @@ namespace Athena
             nasInfo.CurrentPath = @"D:\CDT\";
 
 
+            // 아테나 구동 알림
+            string strPrint = "";
+            strPrint += "Ahtena Start.\n";
+            strPrint += "[System Time] " + systemInfo.GetNowTime() + "\n";
+            strPrint += "[Running Time] " + systemInfo.GetRunningTime() + "\n";
+
+#if DEBUG
+            Bot.SendTextMessageAsync(-1001219697643, strPrint);  // 운영진방
+#else
+            Bot.SendTextMessageAsync(-1001202203239, strPrint);  // 클랜방
+#endif
+
+
             // 타이머 생성 및 시작
             System.Timers.Timer timer = new System.Timers.Timer();
             timer.Interval = 5000; // 5초
@@ -718,7 +731,7 @@ namespace Athena
                                     strPrint += "[SUCCESS] 갱신 완료됐습니다.";
                                 }
                             }
-                            
+
                             range = "클랜원 목록!M" + (7 + searchIndex);
 
                             // Define request parameters.
@@ -1085,7 +1098,7 @@ namespace Athena
 
                 // Define request parameters.
                 String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
-                
+
                 if (strContents.Contains("20") == false)
                 {
                     int yearIdx = 2018;
@@ -2967,7 +2980,7 @@ namespace Athena
                 }
 
                 // Download File
-                var file = await Bot.GetFileAsync(varMessage.Document.FileId);                
+                var file = await Bot.GetFileAsync(varMessage.Document.FileId);
                 var fileName = nasInfo.CurrentPath + varMessage.Document.FileName;
 
                 using (var saveStream = new FileStream(fileName, FileMode.CreateNew, FileAccess.Write))
@@ -3244,6 +3257,58 @@ namespace Athena
                 else
                 {
                     await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 알림을 적용할 수 없습니다.", ParseMode.Default, false, false, iMessageID);
+                }
+            }
+            //========================================================================================
+            // 메모
+            //========================================================================================
+            else if (strCommend == "/메모")
+            {
+                if (strContents == "")
+                {
+                    if (userDirector.getMemo(senderKey).Count == 0)
+                    {
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 저장된 메모가 없습니다.", ParseMode.Default, false, false, iMessageID);
+                        return;
+                    }
+
+                    strPrint += "[ " + strUserName + "님의 메모 ]\n";
+                    strPrint += "--------------------------------------";
+
+                    int index = 1;
+                    foreach (var elem in userDirector.getMemo(senderKey))
+                    {
+                        strPrint += "\n(" + index + ") " + elem.Memo;
+                    }
+
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
+                    return;
+                }
+                else
+                {
+                    string[] contents = strContents.Split(' ');
+
+                    if (contents[0] == "제거" && contents[1] != "")
+                    {
+                        int index = Convert.ToInt32(contents[1]);
+
+                        userDirector.RemoveMemo(senderKey, index - 1);
+                        strPrint += "[SYSTEM] 해당 메모가 제거 되었습니다.";
+                    }
+                    else if (contents[0] != "제거" && contents[0] != "")
+                    {
+                        userDirector.addMemo(senderKey, contents[0].ToString());
+                        strPrint += "[SYSTEM] 해당 메모가 저장 되었습니다.";
+                    }
+                }
+
+                if (strPrint != "")
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
+                }
+                else
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 메모를 적용할 수 없습니다.", ParseMode.Default, false, false, iMessageID);
                 }
             }
             //========================================================================================

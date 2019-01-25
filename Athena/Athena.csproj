@@ -180,6 +180,7 @@
     <Compile Include="System\CLog.cs" />
     <Compile Include="System\CSystemInfo.cs" />
     <Compile Include="TwitterKoreanProcessorCS.cs" />
+    <Compile Include="User\CMemo.cs" />
     <Compile Include="User\CMessage.cs" />
     <Compile Include="User\CPrivateNoti.cs" />
     <Compile Include="User\CUser.cs" />

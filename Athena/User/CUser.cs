@@ -41,19 +41,20 @@ namespace Athena
         public string Time { get; set; }
         public string Info { get; set; }
         
-        List<CMessage> MessageQueue = new List<CMessage>();
+        List<CMessage> MessageList = new List<CMessage>();
         List<CPrivateNoti> PrivateNoti = new List<CPrivateNoti>();
+        List<CMemo> MemoList = new List<CMemo>();
 
         public void addMessage(CMessage message)
         {
-            if (MessageQueue.Count < 100)
+            if (MessageList.Count < 100)
             {
-                MessageQueue.Add(message);
+                MessageList.Add(message);
             }
             else
             {
-                MessageQueue.RemoveAt(MessageQueue.Count - 1);
-                MessageQueue.Add(message);
+                MessageList.RemoveAt(MessageList.Count - 1);
+                MessageList.Add(message);
             }
         }
 
@@ -70,14 +71,32 @@ namespace Athena
             }
         }
 
+        public void addMemo(CMemo memo)
+        {
+            if (MemoList.Count < 100)
+            {
+                MemoList.Add(memo);
+            }
+            else
+            {
+                MemoList.RemoveAt(MemoList.Count - 1);
+                MemoList.Add(memo);
+            }
+        }
+
         public List<CMessage> getMessage()
         {
-            return MessageQueue;
+            return MessageList;
         }
 
         public List<CPrivateNoti> getPrivateNoti()
         {
             return PrivateNoti;
+        }
+
+        public List<CMemo> getMemoList()
+        {
+            return MemoList;
         }
     }
 }

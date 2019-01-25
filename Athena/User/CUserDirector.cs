@@ -110,5 +110,29 @@ namespace Athena
 
             notiQueue.RemoveAt(index);
         }
+
+        public void addMemo(long userKey, string memoString)
+        {
+            CMemo memo = new CMemo();
+            CUser userInfo = getUserInfo(userKey);
+
+            memo.Memo = memoString;
+
+            userInfo.addMemo(memo);
+        }
+
+        public List<CMemo> getMemo(long userKey)
+        {
+            CUser userInfo = getUserInfo(userKey);
+
+            return userInfo.getMemoList();
+        }
+
+        public void RemoveMemo(long userKey, int index)
+        {
+            var memo = getMemo(userKey);
+
+            memo.RemoveAt(index);
+        }
     }
 }
