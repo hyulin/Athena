@@ -106,12 +106,9 @@ namespace Athena
             strPrint += "[System Time] " + systemInfo.GetNowTime() + "\n";
             strPrint += "[Running Time] " + systemInfo.GetRunningTime() + "\n";
 
-//#if DEBUG
-//            Bot.SendTextMessageAsync(-1001219697643, strPrint);  // 운영진방
-//#else
-//            Bot.SendTextMessageAsync(-1001202203239, strPrint);  // 클랜방
-//#endif
-
+#if !DEBUG
+            Bot.SendTextMessageAsync(-1001202203239, strPrint);  // 클랜방
+#endif
 
             // 타이머 생성 및 시작
             System.Timers.Timer timer = new System.Timers.Timer();
