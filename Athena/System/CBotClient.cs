@@ -572,31 +572,12 @@ namespace Athena
             long senderKey = varMessage.From.Id;
             DateTime time = convertTime;
 
-            // CDT 관련방 아니면 동작하지 않도록 수정
-            if (varMessage.Chat.Id != -1001202203239 &&     // 본방
-                varMessage.Chat.Id != -1001219697643 &&     // 운영진방
-                varMessage.Chat.Id != -1001389956706 &&     // 사전안내방
-                varMessage.Chat.Username != "hyulin")
-            {
-                await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 사용할 수 없는 대화방입니다.", ParseMode.Default, false, false, iMessageID);
-                CLog.WriteLog(varMessage.Chat.Id, senderKey, "", "[ERROR] 사용할 수 없는 대화방입니다.", "", "");
-                return;
-            }
-
             // 명령어, 서브명령어 분리
             string strMassage = varMessage.Text;
             string strUserName = varMessage.From.FirstName + varMessage.From.LastName;
             string strCommend = "";
             string strContents = "";
             bool isCommand = false;
-
-            // 본방에 입력된 메시지를 각 유저 정보에 입력
-#if DEBUG
-            userDirector.addMessage(senderKey, strMassage, time);
-#else
-            if (senderKey != 0 && strMassage != "" && varMessage.Chat.Id == -1001202203239)
-                userDirector.addMessage(senderKey, strMassage, time);
-#endif
 
             // 명령어인지 아닌지 구분
             if (strMassage.Substring(0, 1) == "/")
@@ -621,6 +602,32 @@ namespace Athena
                     CLog.WriteLog(varMessage.Chat.Id, senderKey, strUserName, "[ERROR] 아테나에 등록되지 않은 유저입니다.\n등록을 하시려면 /등록 [본계정배틀태그]를 입력해주세요.", strCommend, strContents);
                     return;
                 }
+            }
+
+            // CDT 관련방 아니면 동작하지 않도록
+            if (varMessage.Chat.Id != -1001202203239 &&     // 본방
+                varMessage.Chat.Id != -1001219697643 &&     // 운영진방
+                varMessage.Chat.Id != -1001389956706 &&     // 사전안내방
+                varMessage.Chat.Username != "hyulin")
+            {
+                await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 사용할 수 없는 대화방입니다.", ParseMode.Default, false, false, iMessageID);
+                CLog.WriteLog(varMessage.Chat.Id, senderKey, "", "[ERROR] 사용할 수 없는 대화방입니다.", "", "");
+                return;
+            }
+
+            if (userDirector.getUserInfo(senderKey).UserKey > 0)
+            {
+                // 본방에 입력된 메시지를 각 유저 정보에 입력
+#if DEBUG
+                userDirector.addMessage(senderKey, strMassage, time);
+#else
+                if (senderKey != 0 && strMassage != "" && varMessage.Chat.Id == -1001202203239)
+                    userDirector.addMessage(senderKey, strMassage, time);
+#endif
+            }
+            else
+            {
+                return;
             }
 
             // 명령어가 아닐 경우와 사전안내방이 아닌 경우
@@ -681,7 +688,7 @@ namespace Athena
             if (strCommend == "/도움말" || strCommend == "/help" || strCommend == "/help@CDT_Noti_Bot")
             {
                 strPrint += "==================================\n";
-                strPrint += "[ 아테나 v2.0 ]\n[ Clien Delicious Team Notice Bot ]\n\n";
+                strPrint += "[ 아테나 v2.1 ]\n[ Clien Delicious Team Notice Bot ]\n\n";
                 strPrint += "/공지 : 클랜 공지사항을 출력합니다.\n";
                 strPrint += "/일정 : 이번 달 클랜 일정을 확인합니다.\n";
                 strPrint += "/등록 [본 계정 배틀태그] : 아테나에 등록 합니다.\n";
@@ -706,8 +713,12 @@ namespace Athena
                 strPrint += "/기록 [숫자] : 명예의 전당 상세내용을 조회합니다.\n";
                 strPrint += "/뽑기 [항목1] [항목2] [항목3] ... : 하나를 뽑습니다.\n";
                 strPrint += "/날씨 [지역] : 현재 날씨를 출력합니다.\n";
-                strPrint += "/알림 [시간] [내용] : 설정한 시간에 알림을 줍니다.\n";
+                strPrint += "/알림 : 현재 저장된 개인 알림 리스트를 출력합니다.\n";
+                strPrint += "/알림 [시간] [내용] : 설정한 시간에 알림을 설정합니다..\n";
                 strPrint += "/알림 제거 [시간] : 알림을 제거합니다.\n";
+                strPrint += "/메모 : 현재 저장된 개인 메모 리스트를 출력합니다.\n";
+                strPrint += "/메모 [내용] : 메모를 저장합니다..\n";
+                strPrint += "/메모 제거 [숫자] : 메모를 제거합니다.\n";
                 strPrint += "/안내 : 팀 안내 메시지를 출력합니다.\n";
                 strPrint += "/상태 : 현재 봇 상태를 출력합니다. 대답이 없으면 이상.\n";
                 strPrint += "==================================\n";
