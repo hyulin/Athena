@@ -65,7 +65,11 @@ namespace Athena
 
         public void InitBotClient()
         {
+            string strPrint = "";
+            strPrint += "[ Ahtena Start. ]\n";
+
             systemInfo.SetStartTime();
+            strPrint += "- System Time Loading Completed.\n";
 
             using (var stream =
                 new FileStream("credentials.json", FileMode.Open, FileAccess.Read))
@@ -87,34 +91,42 @@ namespace Athena
                 ApplicationName = ApplicationName,
             });
 
+            strPrint += "- External API Loading Completed.\n";
+
 
             // 시트에서 유저 정보를 Load
-            loadUserInfo();
+            if (loadUserInfo() == true)
+                strPrint += "- User Info Loading Completed.\n";
+            else
+                strPrint += "- User Info Loading Fail.\n";
 
 
             // 백업 파일에서 알림, 메모를 Load
-            loadData();
+            if (loadData() == true)
+                strPrint += "- User Data Loading Completed.\n";
+            else
+                strPrint += "- User Data Loading Fail.\n";
 
 
             // NAS 경로 기본값 설정
             nasInfo.CurrentPath = @"D:\CDT\";
-
-
-            // 아테나 구동 알림
-            string strPrint = "";
-            strPrint += "Ahtena Start.\n";
-            strPrint += "[System Time] " + systemInfo.GetNowTime() + "\n";
-            strPrint += "[Running Time] " + systemInfo.GetRunningTime() + "\n";
-
-#if !DEBUG
-            Bot.SendTextMessageAsync(-1001202203239, strPrint);  // 클랜방
-#endif
+            strPrint += "- Administrator Function Loading Completed.\n";
 
             // 타이머 생성 및 시작
             System.Timers.Timer timer = new System.Timers.Timer();
             timer.Interval = 5000; // 5초
             timer.Elapsed += new ElapsedEventHandler(timer_Elapsed);
             timer.Start();
+            strPrint += "- Thread Create Completed.\n";
+
+            // 아테나 구동 알림            
+            strPrint += "- System Time : " + systemInfo.GetNowTime() + "\n";
+            strPrint += "- Running Time : " + systemInfo.GetRunningTime() + "\n";
+            strPrint += "[ All Completed. ]";
+
+#if !DEBUG
+            Bot.SendTextMessageAsync(-1001202203239, strPrint);  // 클랜방
+#endif
         }
 
         // init methods...
@@ -131,8 +143,10 @@ namespace Athena
             Bot.StartReceiving();               // 이 함수가 실행이 되어야 사용자로부터 메세지를 받을 수 있습니다.
         }
 
-        public void loadUserInfo()
+        public bool loadUserInfo()
         {
+            bool bResult = true;
+
             // Define request parameters.
             String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
             String range = "클랜원 목록!C7:N";
@@ -177,11 +191,23 @@ namespace Athena
                             userDirector.reflechUserInfo(userKey, user);
                     }
                 }
+                else
+                {
+                    bResult = false;
+                }
             }
+            else
+            {
+                bResult = false;
+            }
+
+            return bResult;
         }
 
-        public void loadData()
+        public bool loadData()
         {
+            bool bResult = true;
+
             string FolderName = @"Data/";
             System.IO.DirectoryInfo di = new System.IO.DirectoryInfo(FolderName);
             foreach (System.IO.FileInfo File in di.GetFiles())
@@ -232,9 +258,13 @@ namespace Athena
                         }
                     }
                 }
+                else
+                {
+                    bResult = false;
+                }
             }
 
-            return;
+            return bResult;
         }
 
         public CUser setUserInfo(IList<object> row, long userKey)

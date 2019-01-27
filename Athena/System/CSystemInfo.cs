@@ -9,8 +9,6 @@ namespace Athena
     class CSystemInfo
     {
         DateTime startTime_ = new DateTime();
-        //ulong googleSheetReqCount_ = 0;
-        //ulong messageReqCount_ = 0;
 
         public string GetNowTime()
         {
@@ -37,29 +35,9 @@ namespace Athena
             return strValue;
         }
 
-        //public ulong GetGoogleSheetReqCount()
-        //{
-        //    return googleSheetReqCount_;
-        //}
-
-        //public ulong GetMessageReqCount()
-        //{
-        //    return messageReqCount_;
-        //}
-
         public void SetStartTime()
         {
             startTime_ = DateTime.Now;
         }
-
-        //public void AppendGoogleSheetCount()
-        //{
-        //    googleSheetReqCount_++;
-        //}
-
-        //public void AppendMessageReqCount()
-        //{
-        //    messageReqCount_++;
-        //}
     }
 }
