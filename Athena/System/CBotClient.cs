@@ -66,7 +66,7 @@ namespace Athena
         public void InitBotClient()
         {
             string strPrint = "";
-            strPrint += "[ Ahtena Start. ]\n";
+            strPrint += "[ Athena Start ]\n";
 
             systemInfo.SetStartTime();
             strPrint += "- System Time Loading Completed.\n";
