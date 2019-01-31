@@ -627,7 +627,8 @@ namespace Athena
             }
             else
             {
-                return;
+                if (strCommend != "/안내")
+                    return;
             }
 
             // 명령어가 아닐 경우와 사전안내방이 아닌 경우
