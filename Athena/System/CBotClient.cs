@@ -627,7 +627,7 @@ namespace Athena
             }
             else
             {
-                if (strCommend != "/안내")
+                if (strCommend != "/안내" && strCommend != "/등록")
                     return;
             }
 
