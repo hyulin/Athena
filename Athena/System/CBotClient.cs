@@ -971,10 +971,15 @@ namespace Athena
                                         continue;
                                 }
 
-                                calendar.Day = Convert.ToInt32(row[wday].ToString());
-                                calendar.Week = weekDay;
-                                calendar.Todo = todo[wday].ToString();
-                                calendarDirector.addCalendar(calendar);
+                                int checkNum = 0;
+                                bool isNumber = int.TryParse(row[wday].ToString(), out checkNum);
+                                if (isNumber == true)
+                                {
+                                    calendar.Day = Convert.ToInt32(row[wday].ToString());
+                                    calendar.Week = weekDay;
+                                    calendar.Todo = todo[wday].ToString();
+                                    calendarDirector.addCalendar(calendar);
+                                }
                             }
                         }
 
