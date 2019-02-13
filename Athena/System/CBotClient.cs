@@ -179,7 +179,8 @@ namespace Athena
 
                         // 휴린, 냉각콜라, 만슬, 루미녹스일 경우
                         if ((user.UserKey == 23842788) || (user.UserKey == 50872681) ||
-                            (user.UserKey == 474057213) || (user.UserKey == 83970696))
+                            (user.UserKey == 474057213) || (user.UserKey == 83970696) ||
+                            (user.UserKey == 40883797))
                         {
                             // 유저 타입을 관리자로
                             user.UserType = USER_TYPE.USER_TYPE_ADMIN;
@@ -298,9 +299,10 @@ namespace Athena
             user.Time = row[8].ToString();
             user.Info = row[9].ToString();
 
-            // 휴린, 냉각콜라, 만슬, 루미녹스일 경우
+            // 휴린, 냉각콜라, 만슬, 루미녹스, 고기일 경우
             if ((user.UserKey == 23842788) || (user.UserKey == 50872681) ||
-                (user.UserKey == 474057213) || (user.UserKey == 83970696))
+                (user.UserKey == 474057213) || (user.UserKey == 83970696) ||
+                (user.UserKey == 40883797))
             {
                 // 유저 타입을 관리자로
                 user.UserType = USER_TYPE.USER_TYPE_ADMIN;
@@ -388,7 +390,7 @@ namespace Athena
                     strPrint += "굿모닝~ 오늘도 즐거운 하루 되세요~ :)";
 
 #if DEBUG
-                    Bot.SendTextMessageAsync(-1001219697643, strPrint);  // 운영진방
+                    Bot.SendTextMessageAsync(-1001482490165, strPrint);  // 운영진방
 #else
                     Bot.SendTextMessageAsync(-1001202203239, strPrint);  // 클랜방
 #endif
@@ -422,7 +424,7 @@ namespace Athena
                             {
                                 userDirector.RemoveNoti(elem.Value.UserKey, index);
 #if DEBUG
-                                Bot.SendTextMessageAsync(-1001219697643, strPrint);  // 운영진방
+                                Bot.SendTextMessageAsync(-1001482490165, strPrint);  // 운영진방
 #else
                                 Bot.SendTextMessageAsync(-1001202203239, strPrint);  // 클랜방
 #endif
@@ -483,7 +485,7 @@ namespace Athena
                     }
 
 #if DEBUG
-                    Bot.SendTextMessageAsync(-1001219697643, strPrint);  // 운영진방
+                    Bot.SendTextMessageAsync(-1001482490165, strPrint);  // 운영진방
 #else
                     Bot.SendTextMessageAsync(-1001202203239, strPrint);  // 클랜방
 #endif
@@ -532,7 +534,8 @@ namespace Athena
                     strInfo += "냉각콜라(@Seungman),\n";
                     strInfo += "휴린(@hyulin),\n";
                     strInfo += "만슬(@mans3ul),\n";
-                    strInfo += "LUMINOX(@urusaikara)에게\n";
+                    strInfo += "LUMINOX(@urusaikara),\n";
+                    strInfo += "고기(@jandie99)에게\n";
                     strInfo += "문의해주세요.\n\n";
                     strInfo += "클랜원들의 편의를 위한\n";
                     strInfo += "저, 아테나의 기능을 확인하시려면\n";
@@ -606,7 +609,7 @@ namespace Athena
 
             // CDT 관련방 아니면 동작하지 않도록
             if (varMessage.Chat.Id != -1001202203239 &&     // 본방
-                varMessage.Chat.Id != -1001219697643 &&     // 운영진방
+                varMessage.Chat.Id != -1001482490165 &&     // 운영진방
                 varMessage.Chat.Id != -1001389956706 &&     // 사전안내방
                 varMessage.Chat.Username != "hyulin")
             {
@@ -689,7 +692,7 @@ namespace Athena
             if (strCommend == "/도움말" || strCommend == "/help" || strCommend == "/help@CDT_Noti_Bot")
             {
                 strPrint += "==================================\n";
-                strPrint += "[ 아테나 v2.1 ]\n[ Clien Delicious Team Notice Bot ]\n\n";
+                strPrint += "[ 아테나 v2.2 ]\n[ Clien Delicious Team Notice Bot ]\n\n";
                 strPrint += "/공지 : 클랜 공지사항을 출력합니다.\n";
                 strPrint += "/일정 : 이번 달 클랜 일정을 확인합니다.\n";
                 strPrint += "/등록 [본 계정 배틀태그] : 아테나에 등록 합니다.\n";
@@ -700,6 +703,12 @@ namespace Athena
                 strPrint += "/스크림 : 현재 모집 중인 스크림의 참가자를 출력합니다.\n";
                 strPrint += "/스크림 [요일] : 현재 모집 중인 스크림에 참가신청합니다.\n";
                 strPrint += "/스크림 취소 : 신청한 스크림에 참가를 취소합니다.\n";
+                strPrint += "/오픈디비전 : 현재 모집 중인 오픈디비전의 참가자를 출력합니다.\n";
+                strPrint += "/오픈디비전 [요일] : 현재 모집 중인 오픈디비전에 참가신청합니다.\n";
+                strPrint += "/오픈디비전 취소 : 신청한 오픈디비전에 참가를 취소합니다.\n";
+                strPrint += "/리그 : 현재 모집 중인 리그의 참가자를 출력합니다.\n";
+                strPrint += "/리그 [요일] : 현재 모집 중인 리그에 참가신청합니다.\n";
+                strPrint += "/리그 취소 : 신청한 리그에 참가를 취소합니다.\n";
                 strPrint += "/조사 : 현재 진행 중인 일정 조사를 출력합니다.\n";
                 strPrint += "/조사 [요일] : 현재 진행 중인 일정 조사에 체크합니다.\n";
                 strPrint += "/모임 : 모임 공지와 참가자를 출력합니다.\n";
@@ -2318,19 +2327,31 @@ namespace Athena
             //========================================================================================
             // 스크림
             //========================================================================================
-            else if ((strCommend == "/스크림") || (strCommend == "/오픈디비전"))
+            else if ((strCommend == "/스크림") || (strCommend == "/디비전") || (strCommend == "/리그"))
             {
                 string sheetName = "";
+                int endLine = 0;
 
                 if (strCommend == "/스크림")
+                {
                     sheetName = "스크림";
-                else
-                    sheetName = "오픈디비전";
+                    endLine = 17;
+                }
+                else if (strCommend == "/디비전")
+                {
+                    sheetName = "디비전";
+                    endLine = 17;
+                }
+                else if (strCommend == "/리그")
+                {
+                    sheetName = "리그";
+                    endLine = 35;
+                }
 
                 if (strContents == "")
                 {
                     String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
-                    String range = sheetName + "!B2:U17";
+                    String range = sheetName + "!B2:U" + endLine;
                     SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
                     ValueRange response = request.Execute();
@@ -2387,10 +2408,12 @@ namespace Athena
 
                         string scrim = "";
 
-                        if (sheetName == "스크림")
+                        if ((sheetName == "스크림") || (sheetName == "리그"))
                             scrim = @"Function/Scrim.png";
-                        else
+                        else if (sheetName == "디비전")
                             scrim = @"Function/OpenDivision.png";
+                        else
+                            return;
 
                         var fileName = scrim.Split(Path.DirectorySeparatorChar).Last();
                         var fileStream = new FileStream(scrim, FileMode.Open, FileAccess.Read, FileShare.Read);
@@ -2522,7 +2545,7 @@ namespace Athena
                     int index = 0;
                     bool isInput = false;
 
-                    range = sheetName + "!C6:C17";
+                    range = sheetName + "!C6:C" + endLine;
                     request = service.Spreadsheets.Values.Get(spreadsheetId, range);
                     response = request.Execute();
                     if (response != null)
@@ -2530,7 +2553,9 @@ namespace Athena
                         IList<IList<Object>> values = response.Values;
                         if (values != null && values.Count > 0)
                         {
-                            if (values.Count >= 12)
+                            if ((sheetName == "스크림" && values.Count >= 12) ||
+                                (sheetName == "디비전" && values.Count >= 12) ||
+                                (sheetName == "리그" && values.Count >= 30))
                             {
                                 await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[SYSTEM] " + sheetName + " 신청자가 모두 찼습니다.\n운영진에게 문의해주세요.", ParseMode.Default, false, false, iMessageID);
                                 return;
@@ -2951,7 +2976,7 @@ namespace Athena
             {
                 // 관리자 전용 명령어
                 if ((userDirector.getUserInfo(senderKey).UserType != USER_TYPE.USER_TYPE_ADMIN) ||
-                    (varMessage.Chat.Id != -1001219697643))
+                    (varMessage.Chat.Id != -1001482490165))
                 {
                     await Bot.SendTextMessageAsync(varMessage.Chat.Id, "권한이 없는 유저 또는 대화방입니다.", ParseMode.Default, false, false, iMessageID);
                     return;
@@ -2990,7 +3015,7 @@ namespace Athena
             {
                 // 관리자 전용 명령어
                 if ((userDirector.getUserInfo(senderKey).UserType != USER_TYPE.USER_TYPE_ADMIN) ||
-                    (varMessage.Chat.Id != -1001219697643))
+                    (varMessage.Chat.Id != -1001482490165))
                 {
                     await Bot.SendTextMessageAsync(varMessage.Chat.Id, "권한이 없는 유저 또는 대화방입니다.", ParseMode.Default, false, false, iMessageID);
                     return;
@@ -3045,7 +3070,7 @@ namespace Athena
             {
                 // 관리자 전용 명령어
                 if ((userDirector.getUserInfo(senderKey).UserType != USER_TYPE.USER_TYPE_ADMIN) ||
-                    (varMessage.Chat.Id != -1001219697643))
+                    (varMessage.Chat.Id != -1001482490165))
                 {
                     await Bot.SendTextMessageAsync(varMessage.Chat.Id, "권한이 없는 유저 또는 대화방입니다.", ParseMode.Default, false, false, iMessageID);
                     return;
@@ -3078,7 +3103,7 @@ namespace Athena
             {
                 // 관리자 전용 명령어
                 if ((userDirector.getUserInfo(senderKey).UserType != USER_TYPE.USER_TYPE_ADMIN) ||
-                    (varMessage.Chat.Id != -1001219697643))
+                    (varMessage.Chat.Id != -1001482490165))
                 {
                     await Bot.SendTextMessageAsync(varMessage.Chat.Id, "권한이 없는 유저 또는 대화방입니다.", ParseMode.Default, false, false, iMessageID);
                     return;
@@ -3431,7 +3456,7 @@ namespace Athena
                 strPrint += "[ " + name + "님의 문의 ]\n\n";
                 strPrint += strContents;
 
-                await Bot.SendTextMessageAsync(-1001219697643, strPrint);
+                await Bot.SendTextMessageAsync(-1001482490165, strPrint);
                 await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[SYSTEM] 문의 등록이 완료 됐습니다.", ParseMode.Default, false, false, iMessageID);
             }
             //========================================================================================
