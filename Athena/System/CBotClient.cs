@@ -3417,6 +3417,24 @@ namespace Athena
                 }
             }
             //========================================================================================
+            // 문의
+            //========================================================================================
+            else if (strCommend == "/문의")
+            {
+                if (strContents == "")
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 문의 내용을 입력해주세요.", ParseMode.Default, false, false, iMessageID);
+                    return;
+                }
+
+                string name = userDirector.getUserInfo(senderKey).Name;
+                strPrint += "[ " + name + "님의 문의 ]\n\n";
+                strPrint += strContents;
+
+                await Bot.SendTextMessageAsync(-1001219697643, strPrint);
+                await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[SYSTEM] 문의 등록이 완료 됐습니다.", ParseMode.Default, false, false, iMessageID);
+            }
+            //========================================================================================
             // 안내
             //========================================================================================
             else if (strCommend == "/안내")
