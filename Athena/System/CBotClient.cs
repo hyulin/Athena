@@ -2368,7 +2368,7 @@ namespace Athena
                                 strPrint += "[ " + title[0].ToString() + " ]\n============================\n";
 
                                 int index = 4;
-                                for (int i = index; i < 15; i++)
+                                for (int i = index; i < values.Count; i++)
                                 {
                                     var row = values[i];
 
