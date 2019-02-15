@@ -2368,6 +2368,7 @@ namespace Athena
                                 strPrint += "[ " + title[0].ToString() + " ]\n============================\n";
 
                                 int index = 4;
+                                int totalCount = 0;
                                 for (int i = index; i < values.Count; i++)
                                 {
                                     var row = values[i];
@@ -2398,7 +2399,10 @@ namespace Athena
                                         date += "일";
 
                                     strPrint += "- " + battleTag.ToString() + " (" + position.ToString() + ") / " + score.ToString() + " - " + date.ToString() + "\n";
+                                    totalCount++;
                                 }
+
+                                strPrint += "\n현재 " + totalCount + "명\n";
                             }
                         }
                     }
