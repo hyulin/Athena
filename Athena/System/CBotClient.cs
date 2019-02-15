@@ -3459,7 +3459,8 @@ namespace Athena
 
                 string name = userDirector.getUserInfo(senderKey).Name;
                 strPrint += "[ " + name + "님의 문의 ]\n\n";
-                strPrint += strContents;
+                strPrint += strContents + "\n\n";
+                strPrint += "@Seungman / @hyulin / @mans3ul / @urusaikara / @jandie99";
 
                 await Bot.SendTextMessageAsync(-1001482490165, strPrint);
                 await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[SYSTEM] 문의 등록이 완료 됐습니다.", ParseMode.Default, false, false, iMessageID);
