@@ -513,6 +513,25 @@ namespace Athena
                 return;
             }
 
+            // 메시지 정보 추출
+            string strFirstName = varMessage.From.FirstName;
+            string strLastName = varMessage.From.LastName;
+            string strUserID = varMessage.From.Username;
+            int iMessageID = varMessage.MessageId;
+            long senderKey = varMessage.From.Id;
+            DateTime time = convertTime;
+
+            // 명령어, 서브명령어 분리
+            string strMassage = varMessage.Text;
+            string strUserName = varMessage.From.FirstName + varMessage.From.LastName;
+            string strCommend = "";
+            string strContents = "";
+            bool isCommand = false;
+
+            // 차단된 유저는 이용할 수 없다.
+            if (userDirector.isBlockUser(senderKey) == true)
+                return;
+
             // 입장 메시지 일 경우
             if (varMessage.Type == MessageType.ChatMembersAdded)
             {
@@ -566,21 +585,6 @@ namespace Athena
                     return;
                 }
             }
-
-            // 메시지 정보 추출
-            string strFirstName = varMessage.From.FirstName;
-            string strLastName = varMessage.From.LastName;
-            string strUserID = varMessage.From.Username;
-            int iMessageID = varMessage.MessageId;
-            long senderKey = varMessage.From.Id;
-            DateTime time = convertTime;
-
-            // 명령어, 서브명령어 분리
-            string strMassage = varMessage.Text;
-            string strUserName = varMessage.From.FirstName + varMessage.From.LastName;
-            string strCommend = "";
-            string strContents = "";
-            bool isCommand = false;
 
             // 명령어인지 아닌지 구분
             if (strMassage.Substring(0, 1) == "/")
@@ -649,8 +653,8 @@ namespace Athena
                 {
                     if (tuple.Item1.ToString() != "")
                     {
-                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, tuple.Item1.ToString(), ParseMode.Default, false, false, iMessageID);
                         CLog.WriteLog(varMessage.Chat.Id, senderKey, strUserName, strMassage, tuple.Item1.ToString(), "");
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, tuple.Item1.ToString(), ParseMode.Default, false, false, iMessageID);
                     }
                 }
                 else if (tuple.Item3 == true)
@@ -673,8 +677,8 @@ namespace Athena
                         if (varMessage.ReplyToMessage.From.Username.ToString().Contains("CDT_Noti_Bot") == true)
 #endif
                         {
-                            await Bot.SendTextMessageAsync(varMessage.Chat.Id, naturalLanguage.replyCall(strMassage), ParseMode.Default, false, false, iMessageID);
                             CLog.WriteLog(varMessage.Chat.Id, senderKey, strUserName, strMassage, tuple.Item1.ToString(), "");
+                            await Bot.SendTextMessageAsync(varMessage.Chat.Id, naturalLanguage.replyCall(strMassage), ParseMode.Default, false, false, iMessageID);
                         }
                     }
                 }
@@ -3464,6 +3468,82 @@ namespace Athena
 
                 await Bot.SendTextMessageAsync(-1001482490165, strPrint);
                 await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[SYSTEM] 문의 등록이 완료 됐습니다.", ParseMode.Default, false, false, iMessageID);
+            }
+            //========================================================================================
+            // 차단
+            //========================================================================================
+            else if (strCommend == "/차단")
+            {
+                var user = userDirector.getUserInfo(senderKey);
+                if (user.UserType != USER_TYPE.USER_TYPE_ADMIN)
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 해당 명렁어는 운영진 권한이 필요합니다.", ParseMode.Default, false, false, iMessageID);
+                    return;
+                }
+
+                long blockUserKey = 0;
+                bool bIsUser = false;
+
+                if (strContents == "")
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 차단할 유저를 입력해주세요.", ParseMode.Default, false, false, iMessageID);
+                    return;
+                }
+                else
+                {
+                    // Define request parameters.
+                    String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                    String range = "클랜원 목록!C7:N";
+                    SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+
+                    ValueRange response = request.Execute();
+                    if (response != null)
+                    {
+                        IList<IList<Object>> values = response.Values;
+                        if (values != null && values.Count > 0)
+                        {
+                            foreach (var row in values)
+                            {
+                                if (row[0].ToString().Contains(strContents) == true)
+                                {
+                                    blockUserKey = Convert.ToInt64(row[10].ToString());
+                                    if (userDirector.getUserInfo(blockUserKey).UserType != USER_TYPE.USER_TYPE_ADMIN)
+                                    {
+                                        if (bIsUser == true)
+                                        {
+                                            await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 검색된 유저가 다수입니다.", ParseMode.Default, false, false, iMessageID);
+                                            return;
+                                        }
+
+                                        bIsUser = true;
+                                    }
+                                    else
+                                    {
+                                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 운영진은 차단할 수 없습니다.", ParseMode.Default, false, false, iMessageID);
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    string[] contents = strContents.Split(' ');
+                    if (contents[0] == "해제")
+                    {
+                        userDirector.removeBlockUser(blockUserKey);
+
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[SYSTEM] 아테나 사용 차단이 해제되었습니다.", ParseMode.Default, false, false, iMessageID);
+                        return;
+                    }
+                }
+
+                if (bIsUser == true && blockUserKey != 0)
+                {
+                    userDirector.removeBlockUser(blockUserKey);
+
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[SYSTEM] 아테나 사용 차단되었습니다.", ParseMode.Default, false, false, iMessageID);
+                    return;
+                }
             }
             //========================================================================================
             // 안내

@@ -11,6 +11,7 @@ namespace Athena
         // 유저 딕셔너리
         Dictionary<long, CUser> userInfo = new Dictionary<long, CUser>();
         int userCount = 0;
+        List<long> blockUser = new List<long>();
 
         // 유저 추가
         public void addUserInfo(long userKey, CUser user)
@@ -157,6 +158,24 @@ namespace Athena
 
             // 파일에 백업
             System.IO.File.WriteAllText(@"Data/" + "Memo_" + userKey + ".txt", backup, Encoding.UTF8);
+        }
+
+        public void addBlockUser(long userKey)
+        {
+            blockUser.Add(userKey);
+        }
+
+        public void removeBlockUser(long userKey)
+        {
+            blockUser.Remove(userKey);
+        }
+
+        public bool isBlockUser(long userKey)
+        {
+            if (blockUser.Contains(userKey) == true)
+                return true;
+
+            return false;
         }
     }
 }
