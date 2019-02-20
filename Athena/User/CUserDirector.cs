@@ -172,7 +172,7 @@ namespace Athena
 
         public bool isBlockUser(long userKey)
         {
-            if (blockUser.Contains(userKey) == true)
+            if (blockUser.Count > 0 && blockUser.Contains(userKey) == true)
                 return true;
 
             return false;

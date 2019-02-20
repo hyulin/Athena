@@ -521,13 +521,6 @@ namespace Athena
             long senderKey = varMessage.From.Id;
             DateTime time = convertTime;
 
-            // 명령어, 서브명령어 분리
-            string strMassage = varMessage.Text;
-            string strUserName = varMessage.From.FirstName + varMessage.From.LastName;
-            string strCommend = "";
-            string strContents = "";
-            bool isCommand = false;
-
             // 차단된 유저는 이용할 수 없다.
             if (userDirector.isBlockUser(senderKey) == true)
                 return;
@@ -585,6 +578,13 @@ namespace Athena
                     return;
                 }
             }
+
+            // 명령어, 서브명령어 분리
+            string strMassage = varMessage.Text;
+            string strUserName = varMessage.From.FirstName + varMessage.From.LastName;
+            string strCommend = "";
+            string strContents = "";
+            bool isCommand = false;
 
             // 명령어인지 아닌지 구분
             if (strMassage.Substring(0, 1) == "/")
