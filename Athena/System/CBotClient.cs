@@ -124,9 +124,9 @@ namespace Athena
             strPrint += "- Running Time : " + systemInfo.GetRunningTime() + "\n";
             strPrint += "[ All Completed. ]";
 
-#if !DEBUG
-            Bot.SendTextMessageAsync(-1001202203239, strPrint);  // 클랜방
-#endif
+//#if !DEBUG
+//            Bot.SendTextMessageAsync(-1001202203239, strPrint);  // 클랜방
+//#endif
         }
 
         // init methods...
@@ -3542,6 +3542,11 @@ namespace Athena
                     userDirector.removeBlockUser(blockUserKey);
 
                     await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[SYSTEM] 아테나 사용 차단되었습니다.", ParseMode.Default, false, false, iMessageID);
+                    return;
+                }
+                else
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 차단할 유저가 없습니다.", ParseMode.Default, false, false, iMessageID);
                     return;
                 }
             }
