@@ -51,17 +51,11 @@ namespace Athena
         CUserDirector userDirector = new CUserDirector();
         CNaturalLanguage naturalLanguage = new CNaturalLanguage();
         CNasInfo nasInfo = new CNasInfo();
+        CConfig config = new CConfig();
 
         bool isGoodMorning = false;
 
-        // Bot Token
-#if DEBUG
-        const string strBotToken = "624245556:AAHJQ3bwdUB6IRf1KhQ2eAg4UDWB5RTiXzI";     // 테스트 봇 토큰
-#else
-        const string strBotToken = "648012085:AAHxJwmDWlznWTFMNQ92hJyVwsB_ggJ9ED8";     // 봇 토큰
-#endif
-
-        private Telegram.Bot.TelegramBotClient Bot = new Telegram.Bot.TelegramBotClient(strBotToken);
+        private Telegram.Bot.TelegramBotClient Bot;// = new Telegram.Bot.TelegramBotClient(strBotToken);
 
         public void InitBotClient()
         {
@@ -90,6 +84,15 @@ namespace Athena
                 HttpClientInitializer = credential,
                 ApplicationName = ApplicationName,
             });
+
+
+            // json
+            config.loadConfig();
+#if DEBUG
+            Bot = new Telegram.Bot.TelegramBotClient(config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_TEST));
+#else
+            Bot = new Telegram.Bot.TelegramBotClient(config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_BOT));
+#endif
 
             strPrint += "- External API Loading Completed.\n";
 
@@ -125,7 +128,7 @@ namespace Athena
             strPrint += "[ All Completed. ]";
 
 //#if !DEBUG
-//            Bot.SendTextMessageAsync(-1001202203239, strPrint);  // 클랜방
+//            Bot.SendTextMessageAsync(config.getGroupKey(GROUP_TYPE.GROUP_TYPE_CLAN), strPrint);  // 클랜방
 //#endif
         }
 
@@ -148,7 +151,7 @@ namespace Athena
             bool bResult = true;
 
             // Define request parameters.
-            String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+            String spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
             String range = "클랜원 목록!C7:N";
             SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
@@ -178,9 +181,12 @@ namespace Athena
                         user = setUserInfo(row, Convert.ToInt64(row[10].ToString()));
 
                         // 휴린, 냉각콜라, 만슬, 루미녹스일 경우
-                        if ((user.UserKey == 23842788) || (user.UserKey == 50872681) ||
-                            (user.UserKey == 474057213) || (user.UserKey == 83970696) ||
-                            (user.UserKey == 40883797))
+                        if ((config.getAdminKey(ADMIN_TYPE.ADMIN_TYPE_COKE) == user.UserKey) ||
+                            (config.getAdminKey(ADMIN_TYPE.ADMIN_TYPE_HYULIN) == user.UserKey) ||
+                            (config.getAdminKey(ADMIN_TYPE.ADMIN_TYPE_MANS3UL) == user.UserKey) ||
+                            (config.getAdminKey(ADMIN_TYPE.ADMIN_TYPE_LUMINOX) == user.UserKey) ||
+                            (config.getAdminKey(ADMIN_TYPE.ADMIN_TYPE_GOGI) == user.UserKey))
+
                         {
                             // 유저 타입을 관리자로
                             user.UserType = USER_TYPE.USER_TYPE_ADMIN;
@@ -300,9 +306,11 @@ namespace Athena
             user.Info = row[9].ToString();
 
             // 휴린, 냉각콜라, 만슬, 루미녹스, 고기일 경우
-            if ((user.UserKey == 23842788) || (user.UserKey == 50872681) ||
-                (user.UserKey == 474057213) || (user.UserKey == 83970696) ||
-                (user.UserKey == 40883797))
+            if ((config.getAdminKey(ADMIN_TYPE.ADMIN_TYPE_COKE) == user.UserKey) ||
+                (config.getAdminKey(ADMIN_TYPE.ADMIN_TYPE_HYULIN) == user.UserKey) ||
+                (config.getAdminKey(ADMIN_TYPE.ADMIN_TYPE_MANS3UL) == user.UserKey) ||
+                (config.getAdminKey(ADMIN_TYPE.ADMIN_TYPE_LUMINOX) == user.UserKey) ||
+                (config.getAdminKey(ADMIN_TYPE.ADMIN_TYPE_GOGI) == user.UserKey))
             {
                 // 유저 타입을 관리자로
                 user.UserType = USER_TYPE.USER_TYPE_ADMIN;
@@ -390,9 +398,9 @@ namespace Athena
                     strPrint += "굿모닝~ 오늘도 즐거운 하루 되세요~ :)";
 
 #if DEBUG
-                    Bot.SendTextMessageAsync(-1001482490165, strPrint);  // 운영진방
+                    Bot.SendTextMessageAsync(config.getGroupKey(GROUP_TYPE.GROUP_TYPE_ADMIN), strPrint);  // 운영진방
 #else
-                    Bot.SendTextMessageAsync(-1001202203239, strPrint);  // 클랜방
+                    Bot.SendTextMessageAsync(config.getGroupKey(GROUP_TYPE.GROUP_TYPE_CLAN), strPrint);  // 클랜방
 #endif
                 }
             }
@@ -424,9 +432,9 @@ namespace Athena
                             {
                                 userDirector.RemoveNoti(elem.Value.UserKey, index);
 #if DEBUG
-                                Bot.SendTextMessageAsync(-1001482490165, strPrint);  // 운영진방
+                                Bot.SendTextMessageAsync(config.getGroupKey(GROUP_TYPE.GROUP_TYPE_ADMIN), strPrint);  // 운영진방
 #else
-                                Bot.SendTextMessageAsync(-1001202203239, strPrint);  // 클랜방
+                                Bot.SendTextMessageAsync(config.getGroupKey(GROUP_TYPE.GROUP_TYPE_CLAN), strPrint);  // 클랜방
 #endif
                                 strPrint = "";
                                 index++;
@@ -440,7 +448,7 @@ namespace Athena
             }
 
             // Define request parameters.
-            String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+            String spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
             String range = "클랜 공지!C15:C23";
             String updateRange = "클랜 공지!H14";
             SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
@@ -485,9 +493,9 @@ namespace Athena
                     }
 
 #if DEBUG
-                    Bot.SendTextMessageAsync(-1001482490165, strPrint);  // 운영진방
+                    Bot.SendTextMessageAsync(config.getGroupKey(GROUP_TYPE.GROUP_TYPE_ADMIN), strPrint);  // 운영진방
 #else
-                    Bot.SendTextMessageAsync(-1001202203239, strPrint);  // 클랜방
+                    Bot.SendTextMessageAsync(config.getGroupKey(GROUP_TYPE.GROUP_TYPE_CLAN), strPrint);  // 클랜방
 #endif
                 }
             }
@@ -528,11 +536,11 @@ namespace Athena
             // 입장 메시지 일 경우
             if (varMessage.Type == MessageType.ChatMembersAdded)
             {
-                if (varMessage.Chat.Id == -1001389956706)   // 사전안내방
+                if (varMessage.Chat.Id == config.getGroupKey(GROUP_TYPE.GROUP_TYPE_GUIDE))   // 사전안내방
                 {
                     varMessage.Text = "/안내";
                 }
-                else if (varMessage.Chat.Id == -1001202203239)      // 본방
+                else if (varMessage.Chat.Id == config.getGroupKey(GROUP_TYPE.GROUP_TYPE_CLAN))      // 본방
                 {
                     string strInfo = "";
 
@@ -612,9 +620,9 @@ namespace Athena
             }
 
             // CDT 관련방 아니면 동작하지 않도록
-            if (varMessage.Chat.Id != -1001202203239 &&     // 본방
-                varMessage.Chat.Id != -1001482490165 &&     // 운영진방
-                varMessage.Chat.Id != -1001389956706 &&     // 사전안내방
+            if (varMessage.Chat.Id != config.getGroupKey(GROUP_TYPE.GROUP_TYPE_CLAN) &&     // 본방
+                varMessage.Chat.Id != config.getGroupKey(GROUP_TYPE.GROUP_TYPE_ADMIN) &&     // 운영진방
+                varMessage.Chat.Id != config.getGroupKey(GROUP_TYPE.GROUP_TYPE_GUIDE) &&     // 사전안내방
                 varMessage.Chat.Username != "hyulin")
             {
                 await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 사용할 수 없는 대화방입니다.", ParseMode.Default, false, false, iMessageID);
@@ -628,7 +636,7 @@ namespace Athena
 #if DEBUG
                 userDirector.addMessage(senderKey, strMassage, time);
 #else
-                if (senderKey != 0 && strMassage != "" && varMessage.Chat.Id == -1001202203239)
+                if (senderKey != 0 && strMassage != "" && varMessage.Chat.Id == config.getGroupKey(GROUP_TYPE.GROUP_TYPE_CLAN))
                     userDirector.addMessage(senderKey, strMassage, time);
 #endif
             }
@@ -639,11 +647,11 @@ namespace Athena
             }
 
             // 명령어가 아닐 경우와 사전안내방이 아닌 경우
-            if (isCommand == false && varMessage.Chat.Id != -1001389956706)
+            if (isCommand == false && varMessage.Chat.Id != config.getGroupKey(GROUP_TYPE.GROUP_TYPE_GUIDE))
             {
                 bool isMainRoom = false;
 
-                if (varMessage.Chat.Id == -1001202203239)
+                if (varMessage.Chat.Id == config.getGroupKey(GROUP_TYPE.GROUP_TYPE_CLAN))
                     isMainRoom = true;
 
                 Tuple<string, string, bool> tuple = naturalLanguage.morphemeProcessor(strMassage, userDirector.getMessage(senderKey), isMainRoom);
@@ -754,7 +762,7 @@ namespace Athena
                     string battleTag = strContents;
 
                     // Define request parameters.
-                    String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                    String spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
                     String range = "클랜원 목록!C7:N";
                     SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
@@ -884,7 +892,7 @@ namespace Athena
             else if (strCommend == "/공지")
             {
                 // Define request parameters.
-                String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                String spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
                 String range = "클랜 공지!C15:C23";
                 SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
@@ -923,7 +931,7 @@ namespace Athena
                 CCalendarDirector calendarDirector = new CCalendarDirector();
 
                 // Define request parameters.
-                String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                String spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
                 String range = "클랜 공지!I13:Q27";
                 SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
@@ -1036,7 +1044,7 @@ namespace Athena
                 else
                 {
                     // Define request parameters.
-                    String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                    String spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
                     String range = "클랜원 목록!C7:N";
                     SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
@@ -1216,7 +1224,7 @@ namespace Athena
                 }
 
                 // Define request parameters.
-                String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                String spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
 
                 if (strContents.Contains("20") == false)
                 {
@@ -1412,7 +1420,7 @@ namespace Athena
                 else
                 {
                     // Define request parameters.
-                    String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                    String spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
                     String range = "클랜원 목록!C7:N";
                     SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
                     bool bResult = false;
@@ -1472,7 +1480,7 @@ namespace Athena
             else if (strCommend == "/모임")
             {
                 // Define request parameters.
-                String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                String spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
                 String range = "모임!C4:R12";
                 SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
@@ -1661,7 +1669,7 @@ namespace Athena
             }
             else if (strCommend == "/참가")
             {
-                String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                String spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
                 String range = "모임!D4:D";
                 SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
@@ -1689,7 +1697,7 @@ namespace Athena
                 bool isJoin = false;
 
                 // Define request parameters.
-                spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
                 range = "모임!C" + iCellIndex + ":C";
                 request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
@@ -1817,7 +1825,7 @@ namespace Athena
             }
             else if (strCommend == "/불참")
             {
-                String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                String spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
                 String range = "모임!D4:D";
                 SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
@@ -1842,7 +1850,7 @@ namespace Athena
                 bool isJoin = false;
 
                 // Define request parameters.
-                spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
                 range = "모임!C" + iCellIndex + ":C";
                 request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
@@ -1914,7 +1922,7 @@ namespace Athena
                 bool isAnonymous = false;
 
                 // Define request parameters.
-                String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                String spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
                 String range = "투표!B4:J";
                 SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
@@ -2164,7 +2172,7 @@ namespace Athena
                 if (strContents == "")
                 {
                     // 내부 대회
-                    String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                    String spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
                     String range = "명예의 전당!B7:F16";
                     SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
@@ -2259,7 +2267,7 @@ namespace Athena
 
                         item--;
 
-                        String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                        String spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
                         String range = "명예의 전당!B" + (7 + item) + ":F" + (7 + item);
                         SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
@@ -2294,7 +2302,7 @@ namespace Athena
 
                         item--;
 
-                        String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                        String spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
                         String range = "명예의 전당!B" + (21 + item) + ":F" + (21 + item);
                         SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
@@ -2355,7 +2363,7 @@ namespace Athena
 
                 if (strContents == "")
                 {
-                    String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                    String spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
                     String range = sheetName + "!B2:U" + endLine;
                     SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
@@ -2437,7 +2445,7 @@ namespace Athena
                 {
                     // 타이틀 Load
                     {
-                        String sheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                        String sheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
                         String titleRange = sheetName + "!B2:B";
                         SpreadsheetsResource.ValuesResource.GetRequest titleRequest = service.Spreadsheets.Values.Get(sheetId, titleRange);
 
@@ -2524,7 +2532,7 @@ namespace Athena
                         }
                     }
 
-                    String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                    String spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
                     CUser user = new CUser();
 
                     // 클랜원 목록에서 정보 추출
@@ -2727,7 +2735,7 @@ namespace Athena
             {
                 if (strContents == "")
                 {
-                    String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                    String spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
                     String range = "일정 조사!L7:R14";
                     SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
                     ValueRange response = request.Execute();
@@ -2842,7 +2850,7 @@ namespace Athena
 
                     string calTitle = "";
 
-                    String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                    String spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
                     String range = "일정 조사!L7:L";
                     SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
                     ValueRange response = request.Execute();
@@ -2868,7 +2876,7 @@ namespace Athena
 
                     int index = 0;
 
-                    spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                    spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
                     range = "일정 조사!B5:J74";
                     request = service.Spreadsheets.Values.Get(spreadsheetId, range);
                     response = request.Execute();
@@ -3492,7 +3500,7 @@ namespace Athena
                 else
                 {
                     // Define request parameters.
-                    String spreadsheetId = "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8";
+                    String spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
                     String range = "클랜원 목록!C7:N";
                     SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
@@ -3551,6 +3559,37 @@ namespace Athena
                 }
             }
             //========================================================================================
+            // 방등록
+            //========================================================================================
+            else if (strCommend == "/방등록")
+            {
+                var user = userDirector.getUserInfo(senderKey);
+                if (user.UserType != USER_TYPE.USER_TYPE_ADMIN)
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 해당 명렁어는 운영진 권한이 필요합니다.", ParseMode.Default, false, false, iMessageID);
+                    return;
+                }
+
+                if (strContents == "")
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 등록할 방을 입력해주세요.", ParseMode.Default, false, false, iMessageID);
+                    return;
+                }
+
+                if (strContents == "운영")
+                {
+
+                }
+                else if (strContents == "클랜")
+                {
+
+                }
+                else if (strContents == "안내")
+                {
+
+                }
+            }
+            //========================================================================================
             // 안내
             //========================================================================================
             else if (strCommend == "/안내")
@@ -3586,10 +3625,10 @@ namespace Athena
             //========================================================================================
             else if (strCommend == "/전달")
             {
-                if (senderKey != 23842788)
+                if (config.getAdminKey(ADMIN_TYPE.ADMIN_TYPE_HYULIN) == senderKey)
                     return;
 
-                await Bot.SendTextMessageAsync(-1001202203239, strContents);
+                await Bot.SendTextMessageAsync(config.getGroupKey(GROUP_TYPE.GROUP_TYPE_CLAN), strContents);
             }
             //========================================================================================
             // 리포트

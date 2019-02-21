@@ -1,0 +1,21 @@
+{
+	"token": {
+		"Bot": "648012085:AAHxJwmDWlznWTFMNQ92hJyVwsB_ggJ9ED8",
+		"Test": "624245556:AAHJQ3bwdUB6IRf1KhQ2eAg4UDWB5RTiXzI",
+		"Sheet": "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8"
+	},
+
+	"admin": {
+		"냉각콜라": 50872681,
+		"휴린": 23842788,
+		"만슬": 474057213,
+		"루미녹스": 83970696,
+		"고기": 40883797
+	},
+	
+	"group": {
+		"클랜방": -1001202203239,
+		"운영진방": -1001482490165,
+		"사전안내방": -1001389956706
+	}
+}

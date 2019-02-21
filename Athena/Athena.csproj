@@ -177,6 +177,7 @@
     <Compile Include="ClanFunction\Calendar\CCalendarDirector.cs" />
     <Compile Include="EasterEgg\CEasterEgg.cs" />
     <Compile Include="NaturalLanguage\CNaturalLanguage.cs" />
+    <Compile Include="System\CConfig.cs" />
     <Compile Include="System\CLog.cs" />
     <Compile Include="System\CSystemInfo.cs" />
     <Compile Include="TwitterKoreanProcessorCS.cs" />
