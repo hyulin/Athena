@@ -180,13 +180,8 @@ namespace Athena
                         CUser user = new CUser();
                         user = setUserInfo(row, Convert.ToInt64(row[10].ToString()));
 
-                        // 휴린, 냉각콜라, 만슬, 루미녹스일 경우
-                        if ((config.getAdminKey(ADMIN_TYPE.ADMIN_TYPE_COKE) == user.UserKey) ||
-                            (config.getAdminKey(ADMIN_TYPE.ADMIN_TYPE_HYULIN) == user.UserKey) ||
-                            (config.getAdminKey(ADMIN_TYPE.ADMIN_TYPE_MANS3UL) == user.UserKey) ||
-                            (config.getAdminKey(ADMIN_TYPE.ADMIN_TYPE_LUMINOX) == user.UserKey) ||
-                            (config.getAdminKey(ADMIN_TYPE.ADMIN_TYPE_GOGI) == user.UserKey))
-
+                        // 운영진일 경우
+                        if (config.isAdmin(user.UserKey))
                         {
                             // 유저 타입을 관리자로
                             user.UserType = USER_TYPE.USER_TYPE_ADMIN;
@@ -305,12 +300,8 @@ namespace Athena
             user.Time = row[8].ToString();
             user.Info = row[9].ToString();
 
-            // 휴린, 냉각콜라, 만슬, 루미녹스, 고기일 경우
-            if ((config.getAdminKey(ADMIN_TYPE.ADMIN_TYPE_COKE) == user.UserKey) ||
-                (config.getAdminKey(ADMIN_TYPE.ADMIN_TYPE_HYULIN) == user.UserKey) ||
-                (config.getAdminKey(ADMIN_TYPE.ADMIN_TYPE_MANS3UL) == user.UserKey) ||
-                (config.getAdminKey(ADMIN_TYPE.ADMIN_TYPE_LUMINOX) == user.UserKey) ||
-                (config.getAdminKey(ADMIN_TYPE.ADMIN_TYPE_GOGI) == user.UserKey))
+            // 운영진일 경우
+            if (config.isAdmin(user.UserKey))
             {
                 // 유저 타입을 관리자로
                 user.UserType = USER_TYPE.USER_TYPE_ADMIN;
@@ -3625,7 +3616,7 @@ namespace Athena
             //========================================================================================
             else if (strCommend == "/전달")
             {
-                if (config.getAdminKey(ADMIN_TYPE.ADMIN_TYPE_HYULIN) == senderKey)
+                if (config.isDeveloper(senderKey))
                     return;
 
                 await Bot.SendTextMessageAsync(config.getGroupKey(GROUP_TYPE.GROUP_TYPE_CLAN), strContents);

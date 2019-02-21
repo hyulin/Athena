@@ -16,16 +16,16 @@ namespace Athena
         TOKEN_TYPE_MAX
     }
 
-    enum ADMIN_TYPE
-    {
-        ADMIN_TYPE_COKE,
-        ADMIN_TYPE_HYULIN,
-        ADMIN_TYPE_MANS3UL,
-        ADMIN_TYPE_LUMINOX,
-        ADMIN_TYPE_GOGI,
+    //enum ADMIN_TYPE
+    //{
+    //    ADMIN_TYPE_COKE,
+    //    ADMIN_TYPE_HYULIN,
+    //    ADMIN_TYPE_MANS3UL,
+    //    ADMIN_TYPE_LUMINOX,
+    //    ADMIN_TYPE_GOGI,
         
-        ADMIN_TYPE_MAX
-    }
+    //    ADMIN_TYPE_MAX
+    //}
 
     enum GROUP_TYPE
     {
@@ -39,8 +39,9 @@ namespace Athena
     class CConfig
     {
         public List<string> token_ { get; set; }
-        public List<long> admin_ { get; set; }
         public List<long> group_ { get; set; }
+        public List<long> admin_ { get; set; }
+        public long developer_ { get; set; }
 
         public void loadConfig()
         {
@@ -60,14 +61,6 @@ namespace Athena
             if (admin_ != null && admin_.Count > 0)
                 admin_.Clear();
 
-            List<long> admin = new List<long>();
-            admin.Add((long)json["admin"]["냉각콜라"]);
-            admin.Add((long)json["admin"]["휴린"]);
-            admin.Add((long)json["admin"]["만슬"]);
-            admin.Add((long)json["admin"]["루미녹스"]);
-            admin.Add((long)json["admin"]["고기"]);
-            admin_ = admin;
-
             if (group_ != null && group_.Count > 0)
                 group_.Clear();
 
@@ -76,6 +69,15 @@ namespace Athena
             group.Add((long)json["group"]["운영진방"]);
             group.Add((long)json["group"]["사전안내방"]);
             group_ = group;
+
+            List<long> admin = new List<long>();
+            foreach (var user in json["admin"])
+            {
+                admin.Add((long)user.ElementAt(0));
+            }
+            admin_ = admin;
+
+            developer_ = (long)json["developer"];
         }
 
         public string getTokenKey(TOKEN_TYPE type)
@@ -83,16 +85,22 @@ namespace Athena
             return token_.ElementAt((int)type);
         }
 
-        public long getAdminKey(ADMIN_TYPE type)
+        public bool isAdmin(long userKey)
         {
-            return admin_.ElementAt((int)type);
+            return admin_.Contains(userKey);
+        }
+
+        public bool isDeveloper(long userKey)
+        {
+            if (developer_ == userKey)
+                return true;
+
+            return false;
         }
 
         public long getGroupKey(GROUP_TYPE type)
         {
             return group_.ElementAt((int)type);
         }
-
-        // Todo : 방 등록 시에 config 및 json 파일 자동 수정
     }
 }
