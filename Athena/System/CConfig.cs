@@ -41,6 +41,7 @@ namespace Athena
         public List<string> token_ { get; set; }
         public List<long> group_ { get; set; }
         public List<long> admin_ { get; set; }
+        public List<string> admin_ID_ { get; set; }
         public long developer_ { get; set; }
 
         public void loadConfig()
@@ -76,6 +77,13 @@ namespace Athena
                 admin.Add((long)user.ElementAt(0));
             }
             admin_ = admin;
+
+            List<string> admin_id = new List<string>();
+            foreach (var user in json["admin_id"])
+            {
+                admin_id.Add(user.ElementAt(0).ToString());
+            }
+            admin_ID_ = admin_id;
 
             developer_ = (long)json["developer"];
         }

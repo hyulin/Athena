@@ -177,5 +177,21 @@ namespace Athena
 
             return false;
         }
+
+        public List<CUser> getAdminUser()
+        {
+            List<CUser> admin = new List<CUser>();
+
+            var allUser = getAllUserInfo();
+            foreach (var iter in allUser)
+            {
+                if (iter.Value.UserType == USER_TYPE.USER_TYPE_ADMIN)
+                {
+                    admin.Add(iter.Value);
+                }
+            }
+            
+            return admin;
+        }
     }
 }

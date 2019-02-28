@@ -3607,7 +3607,11 @@ namespace Athena
                 await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream03, "");
                 await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream04, "");
 
-                strPrint = "위 가이드는 본방에서 /안내 입력 시 다시 보실 수 있습니다.";
+                strPrint = "위 가이드는 본방에서 /안내 입력 시 다시 보실 수 있습니다.\n\n";
+                foreach (var iter in config.admin_ID_)
+                {
+                    strPrint += "@" + iter + " ";
+                }
 
                 await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
             }
