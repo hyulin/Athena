@@ -3170,7 +3170,7 @@ namespace Athena
 
                     if (city.Item1 == "" || city.Item2 == "")
                     {
-                        strPrint += "[ERROR] 지역을 다시 확인해주세요.";
+                        strPrint += "[ERROR] 지역을 다시 확인해주세요.\n";
                     }
                     else
                     {
@@ -3200,8 +3200,9 @@ namespace Athena
                         }
                         catch
                         {
-                            await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 날씨를 조회할 수 없습니다.", ParseMode.Default, false, false, iMessageID);
-                            return;
+                            // 없을 수도 있다.
+                            //await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 날씨를 조회할 수 없습니다.", ParseMode.Default, false, false, iMessageID);
+                            //return;
                         }
 
                         // 공공데이터포럼 미세먼지
@@ -3296,19 +3297,20 @@ namespace Athena
                             }
 
                             strPrint += "- 미세먼지 : " + pm10GradeString.ToString() + "(" + pm10Value.ToString() + ")\n";
-                            strPrint += "- 초미세먼지 : " + pm25GradeString.ToString() + "(" + pm25Value.ToString() + ")\n\n";
-                            strPrint += "* 자료제공\n(날씨) OpenWeatherMap\n(대기) 한국환경공단, 공공데이터포럼";
+                            strPrint += "- 초미세먼지 : " + pm25GradeString.ToString() + "(" + pm25Value.ToString() + ")\n";
                         }
                         catch
                         {
-                            await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 날씨를 조회할 수 없습니다.", ParseMode.Default, false, false, iMessageID);
-                            return;
+                            // 미세먼지는 지역이 없을 수 있다.
+                            //await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 날씨를 조회할 수 없습니다.", ParseMode.Default, false, false, iMessageID);
+                            //return;
                         }
                     }
                 }
 
                 if (strPrint != "")
                 {
+                    strPrint += "\n* 자료제공\n(날씨) OpenWeatherMap\n(대기) 한국환경공단, 공공데이터포럼";
                     await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
                 }
                 else
