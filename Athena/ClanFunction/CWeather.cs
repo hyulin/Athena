@@ -563,6 +563,11 @@ namespace Athena
                 eng = "Anseong";
                 kor = "안성";
             }
+            else if (city.Contains("수원") == true)
+            {
+                eng = "suwon-si";
+                kor = "수원";
+            }
 
             Tuple<string, string> tuple = Tuple.Create(eng, kor);
 
