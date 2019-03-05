@@ -431,6 +431,7 @@ namespace Athena
                     int rank = 1;
                     int afterRank = 1;
                     ulong afterValue = 0;
+                    bool isContinue = false;
                     strPrint += "[ 금주의 루팡 Top 10 ]\n============================\n";
                     foreach (KeyValuePair<long, ulong> item in dicChattingCount.OrderByDescending(key => key.Value))
                     {
@@ -441,17 +442,22 @@ namespace Athena
                             break;
 
                         var user = userDirector.getUserInfo(item.Key);
+                        float value = Convert.ToSingle(item.Value);
+                        float count = Convert.ToSingle(totalCount);
 
                         if (afterValue == item.Value)
                         {
-                            afterRank--;
+                            if (isContinue == false)
+                                afterRank--;
 
-                            strPrint += afterRank.ToString() + ". " + user.Name + " : " + item.Value + " (" + (item.Value / totalCount * 100) + "%)\n";
+                            isContinue = true;
+                            strPrint += afterRank.ToString() + ". " + user.Name + " - " + item.Value + "건 (" + Math.Round(value / count * 100.0, 2) + "%)\n";
                             rank++;
                         }
                         else
                         {
-                            strPrint += rank.ToString() + ". " + user.Name + " : " + item.Value + " (" + (item.Value / totalCount * 100) + "%)\n";
+                            isContinue = false;
+                            strPrint += rank.ToString() + ". " + user.Name + " - " + item.Value + "건 (" + Math.Round(value / count * 100.0, 2) + "%)\n";
                             rank++;
                             afterRank = rank;
                         }
