@@ -530,7 +530,10 @@ namespace Athena
         {
             var varMessage = e.Message;
 
-            if (varMessage == null || (varMessage.Type != MessageType.Text && varMessage.Type != MessageType.ChatMembersAdded))
+            if (varMessage == null ||
+                (varMessage.Type != MessageType.Sticker &&
+                 varMessage.Type != MessageType.Text &&
+                 varMessage.Type != MessageType.ChatMembersAdded))
             {
                 if (varMessage.Caption != "/up")
                     return;
@@ -554,6 +557,10 @@ namespace Athena
 
             // 대화량 누적
             userDirector.increaseChattingCount(senderKey);
+
+            // 스티커는 넘어간다.
+            if (varMessage.Type == MessageType.Sticker)
+                return;
 
             // 차단된 유저는 이용할 수 없다.
             if (userDirector.isBlockUser(senderKey) == true)
@@ -3661,7 +3668,7 @@ namespace Athena
                 }
 
                 long rank = 1;
-                strPrint += "[ 대화량 순위 ]\n==========================\n";
+                strPrint += "[ 대화량 순위 ]\n============================\n";
                 foreach (KeyValuePair<long, ulong> item in dicChattingCount.OrderByDescending(key => key.Value))
                 {
                     if (rank > 10)
@@ -3676,7 +3683,7 @@ namespace Athena
                     rank++;
                 }
 
-                strPrint += "";
+                await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
             }
             //========================================================================================
             // 안내

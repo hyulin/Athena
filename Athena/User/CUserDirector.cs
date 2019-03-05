@@ -215,10 +215,10 @@ namespace Athena
             if (userInfo.UserKey > 0)
             {
                 userInfo.chattingCount++;
-            }
 
-            // 파일에 백업
-            System.IO.File.WriteAllText(@"Data/Chatting/" + "ChattingCount_" + userKey.ToString() + ".txt", userInfo.chattingCount.ToString() + "\n", Encoding.UTF8);
+                // 파일에 백업
+                System.IO.File.WriteAllText(@"Data/Chatting/" + "ChattingCount_" + userKey.ToString() + ".txt", userInfo.chattingCount.ToString() + "\n", Encoding.UTF8);
+            }
         }
 
         public void setChattingCount(long userKey, ulong count)
