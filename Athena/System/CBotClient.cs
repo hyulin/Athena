@@ -3733,6 +3733,7 @@ namespace Athena
                 int rank = 1;
                 int afterRank = 1;
                 ulong afterValue = 0;
+                bool isContinue = false;
                 strPrint += "[ 대화량 순위 Top 10 ]\n============================\n";
                 foreach (KeyValuePair<long, ulong> item in dicChattingCount.OrderByDescending(key => key.Value))
                 {
@@ -3746,13 +3747,16 @@ namespace Athena
 
                     if (afterValue == item.Value)
                     {
-                        afterRank--;
+                        if (isContinue == false)
+                            afterRank--;
 
+                        isContinue = true;
                         strPrint += afterRank.ToString() + ". " + user.Name + " : " + item.Value + "\n";
                         rank++;
                     }
                     else
                     {
+                        isContinue = false;
                         strPrint += rank.ToString() + ". " + user.Name + " : " + item.Value + "\n";
                         rank++;
                         afterRank = rank;
