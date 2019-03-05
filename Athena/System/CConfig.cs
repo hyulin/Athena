@@ -110,5 +110,22 @@ namespace Athena
         {
             return group_.ElementAt((int)type);
         }
+
+        public GROUP_TYPE getGroupType(long chatID)
+        {
+            GROUP_TYPE rtType = GROUP_TYPE.GROUP_TYPE_CLAN;
+
+            foreach (var iter in group_)
+            {
+                if (iter == chatID)
+                {
+                    return rtType;
+                }
+
+                rtType++;
+            }
+
+            return GROUP_TYPE.GROUP_TYPE_MAX;
+        }
     }
 }

@@ -556,7 +556,10 @@ namespace Athena
             DateTime time = convertTime;
 
             // 대화량 누적
-            userDirector.increaseChattingCount(senderKey);
+            if (config.getGroupType(varMessage.Chat.Id) == GROUP_TYPE.GROUP_TYPE_CLAN)
+            {
+                userDirector.increaseChattingCount(senderKey);
+            }
 
             // 스티커는 넘어간다.
             if (varMessage.Type == MessageType.Sticker)
@@ -3667,8 +3670,10 @@ namespace Athena
                     dicChattingCount.Add(iter.Value.UserKey, iter.Value.chattingCount);
                 }
 
-                long rank = 1;
-                strPrint += "[ 대화량 순위 ]\n============================\n";
+                int rank = 1;
+                int afterRank = 1;
+                ulong afterValue = 0;
+                strPrint += "[ 대화량 순위 Top 10 ]\n============================\n";
                 foreach (KeyValuePair<long, ulong> item in dicChattingCount.OrderByDescending(key => key.Value))
                 {
                     if (rank > 10)
@@ -3678,9 +3683,22 @@ namespace Athena
                         break;
                     
                     var user = userDirector.getUserInfo(item.Key);
-                    strPrint += rank.ToString() + ". " + user.Name + " : " + item.Value + "\n";
 
-                    rank++;
+                    if (afterValue == item.Value)
+                    {
+                        afterRank--;
+
+                        strPrint += afterRank.ToString() + ". " + user.Name + " : " + item.Value + "\n";
+                        rank++;
+                    }
+                    else
+                    {
+                        strPrint += rank.ToString() + ". " + user.Name + " : " + item.Value + "\n";
+                        rank++;
+                        afterRank = rank;
+                    }
+                    
+                    afterValue = item.Value;
                 }
 
                 await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
