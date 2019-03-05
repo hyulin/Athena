@@ -104,7 +104,7 @@ namespace Athena
                 strPrint += "- User Info Loading Fail.\n";
 
 
-            // 백업 파일에서 알림, 메모를 Load
+            // 백업 파일에서 알림, 메모, 채팅갯수를 Load
             if (loadData() == true)
                 strPrint += "- User Data Loading Completed.\n";
             else
@@ -210,9 +210,36 @@ namespace Athena
         {
             bool bResult = true;
 
-            string FolderName = @"Data/";
-            System.IO.DirectoryInfo di = new System.IO.DirectoryInfo(FolderName);
-            foreach (System.IO.FileInfo File in di.GetFiles())
+            string FolderName = @"Data/Chatting/";
+            System.IO.DirectoryInfo chatDir = new System.IO.DirectoryInfo(FolderName);
+            if (chatDir.Exists == false)
+                return false;
+
+            foreach (System.IO.FileInfo File in chatDir.GetFiles())
+            {
+                if (File.Name.Contains("ChattingCount_") == true)
+                {
+                    string fileName = File.Name.Replace("ChattingCount_", "");
+                    fileName = fileName.Replace(".txt", "");
+
+                    long userKey = Convert.ToInt64(fileName);
+
+                    CUser userInfo = userDirector.getUserInfo(userKey);
+                    if (userInfo.UserKey > 0)
+                    {
+                        string value = System.IO.File.ReadAllText(File.FullName, Encoding.UTF8);
+
+                        userInfo.chattingCount = Convert.ToUInt64(value);
+                    }
+                }
+            }
+
+            FolderName = @"Data/Noti/";
+            System.IO.DirectoryInfo notiDir = new System.IO.DirectoryInfo(FolderName);
+            if (notiDir.Exists == false)
+                return false;
+
+            foreach (System.IO.FileInfo File in notiDir.GetFiles())
             {
                 if (File.Name.Contains("Noti_") == true)
                 {
@@ -222,7 +249,7 @@ namespace Athena
                     long userKey = Convert.ToInt64(fileName);
 
                     CUser userInfo = userDirector.getUserInfo(userKey);
-                    
+
                     string[] memoValue = System.IO.File.ReadAllLines(FolderName + File.Name);
                     if (memoValue.Length > 0)
                     {
@@ -240,7 +267,16 @@ namespace Athena
                         }
                     }
                 }
-                else if (File.Name.Contains("Memo_") == true)
+            }
+
+            FolderName = @"Data/Memo/";
+            System.IO.DirectoryInfo memoDir = new System.IO.DirectoryInfo(FolderName);
+            if (memoDir.Exists == false)
+                return false;
+
+            foreach (System.IO.FileInfo File in memoDir.GetFiles())
+            {
+                if (File.Name.Contains("Memo_") == true)
                 {
                     string fileName = File.Name.Replace("Memo_", "");
                     fileName = fileName.Replace(".txt", "");
@@ -259,10 +295,6 @@ namespace Athena
                             userInfo.addMemo(memo);
                         }
                     }
-                }
-                else
-                {
-                    bResult = false;
                 }
             }
 
@@ -519,6 +551,9 @@ namespace Athena
             int iMessageID = varMessage.MessageId;
             long senderKey = varMessage.From.Id;
             DateTime time = convertTime;
+
+            // 대화량 누적
+            userDirector.increaseChattingCount(senderKey);
 
             // 차단된 유저는 이용할 수 없다.
             if (userDirector.isBlockUser(senderKey) == true)
@@ -3581,6 +3616,67 @@ namespace Athena
                 {
 
                 }
+            }
+            //========================================================================================
+            // 대화량 측정 리셋
+            //========================================================================================
+            else if (strCommend == "/리셋")
+            {
+                var user = userDirector.getUserInfo(senderKey);
+                if (user.UserType != USER_TYPE.USER_TYPE_ADMIN)
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 해당 명렁어는 운영진 권한이 필요합니다.", ParseMode.Default, false, false, iMessageID);
+                    return;
+                }
+
+                if (strContents == "")
+                {
+                    userDirector.resetChattingCount();
+                }
+                else
+                {
+                    CUser userInfo = userDirector.getUserInfoByName(strContents);
+                    if (userInfo.UserKey == 0)
+                    {
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 대화명을 찾을 수 없습니다.", ParseMode.Default, false, false, iMessageID);
+                        return;
+                    }
+
+                    userDirector.resetChattingCount(userInfo.UserKey);
+                }
+
+                await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[SYSTEM] 대화량 리셋 완료 됐습니다.", ParseMode.Default, false, false, iMessageID);
+            }
+            //========================================================================================
+            // 대화량 순위
+            //========================================================================================
+            else if (strCommend == "/순위")
+            {
+                var allUserInfo = userDirector.getAllUserInfo();
+                Dictionary<long, ulong> dicChattingCount = new Dictionary<long, ulong>();
+
+                foreach (var iter in allUserInfo)
+                {
+                    dicChattingCount.Add(iter.Value.UserKey, iter.Value.chattingCount);
+                }
+
+                long rank = 1;
+                strPrint += "[ 대화량 순위 ]\n==========================\n";
+                foreach (KeyValuePair<long, ulong> item in dicChattingCount.OrderByDescending(key => key.Value))
+                {
+                    if (rank > 10)
+                        break;
+
+                    if (item.Value == 0)
+                        break;
+                    
+                    var user = userDirector.getUserInfo(item.Key);
+                    strPrint += rank.ToString() + ". " + user.Name + " : " + item.Value + "\n";
+
+                    rank++;
+                }
+
+                strPrint += "";
             }
             //========================================================================================
             // 안내

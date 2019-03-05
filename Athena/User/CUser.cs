@@ -40,6 +40,7 @@ namespace Athena
         public string OtherPick { get; set; }
         public string Time { get; set; }
         public string Info { get; set; }
+        public ulong chattingCount { get; set; }
         
         List<CMessage> MessageList = new List<CMessage>();
         List<CPrivateNoti> PrivateNoti = new List<CPrivateNoti>();

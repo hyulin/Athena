@@ -44,6 +44,21 @@ namespace Athena
             return tempUserInfo;
         }
 
+        // 대화명으로 유저 정보 얻어옴
+        public CUser getUserInfoByName(string name)
+        {
+            foreach (var iter in userInfo)
+            {
+                if (iter.Value.Name.Contains(name) == true)
+                {
+                    return iter.Value;
+                }
+            }
+
+            CUser tempUserInfo = new CUser();
+            return tempUserInfo;
+        }
+
         // 유저 정보 갱신
         public bool reflechUserInfo(long userKey, CUser user)
         {
@@ -98,7 +113,7 @@ namespace Athena
             userInfo.addPrivateNoti(privateNoti);
 
             // 파일에 백업
-            System.IO.File.AppendAllText(@"Data/" + "Noti_" + userKey + ".txt", hour + "|" + min + "|" + userID + "|" + notiString + "\n", Encoding.UTF8);
+            System.IO.File.AppendAllText(@"Data/Noti/" + "Noti_" + userKey + ".txt", hour + "|" + min + "|" + userID + "|" + notiString + "\n", Encoding.UTF8);
         }
 
         public List<CPrivateNoti> getPrivateNoti(long userKey)
@@ -121,7 +136,7 @@ namespace Athena
             }
 
             // 파일에 백업
-            System.IO.File.WriteAllText(@"Data/" + "Noti_" + userKey + ".txt", backup, Encoding.UTF8);
+            System.IO.File.WriteAllText(@"Data/Noti/" + "Noti_" + userKey + ".txt", backup, Encoding.UTF8);
         }
 
         public void addMemo(long userKey, string memoString)
@@ -134,7 +149,7 @@ namespace Athena
             userInfo.addMemo(memo);
 
             // 파일에 백업
-            System.IO.File.AppendAllText(@"Data/" + "Memo_" + userKey + ".txt", memoString + "\n", Encoding.UTF8);
+            System.IO.File.AppendAllText(@"Data/Memo/" + "Memo_" + userKey + ".txt", memoString + "\n", Encoding.UTF8);
         }
 
         public List<CMemo> getMemo(long userKey)
@@ -157,7 +172,7 @@ namespace Athena
             }
 
             // 파일에 백업
-            System.IO.File.WriteAllText(@"Data/" + "Memo_" + userKey + ".txt", backup, Encoding.UTF8);
+            System.IO.File.WriteAllText(@"Data/Memo/" + "Memo_" + userKey + ".txt", backup, Encoding.UTF8);
         }
 
         public void addBlockUser(long userKey)
@@ -192,6 +207,64 @@ namespace Athena
             }
             
             return admin;
+        }
+
+        public void increaseChattingCount(long userKey)
+        {
+            CUser userInfo = getUserInfo(userKey);
+            if (userInfo.UserKey > 0)
+            {
+                userInfo.chattingCount++;
+            }
+
+            // 파일에 백업
+            System.IO.File.WriteAllText(@"Data/Chatting/" + "ChattingCount_" + userKey.ToString() + ".txt", userInfo.chattingCount.ToString() + "\n", Encoding.UTF8);
+        }
+
+        public void setChattingCount(long userKey, ulong count)
+        {
+            CUser userInfo = getUserInfo(userKey);
+            if (userInfo.UserKey > 0)
+            {
+                userInfo.chattingCount = count;
+            }
+        }
+
+        public void resetChattingCount(long userKey = 0)
+        {
+            if (userKey == 0)
+            {
+                foreach (var iter in userInfo)
+                {
+                    iter.Value.chattingCount = 0;
+                }
+
+                if (System.IO.Directory.Exists(@"Data/Chatting/"))
+                {
+                    string[] files = System.IO.Directory.GetFiles(@"Data/Chatting/");
+
+                    foreach (string file in files)
+                    {
+                        string fileName = System.IO.Path.GetFileName(file);
+                        string deletefile = @"Data/Chatting/" + fileName;
+                        System.IO.File.Delete(deletefile);
+                    }
+                }
+
+                return;
+            }
+
+            CUser user = getUserInfo(userKey);
+            if (user.UserKey > 0)
+            {
+                user.chattingCount = 0;
+            }
+
+            string filePath = @"Data/Chatting/" + "ChattingCount_" + userKey.ToString() + ".txt";
+            if (System.IO.File.Exists(filePath))
+            {
+                System.IO.File.Delete(filePath);
+            }
         }
     }
 }
