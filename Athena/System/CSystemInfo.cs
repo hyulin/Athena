@@ -24,6 +24,11 @@ namespace Athena
         {
             return startTime_;
         }
+        
+        public DayOfWeek getNowDayOfWeek()
+        {
+            return System.DateTime.Now.DayOfWeek;
+        }
 
         public string GetRunningTime()
         {

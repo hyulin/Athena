@@ -54,6 +54,7 @@ namespace Athena
         CConfig config = new CConfig();
 
         bool isGoodMorning = false;
+        bool isLupinOfWeek = false;
 
         private Telegram.Bot.TelegramBotClient Bot;// = new Telegram.Bot.TelegramBotClient(strBotToken);
 
@@ -411,7 +412,66 @@ namespace Athena
         // 아래 이벤트 핸들러 실행
         public void timer_Elapsed(object sender, ElapsedEventArgs e)
         {
-           string strPrint = "";
+            string strPrint = "";
+            
+            if (systemInfo.getNowDayOfWeek() == DayOfWeek.Sunday)
+            {
+                if (isLupinOfWeek == false && DateTime.Now.Hour == 23)
+                {
+                    var allUser = userDirector.getAllUserInfo();
+                    Dictionary<long, ulong> dicChattingCount = new Dictionary<long, ulong>();
+
+                    foreach (var iter in allUser)
+                    {
+                        dicChattingCount.Add(iter.Value.UserKey, iter.Value.chattingCount);
+                    }
+
+                    int rank = 1;
+                    int afterRank = 1;
+                    ulong afterValue = 0;
+                    strPrint += "[ 금주의 루팡 Top 10 ]\n============================\n";
+                    foreach (KeyValuePair<long, ulong> item in dicChattingCount.OrderByDescending(key => key.Value))
+                    {
+                        if (rank > 10)
+                            break;
+
+                        if (item.Value == 0)
+                            break;
+
+                        var user = userDirector.getUserInfo(item.Key);
+
+                        if (afterValue == item.Value)
+                        {
+                            afterRank--;
+
+                            strPrint += afterRank.ToString() + ". " + user.Name + " : " + item.Value + "\n";
+                            rank++;
+                        }
+                        else
+                        {
+                            strPrint += rank.ToString() + ". " + user.Name + " : " + item.Value + "\n";
+                            rank++;
+                            afterRank = rank;
+                        }
+
+                        afterValue = item.Value;
+                    }
+
+                    userDirector.resetChattingCount();
+                    strPrint += "\n대화량 카운트가 초기화 됐습니다.";
+                    isLupinOfWeek = true;
+
+#if DEBUG
+                    Bot.SendTextMessageAsync(config.getGroupKey(GROUP_TYPE.GROUP_TYPE_ADMIN), strPrint);  // 운영진방
+#else
+                    Bot.SendTextMessageAsync(config.getGroupKey(GROUP_TYPE.GROUP_TYPE_CLAN), strPrint);  // 클랜방
+#endif
+                }
+                else if (DateTime.Now.Hour != 23)
+                {
+                    isLupinOfWeek = false;
+                }
+            }
 
             if (DateTime.Now.Hour == 8)
             {
