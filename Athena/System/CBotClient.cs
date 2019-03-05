@@ -442,8 +442,8 @@ namespace Athena
                             break;
 
                         var user = userDirector.getUserInfo(item.Key);
-                        float value = Convert.ToSingle(item.Value);
-                        float count = Convert.ToSingle(totalCount);
+                        double value = Convert.ToDouble(item.Value);
+                        double count = Convert.ToDouble(totalCount);
 
                         if (afterValue == item.Value)
                         {
@@ -3750,8 +3750,8 @@ namespace Athena
                         break;
                     
                     var user = userDirector.getUserInfo(item.Key);
-                    float value = Convert.ToSingle(item.Value);
-                    float count = Convert.ToSingle(totalCount);
+                    double value = Convert.ToDouble(item.Value);
+                    double count = Convert.ToDouble(totalCount);
 
                     if (afterValue == item.Value)
                     {
