@@ -420,10 +420,12 @@ namespace Athena
                 {
                     var allUser = userDirector.getAllUserInfo();
                     Dictionary<long, ulong> dicChattingCount = new Dictionary<long, ulong>();
+                    ulong totalCount = 0;
 
                     foreach (var iter in allUser)
                     {
                         dicChattingCount.Add(iter.Value.UserKey, iter.Value.chattingCount);
+                        totalCount += iter.Value.chattingCount;
                     }
 
                     int rank = 1;
@@ -444,12 +446,12 @@ namespace Athena
                         {
                             afterRank--;
 
-                            strPrint += afterRank.ToString() + ". " + user.Name + " : " + item.Value + "\n";
+                            strPrint += afterRank.ToString() + ". " + user.Name + " : " + item.Value + " (" + (item.Value / totalCount * 100) + "%)\n";
                             rank++;
                         }
                         else
                         {
-                            strPrint += rank.ToString() + ". " + user.Name + " : " + item.Value + "\n";
+                            strPrint += rank.ToString() + ". " + user.Name + " : " + item.Value + " (" + (item.Value / totalCount * 100) + "%)\n";
                             rank++;
                             afterRank = rank;
                         }
@@ -3720,10 +3722,12 @@ namespace Athena
             {
                 var allUserInfo = userDirector.getAllUserInfo();
                 Dictionary<long, ulong> dicChattingCount = new Dictionary<long, ulong>();
+                ulong totalCount = 0;
 
                 foreach (var iter in allUserInfo)
                 {
                     dicChattingCount.Add(iter.Value.UserKey, iter.Value.chattingCount);
+                    totalCount += iter.Value.chattingCount;
                 }
 
                 int rank = 1;
@@ -3740,6 +3744,8 @@ namespace Athena
                         break;
                     
                     var user = userDirector.getUserInfo(item.Key);
+                    float value = Convert.ToSingle(item.Value);
+                    float count = Convert.ToSingle(totalCount);
 
                     if (afterValue == item.Value)
                     {
@@ -3747,13 +3753,13 @@ namespace Athena
                             afterRank--;
 
                         isContinue = true;
-                        strPrint += afterRank.ToString() + ". " + user.Name + " : " + item.Value + "\n";
+                        strPrint += afterRank.ToString() + ". " + user.Name + " - " + item.Value + "건 (" + Math.Round(value / count * 100.0, 2) + "%)\n";
                         rank++;
                     }
                     else
                     {
                         isContinue = false;
-                        strPrint += rank.ToString() + ". " + user.Name + " : " + item.Value + "\n";
+                        strPrint += rank.ToString() + ". " + user.Name + " - " + item.Value + "건 (" + Math.Round(value / count * 100.0, 2) + "%)\n";
                         rank++;
                         afterRank = rank;
                     }
