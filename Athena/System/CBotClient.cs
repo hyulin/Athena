@@ -675,7 +675,7 @@ namespace Athena
             }
 
             // 텍스트가 없으면 넘어간다.
-            if (varMessage.Text == "")
+            if (varMessage.Text == null)
                 return;
 
             // 명령어, 서브명령어 분리
