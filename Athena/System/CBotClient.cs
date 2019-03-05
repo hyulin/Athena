@@ -589,17 +589,12 @@ namespace Athena
         private async void Bot_OnMessage(object sender, Telegram.Bot.Args.MessageEventArgs e)
         {
             var varMessage = e.Message;
+            if (varMessage == null)
+                return;
 
-            if (varMessage == null ||
-                (varMessage.Type != MessageType.Sticker &&
-                 varMessage.Type != MessageType.Text &&
-                 varMessage.Type != MessageType.ChatMembersAdded))
-            {
-                if (varMessage.Caption != "/up")
-                    return;
-                else
-                    varMessage.Text = "/up";
-            }
+            // 업로드일 경우
+            if (varMessage.Caption == "/up")
+                varMessage.Text = "/up";
 
             DateTime convertTime = varMessage.Date.AddHours(9);
             if (convertTime < systemInfo.GetStartTimeToDate())
@@ -620,10 +615,6 @@ namespace Athena
             {
                 userDirector.increaseChattingCount(senderKey);
             }
-
-            // 스티커는 넘어간다.
-            if (varMessage.Type == MessageType.Sticker)
-                return;
 
             // 차단된 유저는 이용할 수 없다.
             if (userDirector.isBlockUser(senderKey) == true)
@@ -682,6 +673,10 @@ namespace Athena
                     return;
                 }
             }
+
+            // 텍스트가 없으면 넘어간다.
+            if (varMessage.Text == "")
+                return;
 
             // 명령어, 서브명령어 분리
             string strMassage = varMessage.Text;
@@ -800,7 +795,7 @@ namespace Athena
             if (strCommend == "/도움말" || strCommend == "/help" || strCommend == "/help@CDT_Noti_Bot")
             {
                 strPrint += "==================================\n";
-                strPrint += "[ 아테나 v2.2 ]\n[ Clien Delicious Team Notice Bot ]\n\n";
+                strPrint += "[ 아테나 v2.3 ]\n[ Clien Delicious Team Notice Bot ]\n\n";
                 strPrint += "/공지 : 클랜 공지사항을 출력합니다.\n";
                 strPrint += "/문의 [내용] : 문의사항을 등록합니다.\n";
                 strPrint += "/일정 : 이번 달 클랜 일정을 확인합니다.\n";
@@ -838,6 +833,7 @@ namespace Athena
                 strPrint += "/메모 : 현재 저장된 개인 메모 리스트를 출력합니다.\n";
                 strPrint += "/메모 [내용] : 메모를 저장합니다..\n";
                 strPrint += "/메모 제거 [숫자] : 메모를 제거합니다.\n";
+                strPrint += "/순위 : 대화량 순위를 출력합니다.\n";
                 strPrint += "/안내 : 팀 안내 메시지를 출력합니다.\n";
                 strPrint += "/상태 : 현재 봇 상태를 출력합니다. 대답이 없으면 이상.\n";
                 strPrint += "==================================\n";
