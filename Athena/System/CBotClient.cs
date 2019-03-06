@@ -618,15 +618,15 @@ namespace Athena
             long senderKey = varMessage.From.Id;
             DateTime time = convertTime;
 
+            // 차단된 유저는 이용할 수 없다.
+            if (userDirector.isBlockUser(senderKey) == true)
+                return;
+
             // 대화량 누적
             if (config.getGroupType(varMessage.Chat.Id) == GROUP_TYPE.GROUP_TYPE_CLAN)
             {
                 userDirector.increaseChattingCount(senderKey);
             }
-
-            // 차단된 유저는 이용할 수 없다.
-            if (userDirector.isBlockUser(senderKey) == true)
-                return;
 
             // 입장 메시지 일 경우
             if (varMessage.Type == MessageType.ChatMembersAdded)
