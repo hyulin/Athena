@@ -3696,10 +3696,9 @@ namespace Athena
             //========================================================================================
             else if (strCommend == "/리셋")
             {
-                var user = userDirector.getUserInfo(senderKey);
-                if (user.UserType != USER_TYPE.USER_TYPE_ADMIN)
+                if (config.isDeveloper(senderKey) == false)
                 {
-                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 해당 명렁어는 운영진 권한이 필요합니다.", ParseMode.Default, false, false, iMessageID);
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 해당 명렁어는 개발자 권한이 필요합니다.", ParseMode.Default, false, false, iMessageID);
                     return;
                 }
 
