@@ -3432,6 +3432,12 @@ namespace Athena
             //========================================================================================
             else if (strCommend == "/알림")
             {
+                if (strUserID == null || strUserID == "")
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 텔레그램 아이디를 먼저 설정해주세요.", ParseMode.Default, false, false, iMessageID);
+                    return;
+                }
+
                 if (strContents == "")
                 {
                     if (userDirector.getPrivateNoti(senderKey).Count == 0)
@@ -3471,13 +3477,27 @@ namespace Athena
                 }
                 else
                 {
+                    int checkNum = 0;
+                    bool isNumber = int.TryParse(strContents.Substring(0, 4), out checkNum);
+                    if (isNumber == false)
+                    {
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 시간을 잘못 입력하셨습니다.\n(ex: 오후 7시 30분 : 1930)", ParseMode.Default, false, false, iMessageID);
+                        return;
+                    }
+
+                    bool isSearch = false;
+
                     string notiTime = strContents.Substring(0, 4);
                     string notiString = strContents.Substring(5);
 
                     int hour = Convert.ToInt32(notiTime.Substring(0, 2));
                     int min = Convert.ToInt32(notiTime.Substring(2, 2));
 
-                    bool isSearch = false;
+                    if (hour > 23 || min > 59)
+                    {
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 시간을 잘못 입력하셨습니다.\n(ex: 오후 7시 30분 : 1930)", ParseMode.Default, false, false, iMessageID);
+                        return;
+                    }
 
                     if (hour != 0)
                     {
