@@ -18,6 +18,11 @@ namespace Athena
                 eng = "seoul";
                 kor = "서울";
             }
+            else if (city.Contains("경기광주") == true)
+            {
+                eng = "Kwangju";
+                kor = "경기광주";
+            }
             else if (city.Contains("경기") == true)
             {
                 eng = "gyeonggi-do";
@@ -132,11 +137,6 @@ namespace Athena
             {
                 eng = "Munsan";
                 kor = "문산";
-            }
-            else if (city.Contains("경기광주") == true)
-            {
-                eng = "Kwangju";
-                kor = "경기광주";
             }
             else if (city.Contains("구리") == true)
             {
