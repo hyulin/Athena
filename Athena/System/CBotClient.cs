@@ -153,7 +153,7 @@ namespace Athena
 
             // Define request parameters.
             String spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
-            String range = "클랜원 목록!C7:N";
+            String range = "클랜원 목록!C7:R";
             SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
             ValueRange response = request.Execute();
@@ -167,10 +167,10 @@ namespace Athena
                         bool isReflesh = false;
 
                         // 아테나에 등록되지 않은 유저
-                        if (row[10].ToString() == "")
+                        if (row[14].ToString() == "")
                             continue;
 
-                        long userKey = Convert.ToInt64(row[10].ToString());
+                        long userKey = Convert.ToInt64(row[14].ToString());
                         var userData = userDirector.getUserInfo(userKey);
                         if (userData.UserKey != 0)
                         {
@@ -179,7 +179,7 @@ namespace Athena
                         }
 
                         CUser user = new CUser();
-                        user = setUserInfo(row, Convert.ToInt64(row[10].ToString()));
+                        user = setUserInfo(row, Convert.ToInt64(row[14].ToString()));
 
                         // 운영진일 경우
                         if (config.isAdmin(user.UserKey))
@@ -863,7 +863,7 @@ namespace Athena
 
                     // Define request parameters.
                     String spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
-                    String range = "클랜원 목록!C7:N";
+                    String range = "클랜원 목록!C7:R";
                     SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
                     ValueRange response = request.Execute();
@@ -887,10 +887,10 @@ namespace Athena
                                     searchCount++;
                                     searchIndex = index;
 
-                                    if (row[10].ToString() != "")
+                                    if (row[14].ToString() != "")
                                     {
                                         // 이미 값이 있으므로 갱신한다.
-                                        userKey = Convert.ToInt64(row[10].ToString());
+                                        userKey = Convert.ToInt64(row[14].ToString());
                                         isReflesh = true;
                                     }
                                     else
@@ -917,10 +917,13 @@ namespace Athena
                                     most[1] = row[5].ToString();
                                     most[2] = row[6].ToString();
                                     user.MostPick = most;
-
                                     user.OtherPick = row[7].ToString();
                                     user.Time = row[8].ToString();
                                     user.Info = row[9].ToString();
+                                    user.Monitor = row[10].ToString();
+                                    user.HeadSet = row[11].ToString();
+                                    user.Keyboard = row[12].ToString();
+                                    user.Mouse = row[13].ToString();
                                 }
                                 else
                                 {
@@ -954,7 +957,7 @@ namespace Athena
                                 }
                             }
 
-                            range = "클랜원 목록!M" + (7 + searchIndex);
+                            range = "클랜원 목록!Q" + (7 + searchIndex);
 
                             // Define request parameters.
                             ValueRange valueRange = new ValueRange();
@@ -1145,7 +1148,7 @@ namespace Athena
                 {
                     // Define request parameters.
                     String spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
-                    String range = "클랜원 목록!C7:N";
+                    String range = "클랜원 목록!C7:R";
                     SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
                     ValueRange response = request.Execute();
@@ -1295,7 +1298,17 @@ namespace Athena
                                 strPrint += "- 모스트 : " + row[4].ToString() + " / " + row[5].ToString() + " / " + row[6].ToString() + "\n";
                                 strPrint += "- 이외 가능 픽 : " + row[7].ToString() + "\n";
                                 strPrint += "- 접속 시간대 : " + row[8].ToString() + "\n";
-                                strPrint += "- 소개 : " + row[9].ToString() + "\n";
+                                strPrint += "----------------------------------\n";
+                                if (row[9].ToString() != "")
+                                    strPrint += "- 모니터 : " + row[9].ToString() + "\n";
+                                if (row[10].ToString() != "")
+                                    strPrint += "- 헤드셋 : " + row[10].ToString() + "\n";
+                                if (row[11].ToString() != "")
+                                    strPrint += "- 키보드 : " + row[11].ToString() + "\n";
+                                if (row[12].ToString() != "")
+                                    strPrint += "- 마우스 : " + row[12].ToString() + "\n";
+                                if (row[13].ToString() != "")
+                                    strPrint += "- eDPI : " + row[13].ToString() + "\n";
 
                                 bContinue = true;   // 한 명만 출력된다면 이 부분은 무시됨.
                             }
@@ -1521,7 +1534,7 @@ namespace Athena
                 {
                     // Define request parameters.
                     String spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
-                    String range = "클랜원 목록!C7:N";
+                    String range = "클랜원 목록!C7:R";
                     SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
                     bool bResult = false;
 
@@ -2636,7 +2649,7 @@ namespace Athena
                     CUser user = new CUser();
 
                     // 클랜원 목록에서 정보 추출
-                    String range = "클랜원 목록!C7:N";
+                    String range = "클랜원 목록!C7:R";
                     SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
                     ValueRange response = request.Execute();
                     if (response != null)
@@ -2650,7 +2663,7 @@ namespace Athena
                                     continue;
 
                                 // 유저키 일치
-                                if (Convert.ToInt64(row[10].ToString()) == senderKey)
+                                if (Convert.ToInt64(row[14].ToString()) == senderKey)
                                 {
                                     user = setUserInfo(row, senderKey);
                                     break;
@@ -3623,7 +3636,7 @@ namespace Athena
                 {
                     // Define request parameters.
                     String spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
-                    String range = "클랜원 목록!C7:N";
+                    String range = "클랜원 목록!C7:R";
                     SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
                     ValueRange response = request.Execute();
@@ -3636,7 +3649,7 @@ namespace Athena
                             {
                                 if (row[0].ToString().Contains(strContents) == true)
                                 {
-                                    blockUserKey = Convert.ToInt64(row[10].ToString());
+                                    blockUserKey = Convert.ToInt64(row[14].ToString());
                                     if (userDirector.getUserInfo(blockUserKey).UserType != USER_TYPE.USER_TYPE_ADMIN)
                                     {
                                         if (bIsUser == true)
