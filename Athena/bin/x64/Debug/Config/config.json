@@ -1,30 +1,30 @@
-{
+﻿{
 	"token": {
-		"Bot": "648012085:AAHxJwmDWlznWTFMNQ92hJyVwsB_ggJ9ED8",
-		"Test": "624245556:AAHJQ3bwdUB6IRf1KhQ2eAg4UDWB5RTiXzI",
+		"Bot": "672468666:AAH70c1u84A5lTJg1_U40W1WDNI-Fx8mqdw",
+		"Test": "863109236:AAHrhryIHW7T9FNHX0u23Uchu3MgjtbRsw8",
 		"Sheet": "17G2eOb0WH5P__qFOthhqJ487ShjCtvJ6GpiUZ_mr5B8"
 	},
 
 	"group": {
 		"클랜방": -1001202203239,
-		"운영진방": -1001482490165,
-		"사전안내방": -1001389956706
+		"테스트방": -1001447129275,
+		"사전안내방": -1001410198867
 	},
 	
 	"admin": {
 		"냉각콜라": 50872681,
-		"휴린": 23842788,
-		"만슬": 474057213,
-		"루미녹스": 83970696,
-		"고기": 40883797
+		"고기": 40883797,
+		"유선명(여썸)": 62271433,
+		"이근학": 58686927,
+		"카페인": 346024595
 	},
 	
 	"admin_id": {
 		"냉각콜라": "Seungman",
-		"휴린": "hyulin",
-		"만슬": "mans3ul",
-		"루미녹스": "urusaikara",
-		"고기": "jandie99"
+		"고기": "jandie99",
+		"유선명(여썸)": "AWESOMEYUU",
+		"이근학": "leek603",
+		"카페인": "sunho29"
 	},
 	
 	"developer": 23842788

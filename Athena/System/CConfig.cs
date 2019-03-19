@@ -30,7 +30,7 @@ namespace Athena
     enum GROUP_TYPE
     {
         GROUP_TYPE_CLAN,
-        GROUP_TYPE_ADMIN,
+        GROUP_TYPE_TEST,
         GROUP_TYPE_GUIDE,
 
         GROUP_TYPE_MAX
@@ -67,7 +67,7 @@ namespace Athena
 
             List<long> group = new List<long>();
             group.Add((long)json["group"]["클랜방"]);
-            group.Add((long)json["group"]["운영진방"]);
+            group.Add((long)json["group"]["테스트방"]);
             group.Add((long)json["group"]["사전안내방"]);
             group_ = group;
 

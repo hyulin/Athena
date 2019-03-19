@@ -470,7 +470,7 @@ namespace Athena
                     isLupinOfWeek = true;
 
 #if DEBUG
-                    Bot.SendTextMessageAsync(config.getGroupKey(GROUP_TYPE.GROUP_TYPE_ADMIN), strPrint);  // 운영진방
+                    Bot.SendTextMessageAsync(config.getGroupKey(GROUP_TYPE.GROUP_TYPE_TEST), strPrint);  // 운영진방
 #else
                     Bot.SendTextMessageAsync(config.getGroupKey(GROUP_TYPE.GROUP_TYPE_CLAN), strPrint);  // 클랜방
 #endif
@@ -489,7 +489,7 @@ namespace Athena
                     strPrint += "굿모닝~ 오늘도 즐거운 하루 되세요~ :)";
 
 #if DEBUG
-                    Bot.SendTextMessageAsync(config.getGroupKey(GROUP_TYPE.GROUP_TYPE_ADMIN), strPrint);  // 운영진방
+                    Bot.SendTextMessageAsync(config.getGroupKey(GROUP_TYPE.GROUP_TYPE_TEST), strPrint);  // 운영진방
 #else
                     Bot.SendTextMessageAsync(config.getGroupKey(GROUP_TYPE.GROUP_TYPE_CLAN), strPrint);  // 클랜방
 #endif
@@ -523,7 +523,7 @@ namespace Athena
                             {
                                 userDirector.RemoveNoti(elem.Value.UserKey, index);
 #if DEBUG
-                                Bot.SendTextMessageAsync(config.getGroupKey(GROUP_TYPE.GROUP_TYPE_ADMIN), strPrint);  // 운영진방
+                                Bot.SendTextMessageAsync(config.getGroupKey(GROUP_TYPE.GROUP_TYPE_TEST), strPrint);  // 운영진방
 #else
                                 Bot.SendTextMessageAsync(config.getGroupKey(GROUP_TYPE.GROUP_TYPE_CLAN), strPrint);  // 클랜방
 #endif
@@ -584,7 +584,7 @@ namespace Athena
                     }
 
 #if DEBUG
-                    Bot.SendTextMessageAsync(config.getGroupKey(GROUP_TYPE.GROUP_TYPE_ADMIN), strPrint);  // 운영진방
+                    Bot.SendTextMessageAsync(config.getGroupKey(GROUP_TYPE.GROUP_TYPE_TEST), strPrint);  // 운영진방
 #else
                     Bot.SendTextMessageAsync(config.getGroupKey(GROUP_TYPE.GROUP_TYPE_CLAN), strPrint);  // 클랜방
 #endif
@@ -647,18 +647,15 @@ namespace Athena
                     strInfo += "클랜 생활에 불편하신 점이 있으시거나\n";
                     strInfo += "건의사항, 문의사항이 있으실 때는\n";
                     strInfo += "냉각콜라(@Seungman),\n";
-                    strInfo += "휴린(@hyulin),\n";
-                    strInfo += "만슬(@mans3ul),\n";
-                    strInfo += "LUMINOX(@urusaikara),\n";
-                    strInfo += "고기(@jandie99)에게\n";
+                    strInfo += "고기(@jandie99),\n";
+                    strInfo += "AWESOME 부부(@leek603 , @AWESOMEYUU),\n";
+                    strInfo += "카페인(@sunho29) 에게\n";
                     strInfo += "문의해주세요.\n\n";
                     strInfo += "클랜원들의 편의를 위한\n";
                     strInfo += "저, 아테나의 기능을 확인하시려면\n";
                     strInfo += "/도움말 을 입력해주세요.\n";
-                    strInfo += "편리한 기능들이 많이 있으며,\n";
-                    strInfo += "앞으로 더 추가될 예정입니다.\n";
                     strInfo += "아테나에 대해 문의사항이 있으실 때는\n";
-                    strInfo += "운영자 휴린(@hyulin)에게 문의해주세요.\n";
+                    strInfo += "휴린(@hyulin)에게 문의해주세요.\n";
                     strInfo += "\n";
                     strInfo += "우리 클랜의 모든 일정관리 및 운영은\n";
                     strInfo += "통합문서를 통해 확인 하실 수 있습니다.\n";
@@ -720,7 +717,7 @@ namespace Athena
 
             // CDT 관련방 아니면 동작하지 않도록
             if (varMessage.Chat.Id != config.getGroupKey(GROUP_TYPE.GROUP_TYPE_CLAN) &&     // 본방
-                varMessage.Chat.Id != config.getGroupKey(GROUP_TYPE.GROUP_TYPE_ADMIN) &&     // 운영진방
+                varMessage.Chat.Id != config.getGroupKey(GROUP_TYPE.GROUP_TYPE_TEST) &&     // 테스트방
                 varMessage.Chat.Id != config.getGroupKey(GROUP_TYPE.GROUP_TYPE_GUIDE) &&     // 사전안내방
                 varMessage.Chat.Username != "hyulin")
             {
@@ -744,7 +741,7 @@ namespace Athena
                 if (strCommend != "/안내" && strCommend != "/등록")
                     return;
             }
-
+            /*
             // 명령어가 아닐 경우와 사전안내방이 아닌 경우
             if (isCommand == false && varMessage.Chat.Id != config.getGroupKey(GROUP_TYPE.GROUP_TYPE_GUIDE))
             {
@@ -794,7 +791,7 @@ namespace Athena
             {
                 CLog.WriteLog(varMessage.Chat.Id, senderKey, strUserName, strMassage, strCommend, strContents);
             }
-
+            */
             string strPrint = "";
 
             //========================================================================================
