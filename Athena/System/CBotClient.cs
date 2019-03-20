@@ -3102,8 +3102,8 @@ namespace Athena
             else if (strCommend == "/dir")
             {
                 // 관리자 전용 명령어
-                if ((userDirector.getUserInfo(senderKey).UserType != USER_TYPE.USER_TYPE_ADMIN) ||
-                    (varMessage.Chat.Id != -1001482490165))
+                if (userDirector.getUserInfo(senderKey).UserType != USER_TYPE.USER_TYPE_ADMIN &&
+                    config.isDeveloper(senderKey) == false)
                 {
                     await Bot.SendTextMessageAsync(varMessage.Chat.Id, "권한이 없는 유저 또는 대화방입니다.", ParseMode.Default, false, false, iMessageID);
                     return;
@@ -3141,8 +3141,8 @@ namespace Athena
             else if (strCommend == "/cd")
             {
                 // 관리자 전용 명령어
-                if ((userDirector.getUserInfo(senderKey).UserType != USER_TYPE.USER_TYPE_ADMIN) ||
-                    (varMessage.Chat.Id != -1001482490165))
+                if (userDirector.getUserInfo(senderKey).UserType != USER_TYPE.USER_TYPE_ADMIN &&
+                    config.isDeveloper(senderKey) == false)
                 {
                     await Bot.SendTextMessageAsync(varMessage.Chat.Id, "권한이 없는 유저 또는 대화방입니다.", ParseMode.Default, false, false, iMessageID);
                     return;
@@ -3196,8 +3196,8 @@ namespace Athena
             else if (strCommend == "/down")
             {
                 // 관리자 전용 명령어
-                if ((userDirector.getUserInfo(senderKey).UserType != USER_TYPE.USER_TYPE_ADMIN) ||
-                    (varMessage.Chat.Id != -1001482490165))
+                if (userDirector.getUserInfo(senderKey).UserType != USER_TYPE.USER_TYPE_ADMIN &&
+                    config.isDeveloper(senderKey) == false)
                 {
                     await Bot.SendTextMessageAsync(varMessage.Chat.Id, "권한이 없는 유저 또는 대화방입니다.", ParseMode.Default, false, false, iMessageID);
                     return;
@@ -3229,8 +3229,8 @@ namespace Athena
             else if (strCommend == "/up")
             {
                 // 관리자 전용 명령어
-                if ((userDirector.getUserInfo(senderKey).UserType != USER_TYPE.USER_TYPE_ADMIN) ||
-                    (varMessage.Chat.Id != -1001482490165))
+                if (userDirector.getUserInfo(senderKey).UserType != USER_TYPE.USER_TYPE_ADMIN &&
+                    config.isDeveloper(senderKey) == false)
                 {
                     await Bot.SendTextMessageAsync(varMessage.Chat.Id, "권한이 없는 유저 또는 대화방입니다.", ParseMode.Default, false, false, iMessageID);
                     return;
