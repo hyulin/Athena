@@ -649,7 +649,8 @@ namespace Athena
                     strInfo += "냉각콜라(@Seungman),\n";
                     strInfo += "고기(@jandie99),\n";
                     strInfo += "AWESOME 부부(@leek603 , @AWESOMEYUU),\n";
-                    strInfo += "카페인(@sunho29) 에게\n";
+                    strInfo += "카페인(@sunho29),\n";
+                    strInfo += "청포도(@leetk321) 에게\n";
                     strInfo += "문의해주세요.\n\n";
                     strInfo += "클랜원들의 편의를 위한\n";
                     strInfo += "저, 아테나의 기능을 확인하시려면\n";
@@ -3811,25 +3812,30 @@ namespace Athena
             {
                 await Bot.SendChatActionAsync(varMessage.Chat.Id, ChatAction.UploadPhoto);
 
-                const string strCDTInfo01 = @"CDT_Info/CDT_Info_1.png";
-                const string strCDTInfo02 = @"CDT_Info/CDT_Info_2.png";
-                const string strCDTInfo03 = @"CDT_Info/CDT_Info_3.png";
-                const string strCDTInfo04 = @"CDT_Info/CDT_Info_4.png";
+                const string strCDTInfo00 = @"CDT_Info/CDT_Info_0.PNG";
+                var fileName00 = strCDTInfo00.Split(Path.DirectorySeparatorChar).Last();
+                var fileStream00 = new FileStream(strCDTInfo00, FileMode.Open, FileAccess.Read, FileShare.Read);
+                await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream00, "");
 
-                var fileName01 = strCDTInfo01.Split(Path.DirectorySeparatorChar).Last();
-                var fileName02 = strCDTInfo02.Split(Path.DirectorySeparatorChar).Last();
-                var fileName03 = strCDTInfo03.Split(Path.DirectorySeparatorChar).Last();
-                var fileName04 = strCDTInfo04.Split(Path.DirectorySeparatorChar).Last();
+                //const string strCDTInfo01 = @"CDT_Info/CDT_Info_1.png";
+                //const string strCDTInfo02 = @"CDT_Info/CDT_Info_2.png";
+                //const string strCDTInfo03 = @"CDT_Info/CDT_Info_3.png";
+                //const string strCDTInfo04 = @"CDT_Info/CDT_Info_4.png";
 
-                var fileStream01 = new FileStream(strCDTInfo01, FileMode.Open, FileAccess.Read, FileShare.Read);
-                var fileStream02 = new FileStream(strCDTInfo02, FileMode.Open, FileAccess.Read, FileShare.Read);
-                var fileStream03 = new FileStream(strCDTInfo03, FileMode.Open, FileAccess.Read, FileShare.Read);
-                var fileStream04 = new FileStream(strCDTInfo04, FileMode.Open, FileAccess.Read, FileShare.Read);
+                //var fileName01 = strCDTInfo01.Split(Path.DirectorySeparatorChar).Last();
+                //var fileName02 = strCDTInfo02.Split(Path.DirectorySeparatorChar).Last();
+                //var fileName03 = strCDTInfo03.Split(Path.DirectorySeparatorChar).Last();
+                //var fileName04 = strCDTInfo04.Split(Path.DirectorySeparatorChar).Last();
 
-                await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream01, "");
-                await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream02, "");
-                await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream03, "");
-                await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream04, "");
+                //var fileStream01 = new FileStream(strCDTInfo01, FileMode.Open, FileAccess.Read, FileShare.Read);
+                //var fileStream02 = new FileStream(strCDTInfo02, FileMode.Open, FileAccess.Read, FileShare.Read);
+                //var fileStream03 = new FileStream(strCDTInfo03, FileMode.Open, FileAccess.Read, FileShare.Read);
+                //var fileStream04 = new FileStream(strCDTInfo04, FileMode.Open, FileAccess.Read, FileShare.Read);
+
+                //await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream01, "");
+                //await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream02, "");
+                //await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream03, "");
+                //await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream04, "");
 
                 strPrint = "위 가이드는 본방에서 /안내 입력 시 다시 보실 수 있습니다.\n\n";
                 foreach (var iter in config.admin_ID_)
