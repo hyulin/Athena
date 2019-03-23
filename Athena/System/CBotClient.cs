@@ -631,7 +631,8 @@ namespace Athena
             // 입장 메시지 일 경우
             if (varMessage.Type == MessageType.ChatMembersAdded)
             {
-                if (varMessage.Chat.Id == config.getGroupKey(GROUP_TYPE.GROUP_TYPE_GUIDE))   // 사전안내방
+                if (varMessage.Chat.Id == config.getGroupKey(GROUP_TYPE.GROUP_TYPE_GUIDE) ||   // 사전안내방
+                    varMessage.Chat.Id == config.getGroupKey(GROUP_TYPE.GROUP_TYPE_TEST))   // 테스트방
                 {
                     varMessage.Text = "/안내";
                 }
