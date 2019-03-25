@@ -631,8 +631,11 @@ namespace Athena
             // 입장 메시지 일 경우
             if (varMessage.Type == MessageType.ChatMembersAdded)
             {
-                if (varMessage.Chat.Id == config.getGroupKey(GROUP_TYPE.GROUP_TYPE_GUIDE) ||   // 사전안내방
-                    varMessage.Chat.Id == config.getGroupKey(GROUP_TYPE.GROUP_TYPE_TEST))   // 테스트방
+#if !DEBUG
+                if (varMessage.Chat.Id == config.getGroupKey(GROUP_TYPE.GROUP_TYPE_GUIDE))  // 사전안내방
+#else
+                if (varMessage.Chat.Id == config.getGroupKey(GROUP_TYPE.GROUP_TYPE_TEST))   // 테스트방
+#endif
                 {
                     varMessage.Text = "/안내";
                 }
@@ -3812,33 +3815,36 @@ namespace Athena
             else if (strCommend == "/안내")
             {
                 await Bot.SendChatActionAsync(varMessage.Chat.Id, ChatAction.UploadPhoto);
+                
+                const string strCDTInfo01 = @"CDT_Info/CDT_Info_1.png";
+                const string strCDTInfo02 = @"CDT_Info/CDT_Info_2.png";
+                const string strCDTInfo03 = @"CDT_Info/CDT_Info_3.png";
+                const string strCDTInfo04 = @"CDT_Info/CDT_Info_4.png";
+                const string strCDTInfo05 = @"CDT_Info/CDT_Info_5.png";
+                const string strDiscordGuide = @"CDT_Info/Discord_Guide.png";
 
-                const string strCDTInfo00 = @"CDT_Info/CDT_Info_0.PNG";
-                var fileName00 = strCDTInfo00.Split(Path.DirectorySeparatorChar).Last();
-                var fileStream00 = new FileStream(strCDTInfo00, FileMode.Open, FileAccess.Read, FileShare.Read);
-                await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream00, "");
+                var fileName01 = strCDTInfo01.Split(Path.DirectorySeparatorChar).Last();
+                var fileName02 = strCDTInfo02.Split(Path.DirectorySeparatorChar).Last();
+                var fileName03 = strCDTInfo03.Split(Path.DirectorySeparatorChar).Last();
+                var fileName04 = strCDTInfo04.Split(Path.DirectorySeparatorChar).Last();
+                var fileName05 = strCDTInfo05.Split(Path.DirectorySeparatorChar).Last();
+                var fileDiscordGuide = strDiscordGuide.Split(Path.DirectorySeparatorChar).Last();
 
-                //const string strCDTInfo01 = @"CDT_Info/CDT_Info_1.png";
-                //const string strCDTInfo02 = @"CDT_Info/CDT_Info_2.png";
-                //const string strCDTInfo03 = @"CDT_Info/CDT_Info_3.png";
-                //const string strCDTInfo04 = @"CDT_Info/CDT_Info_4.png";
+                var fileStream01 = new FileStream(strCDTInfo01, FileMode.Open, FileAccess.Read, FileShare.Read);
+                var fileStream02 = new FileStream(strCDTInfo02, FileMode.Open, FileAccess.Read, FileShare.Read);
+                var fileStream03 = new FileStream(strCDTInfo03, FileMode.Open, FileAccess.Read, FileShare.Read);
+                var fileStream04 = new FileStream(strCDTInfo04, FileMode.Open, FileAccess.Read, FileShare.Read);
+                var fileStream05 = new FileStream(strCDTInfo03, FileMode.Open, FileAccess.Read, FileShare.Read);
+                var fileDiscordStream = new FileStream(strCDTInfo04, FileMode.Open, FileAccess.Read, FileShare.Read);
 
-                //var fileName01 = strCDTInfo01.Split(Path.DirectorySeparatorChar).Last();
-                //var fileName02 = strCDTInfo02.Split(Path.DirectorySeparatorChar).Last();
-                //var fileName03 = strCDTInfo03.Split(Path.DirectorySeparatorChar).Last();
-                //var fileName04 = strCDTInfo04.Split(Path.DirectorySeparatorChar).Last();
+                await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream01, "");
+                await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream02, "");
+                await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream03, "");
+                await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream04, "");
+                await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream05, "");
+                await Bot.SendPhotoAsync(varMessage.Chat.Id, fileDiscordStream, "");
 
-                //var fileStream01 = new FileStream(strCDTInfo01, FileMode.Open, FileAccess.Read, FileShare.Read);
-                //var fileStream02 = new FileStream(strCDTInfo02, FileMode.Open, FileAccess.Read, FileShare.Read);
-                //var fileStream03 = new FileStream(strCDTInfo03, FileMode.Open, FileAccess.Read, FileShare.Read);
-                //var fileStream04 = new FileStream(strCDTInfo04, FileMode.Open, FileAccess.Read, FileShare.Read);
-
-                //await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream01, "");
-                //await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream02, "");
-                //await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream03, "");
-                //await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream04, "");
-
-                strPrint = "위 가이드는 본방에서 /안내 입력 시 다시 보실 수 있습니다.\n\n";
+                strPrint = "위 가이드는 본방에서 /안내 입력 또는\n디스코드 #readme 와 #guide 채널에서도\n다시 보실 수 있습니다.\n\n";
                 foreach (var iter in config.admin_ID_)
                 {
                     strPrint += "@" + iter + " ";
