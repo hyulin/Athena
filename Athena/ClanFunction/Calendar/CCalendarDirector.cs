@@ -13,7 +13,7 @@ namespace Athena
         public void addCalendar(CCalendar calendar)
         {
             int index = calendar.Day;
-
+            
             calenderDictionary_.Add(index, calendar);
         }
 

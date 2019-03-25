@@ -71,7 +71,9 @@ namespace Athena
             userInfo[userKey].Position = user.Position;
             userInfo[userKey].MostPick = user.MostPick;
             userInfo[userKey].OtherPick = user.OtherPick;
-            userInfo[userKey].Time = user.Time;
+            userInfo[userKey].Team = user.Team;
+            userInfo[userKey].Youtube = user.Youtube;
+            userInfo[userKey].Twitch = user.Twitch;
             userInfo[userKey].Info = user.Info;
 
             return true;

@@ -38,13 +38,18 @@ namespace Athena
         public POSITION Position { get; set; }
         public string[] MostPick { get; set; }
         public string OtherPick { get; set; }
-        public string Time { get; set; }
+
+        public string Team { get; set; }
+        public string Youtube { get; set; }
+        public string Twitch { get; set; }
         public string Info { get; set; }
+        
         public string Monitor { get; set; }
         public string HeadSet { get; set; }
         public string Keyboard { get; set; }
         public string Mouse { get; set; }
         public int eDPI { get; set; }
+
         public ulong chattingCount { get; set; }
         
         List<CMessage> MessageList = new List<CMessage>();

@@ -153,7 +153,7 @@ namespace Athena
 
             // Define request parameters.
             String spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
-            String range = "클랜원 목록!C7:R";
+            String range = "클랜원 목록!C8:U";
             SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
             ValueRange response = request.Execute();
@@ -167,10 +167,10 @@ namespace Athena
                         bool isReflesh = false;
 
                         // 아테나에 등록되지 않은 유저
-                        if (row[14].ToString() == "")
+                        if (row[17].ToString() == "")
                             continue;
 
-                        long userKey = Convert.ToInt64(row[14].ToString());
+                        long userKey = Convert.ToInt64(row[17].ToString());
                         var userData = userDirector.getUserInfo(userKey);
                         if (userData.UserKey != 0)
                         {
@@ -179,7 +179,7 @@ namespace Athena
                         }
 
                         CUser user = new CUser();
-                        user = setUserInfo(row, Convert.ToInt64(row[14].ToString()));
+                        user = setUserInfo(row, Convert.ToInt64(row[17].ToString()));
 
                         // 운영진일 경우
                         if (config.isAdmin(user.UserKey))
@@ -330,8 +330,10 @@ namespace Athena
             user.MostPick = most;
 
             user.OtherPick = row[7].ToString();
-            user.Time = row[8].ToString();
-            user.Info = row[9].ToString();
+            user.Team = row[8].ToString();
+            user.Youtube = row[9].ToString();
+            user.Twitch = row[10].ToString();
+            user.Info = row[11].ToString();
 
             // 운영진일 경우
             if (config.isAdmin(user.UserKey))
@@ -542,17 +544,22 @@ namespace Athena
             String spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
             String range = "클랜 공지!C15:C23";
             String updateRange = "클랜 공지!H14";
+            String calendarRange = "클랜 공지!P12";
             SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
             SpreadsheetsResource.ValuesResource.GetRequest updateRequest = service.Spreadsheets.Values.Get(spreadsheetId, updateRange);
+            SpreadsheetsResource.ValuesResource.GetRequest calendarRequest = service.Spreadsheets.Values.Get(spreadsheetId, calendarRange);
 
             ValueRange response = request.Execute();
             ValueRange updateResponse = updateRequest.Execute();
+            ValueRange calendarResponse = calendarRequest.Execute();
 
             if (response != null && updateResponse != null)
             {
                 IList<IList<Object>> values = response.Values;
                 IList<IList<Object>> updateValues = updateResponse.Values;
+                IList<IList<Object>> calendarValues = calendarResponse.Values;
 
+                // 공지
                 if (updateValues != null && updateValues.ToString() != "")
                 {
                     if (values != null && values.Count > 0)
@@ -588,6 +595,147 @@ namespace Athena
 #else
                     Bot.SendTextMessageAsync(config.getGroupKey(GROUP_TYPE.GROUP_TYPE_CLAN), strPrint);  // 클랜방
 #endif
+                }
+
+                // 일정
+                if (calendarValues != null && calendarValues.ToString() != "")
+                {
+                    CCalendarDirector calendarDirector = new CCalendarDirector();
+
+                    // Define request parameters.
+                    String autoCalendarRange = "클랜 공지!I13:Q27";
+                    SpreadsheetsResource.ValuesResource.GetRequest autoCalendarRequest = service.Spreadsheets.Values.Get(spreadsheetId, autoCalendarRange);
+
+                    ValueRange autoCalendarResponse = autoCalendarRequest.Execute();
+                    if (response != null)
+                    {
+                        IList<IList<Object>> autoCalendarValues = autoCalendarResponse.Values;
+                        if (autoCalendarValues != null && autoCalendarValues.Count > 0)
+                        {
+                            var title = autoCalendarValues[0];
+                            if (title.Count == 0)
+                            {
+#if DEBUG
+                                // 테스트방
+                                Bot.SendTextMessageAsync(config.getGroupKey(GROUP_TYPE.GROUP_TYPE_TEST), "[ERROR] 일정이 등록되지 않았습니다.");
+#else
+                                // 클랜방
+                                Bot.SendTextMessageAsync(config.getGroupKey(GROUP_TYPE.GROUP_TYPE_CLAN), "[ERROR] 일정이 등록되지 않았습니다.");
+#endif
+
+                                return;
+                            }
+
+                            // 날짜
+                            for (int index = 3; index < autoCalendarValues.Count; index += 2)
+                            {
+                                var row = autoCalendarValues[index];
+                                var todo = autoCalendarValues[index + 1];
+
+                                for (int wday = 0; wday < 8/*일주일 7일 + 빈칸 1개*/; wday++)
+                                {
+                                    CCalendar calendar = new CCalendar();
+                                    string weekDay = "";
+
+                                    // 중간에 한 칸이 비어있음
+                                    if (wday == 1)
+                                        continue;
+
+                                    if (row[wday].ToString() == "")
+                                        continue;
+
+                                    switch (wday)
+                                    {
+                                        case 0:
+                                            weekDay = "일";
+                                            break;
+                                        case 2:
+                                            weekDay = "월";
+                                            break;
+                                        case 3:
+                                            weekDay = "화";
+                                            break;
+                                        case 4:
+                                            weekDay = "수";
+                                            break;
+                                        case 5:
+                                            weekDay = "목";
+                                            break;
+                                        case 6:
+                                            weekDay = "금";
+                                            break;
+                                        case 7:
+                                            weekDay = "토";
+                                            break;
+                                        default:
+                                            continue;
+                                    }
+
+                                    int checkNum = 0;
+                                    bool isNumber = int.TryParse(row[wday].ToString(), out checkNum);
+                                    if (isNumber == true)
+                                    {
+                                        calendar.Day = Convert.ToInt32(row[wday].ToString());
+                                        calendar.Week = weekDay;
+                                        calendar.Todo = todo[wday].ToString();
+                                        calendarDirector.addCalendar(calendar);
+                                    }
+                                }
+                            }
+
+                            strPrint += "[ " + title[0].ToString() + " ]\n============================\n";
+
+                            for (int i = 1; i <= calendarDirector.getCalendarCount(); i++)
+                            {
+                                CCalendar calendar = calendarDirector.getCalendar(i);
+
+                                if (calendar.Todo != "")
+                                {
+                                    strPrint += "* " + calendar.Day + "일(" + calendar.Week + ") : " + calendar.Todo + "\n";
+                                }
+                            }
+                        }
+                    }
+
+                    if (strPrint != "")
+                    {
+                        const string notice = @"Function/Calendar.png";
+                        var fileName = notice.Split(Path.DirectorySeparatorChar).Last();
+                        var fileStream = new FileStream(notice, FileMode.Open, FileAccess.Read, FileShare.Read);
+#if DEBUG
+                        // 테스트방
+                        Bot.SendPhotoAsync(config.getGroupKey(GROUP_TYPE.GROUP_TYPE_TEST), fileStream, strPrint);
+#else
+                        // 클랜방
+                        Bot.SendPhotoAsync(config.getGroupKey(GROUP_TYPE.GROUP_TYPE_CLAN), fileStream, strPrint);
+#endif
+                    }
+                    else
+                    {
+#if DEBUG
+                        // 테스트방
+                        Bot.SendTextMessageAsync(config.getGroupKey(GROUP_TYPE.GROUP_TYPE_TEST), "[ERROR] 일정이 등록되지 않았습니다.");
+#else
+                        // 클랜방
+                        Bot.SendTextMessageAsync(config.getGroupKey(GROUP_TYPE.GROUP_TYPE_CLAN), "[ERROR] 일정이 등록되지 않았습니다.");
+#endif
+                    }
+
+                    // Define request parameters.
+                    ValueRange valueRange = new ValueRange();
+                    valueRange.MajorDimension = "COLUMNS"; //"ROWS";//COLUMNS 
+
+                    var oblist = new List<object>() { "" };
+                    valueRange.Values = new List<IList<object>> { oblist };
+
+                    SpreadsheetsResource.ValuesResource.UpdateRequest releaseRequest = service.Spreadsheets.Values.Update(valueRange, spreadsheetId, calendarRange);
+
+                    releaseRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.RAW;
+                    UpdateValuesResponse releaseResponse = releaseRequest.Execute();
+                    if (releaseResponse == null)
+                    {
+                        strPrint = "[ERROR] 시트를 업데이트 할 수 없습니다.";
+                    }
                 }
             }
         }
@@ -865,7 +1013,7 @@ namespace Athena
 
                     // Define request parameters.
                     String spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
-                    String range = "클랜원 목록!C7:R";
+                    String range = "클랜원 목록!C8:U";
                     SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
                     ValueRange response = request.Execute();
@@ -889,10 +1037,10 @@ namespace Athena
                                     searchCount++;
                                     searchIndex = index;
 
-                                    if (row[14].ToString() != "")
+                                    if (row[17].ToString() != "")
                                     {
                                         // 이미 값이 있으므로 갱신한다.
-                                        userKey = Convert.ToInt64(row[14].ToString());
+                                        userKey = Convert.ToInt64(row[17].ToString());
                                         isReflesh = true;
                                     }
                                     else
@@ -920,12 +1068,16 @@ namespace Athena
                                     most[2] = row[6].ToString();
                                     user.MostPick = most;
                                     user.OtherPick = row[7].ToString();
-                                    user.Time = row[8].ToString();
-                                    user.Info = row[9].ToString();
-                                    user.Monitor = row[10].ToString();
-                                    user.HeadSet = row[11].ToString();
-                                    user.Keyboard = row[12].ToString();
-                                    user.Mouse = row[13].ToString();
+
+                                    user.Team = row[8].ToString();
+                                    user.Youtube = row[9].ToString();
+                                    user.Twitch = row[10].ToString();
+                                    user.Info = row[11].ToString();
+                                    
+                                    user.Monitor = row[12].ToString();
+                                    user.HeadSet = row[13].ToString();
+                                    user.Keyboard = row[14].ToString();
+                                    user.Mouse = row[15].ToString();
                                 }
                                 else
                                 {
@@ -959,7 +1111,7 @@ namespace Athena
                                 }
                             }
 
-                            range = "클랜원 목록!Q" + (7 + searchIndex);
+                            range = "클랜원 목록!T" + (8 + searchIndex);
 
                             // Define request parameters.
                             ValueRange valueRange = new ValueRange();
@@ -1150,7 +1302,7 @@ namespace Athena
                 {
                     // Define request parameters.
                     String spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
-                    String range = "클랜원 목록!C7:R";
+                    String range = "클랜원 목록!C8:U";
                     SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
                     ValueRange response = request.Execute();
@@ -1292,25 +1444,43 @@ namespace Athena
                                 strPrint += "* 티어 및 점수는 전적을 조회합니다. *\n\n";
                                 strPrint += "[ " + row[0].ToString() + " ]\n";
                                 strPrint += "- 조회 배틀태그 : " + battleTag + "\n";
+
+                                if (row[8].ToString() != "")
+                                    strPrint += "- 소속팀 : " + row[8].ToString() + "\n";
+                                else
+                                    strPrint += "- 소속팀 : 없음\n";
+
                                 strPrint += "- 티어 : " + strTier + "\n";
                                 strPrint += "- 점수 : " + strScore + "\n";
                                 strPrint += "- 본 계정 배틀태그 : " + mainBattleTag + "\n";
-                                strPrint += "- 부 계정 배틀태그 : " + row[2].ToString() + "\n";
+
+                                if (row[2].ToString() != "")
+                                    strPrint += "- 부 계정 배틀태그 : " + row[2].ToString() + "\n";
+
                                 strPrint += "- 포지션 : " + row[3].ToString() + "\n";
-                                strPrint += "- 모스트 : " + row[4].ToString() + " / " + row[5].ToString() + " / " + row[6].ToString() + "\n";
-                                strPrint += "- 이외 가능 픽 : " + row[7].ToString() + "\n";
-                                strPrint += "- 접속 시간대 : " + row[8].ToString() + "\n";
-                                strPrint += "----------------------------------\n";
-                                if (row[9].ToString() != "")
-                                    strPrint += "- 모니터 : " + row[9].ToString() + "\n";
-                                if (row[10].ToString() != "")
-                                    strPrint += "- 헤드셋 : " + row[10].ToString() + "\n";
+
+                                strPrint += "- 모스트 : ";
+                                if (row[4].ToString() != "")
+                                    strPrint += row[4].ToString();
+                                if (row[5].ToString() != "")
+                                    strPrint += " / " + row[5].ToString();
+                                if (row[6].ToString() != "")
+                                    strPrint += " / " + row[6].ToString();
+                                if (row[7].ToString() != "")
+                                    strPrint += "- 이외 가능 픽 : " + row[7].ToString() + "\n";
+
                                 if (row[11].ToString() != "")
-                                    strPrint += "- 키보드 : " + row[11].ToString() + "\n";
-                                if (row[12].ToString() != "")
-                                    strPrint += "- 마우스 : " + row[12].ToString() + "\n";
-                                if (row[13].ToString() != "")
-                                    strPrint += "- eDPI : " + row[13].ToString() + "\n";
+                                    strPrint += "- 자기소개 : " + row[11].ToString() + "\n";
+
+                                strPrint += "----------------------------------\n";
+
+                                if (row[9].ToString() != "")
+                                    strPrint += "- Youtube : " + row[9].ToString() + "\n";
+                                if (row[10].ToString() != "")
+                                    strPrint += "- Twitch : " + row[10].ToString() + "\n";
+
+                                if (row[9].ToString() != "" || row[10].ToString() != "")
+                                    strPrint += "----------------------------------\n";
 
                                 bContinue = true;   // 한 명만 출력된다면 이 부분은 무시됨.
                             }
@@ -1536,7 +1706,7 @@ namespace Athena
                 {
                     // Define request parameters.
                     String spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
-                    String range = "클랜원 목록!C7:R";
+                    String range = "클랜원 목록!C8:U";
                     SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
                     bool bResult = false;
 
@@ -1558,8 +1728,17 @@ namespace Athena
                                     row[6].ToString().ToUpper().Contains(strContents.ToUpper()) ||
                                     row[3].ToString() == "플렉스")
                                     {
-                                        strPrint += row[0] + "(" + row[1] + ") : ";
-                                        strPrint += row[3] + "(" + row[4].ToString() + "/" + row[5].ToString() + "/" + row[6].ToString() + ")\n";
+                                        strPrint += row[0] + "(" + row[1] + ") : " + row[3].ToString() + " (";
+
+                                        if (row[4].ToString() != "")
+                                            strPrint += row[4].ToString();
+                                        if (row[5].ToString() != "")
+                                            strPrint += " / " + row[5].ToString();
+                                        if (row[6].ToString() != "")
+                                            strPrint += " / " + row[6].ToString();
+
+                                        strPrint += ")\n";
+
                                         bResult = true;
                                     }
                                 }
@@ -1570,8 +1749,17 @@ namespace Athena
                                     row[5].ToString().ToUpper().Contains(strContents.ToUpper()) ||
                                     row[6].ToString().ToUpper().Contains(strContents.ToUpper()))
                                     {
-                                        strPrint += row[0] + "(" + row[1] + ") : ";
-                                        strPrint += row[3] + " (" + row[4].ToString() + "/" + row[5].ToString() + "/" + row[6].ToString() + ")\n";
+                                        strPrint += row[0] + "(" + row[1] + ") : " + row[3].ToString() + " (";
+
+                                        if (row[4].ToString() != "")
+                                            strPrint += row[4].ToString();
+                                        if (row[5].ToString() != "")
+                                            strPrint += " / " + row[5].ToString();
+                                        if (row[6].ToString() != "")
+                                            strPrint += " / " + row[6].ToString();
+
+                                        strPrint += ")\n";
+
                                         bResult = true;
                                     }
                                 }
@@ -2472,7 +2660,7 @@ namespace Athena
                 }
                 else if (strCommend == "/리그")
                 {
-                    sheetName = "리그";
+                    sheetName = "리그 신청";
                     endLine = 35;
                 }
 
@@ -2540,7 +2728,7 @@ namespace Athena
 
                         string scrim = "";
 
-                        if ((sheetName == "스크림") || (sheetName == "리그"))
+                        if ((sheetName == "스크림") || (sheetName == "리그 신청"))
                             scrim = @"Function/Scrim.png";
                         else if (sheetName == "디비전")
                             scrim = @"Function/OpenDivision.png";
@@ -2651,7 +2839,7 @@ namespace Athena
                     CUser user = new CUser();
 
                     // 클랜원 목록에서 정보 추출
-                    String range = "클랜원 목록!C7:R";
+                    String range = "클랜원 목록!C8:U";
                     SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
                     ValueRange response = request.Execute();
                     if (response != null)
@@ -2661,11 +2849,8 @@ namespace Athena
                         {
                             foreach (var row in values)
                             {
-                                if (row[10].ToString() == "")
-                                    continue;
-
                                 // 유저키 일치
-                                if (Convert.ToInt64(row[14].ToString()) == senderKey)
+                                if (Convert.ToInt64(row[17].ToString()) == senderKey)
                                 {
                                     user = setUserInfo(row, senderKey);
                                     break;
@@ -2687,7 +2872,7 @@ namespace Athena
                         {
                             if ((sheetName == "스크림" && values.Count >= 12) ||
                                 (sheetName == "디비전" && values.Count >= 12) ||
-                                (sheetName == "리그" && values.Count >= 30))
+                                (sheetName == "리그 신청" && values.Count >= 30))
                             {
                                 await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[SYSTEM] " + sheetName + " 신청자가 모두 찼습니다.\n운영진에게 문의해주세요.", ParseMode.Default, false, false, iMessageID);
                                 return;
@@ -3638,7 +3823,7 @@ namespace Athena
                 {
                     // Define request parameters.
                     String spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
-                    String range = "클랜원 목록!C7:R";
+                    String range = "클랜원 목록!C8:U";
                     SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
                     ValueRange response = request.Execute();
@@ -3651,7 +3836,7 @@ namespace Athena
                             {
                                 if (row[0].ToString().Contains(strContents) == true)
                                 {
-                                    blockUserKey = Convert.ToInt64(row[14].ToString());
+                                    blockUserKey = Convert.ToInt64(row[17].ToString());
                                     if (userDirector.getUserInfo(blockUserKey).UserType != USER_TYPE.USER_TYPE_ADMIN)
                                     {
                                         if (bIsUser == true)
