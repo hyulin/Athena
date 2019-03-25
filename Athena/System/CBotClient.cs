@@ -3821,7 +3821,7 @@ namespace Athena
                 const string strCDTInfo03 = @"CDT_Info/CDT_Info_3.png";
                 const string strCDTInfo04 = @"CDT_Info/CDT_Info_4.png";
                 const string strCDTInfo05 = @"CDT_Info/CDT_Info_5.png";
-                const string strDiscordGuide = @"CDT_Info/Discord_Guide.png";
+                const string strDiscordGuide = @"CDT_Info/DiscordGuide.png";
 
                 var fileName01 = strCDTInfo01.Split(Path.DirectorySeparatorChar).Last();
                 var fileName02 = strCDTInfo02.Split(Path.DirectorySeparatorChar).Last();
@@ -3834,8 +3834,8 @@ namespace Athena
                 var fileStream02 = new FileStream(strCDTInfo02, FileMode.Open, FileAccess.Read, FileShare.Read);
                 var fileStream03 = new FileStream(strCDTInfo03, FileMode.Open, FileAccess.Read, FileShare.Read);
                 var fileStream04 = new FileStream(strCDTInfo04, FileMode.Open, FileAccess.Read, FileShare.Read);
-                var fileStream05 = new FileStream(strCDTInfo03, FileMode.Open, FileAccess.Read, FileShare.Read);
-                var fileDiscordStream = new FileStream(strCDTInfo04, FileMode.Open, FileAccess.Read, FileShare.Read);
+                var fileStream05 = new FileStream(strCDTInfo05, FileMode.Open, FileAccess.Read, FileShare.Read);
+                var fileDiscordStream = new FileStream(strDiscordGuide, FileMode.Open, FileAccess.Read, FileShare.Read);
 
                 await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream01, "");
                 await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream02, "");
