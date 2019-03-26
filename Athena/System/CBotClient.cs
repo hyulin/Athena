@@ -955,7 +955,7 @@ namespace Athena
                 strPrint += "==================================\n";
                 strPrint += "[ 아테나 v2.3 ]\n[ Clien Delicious Team Notice Bot ]\n\n";
                 strPrint += "/공지 : 클랜 공지사항을 출력합니다.\n";
-                strPrint += "/문의 [내용] : 문의사항을 등록합니다.\n";
+                //strPrint += "/문의 [내용] : 문의사항을 등록합니다.\n";
                 strPrint += "/일정 : 이번 달 클랜 일정을 확인합니다.\n";
                 strPrint += "/등록 [본 계정 배틀태그] : 아테나에 등록 합니다.\n";
                 strPrint += "/조회 [검색어] : 클랜원을 조회합니다.\n";
@@ -3783,22 +3783,22 @@ namespace Athena
             //========================================================================================
             // 문의
             //========================================================================================
-            else if (strCommend == "/문의")
-            {
-                if (strContents == "")
-                {
-                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 문의 내용을 입력해주세요.", ParseMode.Default, false, false, iMessageID);
-                    return;
-                }
+            //else if (strCommend == "/문의")
+            //{
+            //    if (strContents == "")
+            //    {
+            //        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 문의 내용을 입력해주세요.", ParseMode.Default, false, false, iMessageID);
+            //        return;
+            //    }
 
-                string name = userDirector.getUserInfo(senderKey).Name;
-                strPrint += "[ " + name + "님의 문의 ]\n\n";
-                strPrint += strContents + "\n\n";
-                strPrint += "@Seungman / @hyulin / @mans3ul / @urusaikara / @jandie99";
+            //    string name = userDirector.getUserInfo(senderKey).Name;
+            //    strPrint += "[ " + name + "님의 문의 ]\n\n";
+            //    strPrint += strContents + "\n\n";
+            //    strPrint += "@Seungman / @hyulin / @mans3ul / @urusaikara / @jandie99";
 
-                await Bot.SendTextMessageAsync(-1001482490165, strPrint);
-                await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[SYSTEM] 문의 등록이 완료 됐습니다.", ParseMode.Default, false, false, iMessageID);
-            }
+            //    await Bot.SendTextMessageAsync(-1001482490165, strPrint);
+            //    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[SYSTEM] 문의 등록이 완료 됐습니다.", ParseMode.Default, false, false, iMessageID);
+            //}
             //========================================================================================
             // 차단
             //========================================================================================
