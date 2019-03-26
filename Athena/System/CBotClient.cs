@@ -1466,6 +1466,8 @@ namespace Athena
                                     strPrint += " / " + row[5].ToString();
                                 if (row[6].ToString() != "")
                                     strPrint += " / " + row[6].ToString();
+                                strPrint += "\n";
+
                                 if (row[7].ToString() != "")
                                     strPrint += "- 이외 가능 픽 : " + row[7].ToString() + "\n";
 
