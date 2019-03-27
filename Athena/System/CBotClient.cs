@@ -2694,6 +2694,11 @@ namespace Athena
                                     {
                                         continue;
                                     }
+                                    else if (row.Count >= 5)
+                                    {
+                                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 시트에 문제가 있습니다.\n시트를 확인해주세요.\n(ex: 빈칸 존재, 비정상 데이터 입력)", ParseMode.Default, false, false, iMessageID);
+                                        return;
+                                    }
 
                                     string battleTag = row[1].ToString();
                                     string tier = row[2].ToString();
