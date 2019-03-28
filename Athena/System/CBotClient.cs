@@ -2856,6 +2856,9 @@ namespace Athena
                         {
                             foreach (var row in values)
                             {
+                                if (row[17] == null || row[17].ToString() == "")
+                                    continue;
+
                                 // 유저키 일치
                                 if (Convert.ToInt64(row[17].ToString()) == senderKey)
                                 {
