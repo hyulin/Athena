@@ -8,24 +8,29 @@ namespace Athena
 {
     class CCalendarDirector
     {
-        Dictionary<int, CCalendar> calenderDictionary_ = new Dictionary<int, CCalendar>();
+        Dictionary<DateTime, CCalendar> calenderDictionary_ = new Dictionary<DateTime, CCalendar>();
 
         public void addCalendar(CCalendar calendar)
-        {
-            int index = calendar.Day;
-            
-            calenderDictionary_.Add(index, calendar);
+        {            
+            calenderDictionary_.Add(calendar.Time, calendar);
         }
 
-        public CCalendar getCalendar(int day)
+        public CCalendar getCalendar(int year, int month, int day)
         {
-            if (calenderDictionary_.ContainsKey(day) == true)
+            DateTime time = new DateTime(year, month, day);
+
+            if (calenderDictionary_.ContainsKey(time) == true)
             {
-                return calenderDictionary_[day];
+                return calenderDictionary_[time];
             }
 
             CCalendar emptyCalendar = new CCalendar();
             return emptyCalendar;
+        }
+
+        public Dictionary<DateTime, CCalendar> getCalendar()
+        {
+            return calenderDictionary_;
         }
 
         public int getCalendarCount()
