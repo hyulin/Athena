@@ -1289,6 +1289,13 @@ namespace Athena
                 int month = 0;
                 bool isTitle = false;
 
+                if (nextDay == 0)
+                    strPrint += "* 오늘의 일정 *\n";
+                else if (nextDay == 100)
+                    strPrint += "* 현재 등록된 전체 일정 *\n";
+                else if (nextDay != 100)
+                    strPrint += "* 현재 날짜부터 " + nextDay + "일 간의 일정 *\n";
+
                 foreach (var elem in calendarPrint)
                 {
                     if (month != elem.Value.Time.Month)
