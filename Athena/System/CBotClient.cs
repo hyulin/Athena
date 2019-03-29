@@ -622,34 +622,6 @@ namespace Athena
                                 CCalendar calendar = new CCalendar();
                                 var row = values[index + calumn++];
 
-                                // 날짜칸일 경우
-                                switch (week)
-                                {
-                                    case 0:
-                                        calendar.Week = "일";
-                                        break;
-                                    case 2:
-                                        calendar.Week = "월";
-                                        break;
-                                    case 3:
-                                        calendar.Week = "화";
-                                        break;
-                                    case 4:
-                                        calendar.Week = "수";
-                                        break;
-                                    case 5:
-                                        calendar.Week = "목";
-                                        break;
-                                    case 6:
-                                        calendar.Week = "금";
-                                        break;
-                                    case 7:
-                                        calendar.Week = "토";
-                                        break;
-                                    default:
-                                        continue;
-                                }
-
                                 string[] dateSplit = row[week].ToString().Split('/');
 
                                 DateTime dateTime;
@@ -716,7 +688,30 @@ namespace Athena
                         isTitle = false;
                     }
 
-                    strPrint += elem.Value.Time.Day + "일(" + elem.Value.Week + ") : ";
+                    delegateDayOfWeek getDayOfWeek = (DayOfWeek week) =>
+                    {
+                        switch (week)
+                        {
+                            case DayOfWeek.Sunday:
+                                return "일";
+                            case DayOfWeek.Monday:
+                                return "월";
+                            case DayOfWeek.Tuesday:
+                                return "화";
+                            case DayOfWeek.Wednesday:
+                                return "수";
+                            case DayOfWeek.Thursday:
+                                return "목";
+                            case DayOfWeek.Friday:
+                                return "금";
+                            case DayOfWeek.Saturday:
+                                return "토";
+                        }
+
+                        return "없음";
+                    };
+
+                    strPrint += elem.Value.Time.Day + "일(" + getDayOfWeek(elem.Value.Time.DayOfWeek) + ") : ";
                     bool isFirst = true;
                     foreach (var todo in elem.Value.Todo)
                     {
@@ -762,6 +757,8 @@ namespace Athena
                 }
             }
         }
+
+        delegate string delegateDayOfWeek(DayOfWeek week);
 
         //Events...
         // Telegram...
@@ -864,12 +861,12 @@ namespace Athena
             string strUserName = varMessage.From.FirstName + varMessage.From.LastName;
             string strCommend = "";
             string strContents = "";
-            bool isCommand = false;
+            //bool isCommand = false;
 
             // 명령어인지 아닌지 구분
             if (strMassage.Substring(0, 1) == "/")
             {
-                isCommand = true;
+                //isCommand = true;
 
                 // 명령어와 서브명령어 구분
                 if (strMassage.IndexOf(" ") == -1)
@@ -1250,34 +1247,6 @@ namespace Athena
                                 CCalendar calendar = new CCalendar();
                                 var row = values[index + calumn++];
 
-                                // 날짜칸일 경우
-                                switch (week)
-                                {
-                                    case 0:
-                                        calendar.Week = "일";
-                                        break;
-                                    case 2:
-                                        calendar.Week = "월";
-                                        break;
-                                    case 3:
-                                        calendar.Week = "화";
-                                        break;
-                                    case 4:
-                                        calendar.Week = "수";
-                                        break;
-                                    case 5:
-                                        calendar.Week = "목";
-                                        break;
-                                    case 6:
-                                        calendar.Week = "금";
-                                        break;
-                                    case 7:
-                                        calendar.Week = "토";
-                                        break;
-                                    default:
-                                        continue;
-                                }
-
                                 string[] dateSplit = row[week].ToString().Split('/');
 
                                 DateTime dateTime;
@@ -1344,7 +1313,31 @@ namespace Athena
                         isTitle = false;
                     }
 
-                    strPrint += elem.Value.Time.Day + "일(" + elem.Value.Week + ") : ";
+                    delegateDayOfWeek getDayOfWeek = (DayOfWeek week) =>
+                    {
+                        switch (week)
+                        {
+                            case DayOfWeek.Sunday:
+                                return "일";
+                            case DayOfWeek.Monday:
+                                return "월";
+                            case DayOfWeek.Tuesday:
+                                return "화";
+                            case DayOfWeek.Wednesday:
+                                return "수";
+                            case DayOfWeek.Thursday:
+                                return "목";
+                            case DayOfWeek.Friday:
+                                return "금";
+                            case DayOfWeek.Saturday:
+                                return "토";
+                        }
+
+                        return "없음";
+                    };
+
+                    strPrint += elem.Value.Time.Day + "일(" + getDayOfWeek(elem.Value.Time.DayOfWeek) + ") : ";
+                    
                     bool isFirst = true;
                     foreach (var todo in elem.Value.Todo)
                     {
