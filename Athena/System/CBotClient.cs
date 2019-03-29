@@ -3856,8 +3856,10 @@ namespace Athena
                     {
                         int index = Convert.ToInt32(contents[1]);
 
-                        userDirector.RemoveMemo(senderKey, index - 1);
-                        strPrint += "[SYSTEM] 해당 메모가 제거 되었습니다.";
+                        if (userDirector.RemoveMemo(senderKey, index - 1) == true)
+                            strPrint += "[SYSTEM] 해당 메모가 제거 되었습니다.";
+                        else
+                            strPrint += "[ERROR] 메모 인덱스가 잘못 됐습니다.";
                     }
                     else if (contents[0] != "제거" && contents[0] != "")
                     {

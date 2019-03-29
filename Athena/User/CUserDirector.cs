@@ -161,9 +161,12 @@ namespace Athena
             return userInfo.getMemoList();
         }
 
-        public void RemoveMemo(long userKey, int index)
+        public bool RemoveMemo(long userKey, int index)
         {
             var memo = getMemo(userKey);
+
+            if (memo.Count - 1 < index)
+                return false;
 
             memo.RemoveAt(index);
 
@@ -175,6 +178,8 @@ namespace Athena
 
             // 파일에 백업
             System.IO.File.WriteAllText(@"Data/Memo/" + "Memo_" + userKey + ".txt", backup, Encoding.UTF8);
+
+            return true;
         }
 
         public void addBlockUser(long userKey)
