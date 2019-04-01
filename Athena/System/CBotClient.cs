@@ -3948,7 +3948,7 @@ namespace Athena
                                 {
                                     blockUserKey = Convert.ToInt64(row[17].ToString());
                                     if (userDirector.getUserInfo(blockUserKey).UserType != USER_TYPE.USER_TYPE_ADMIN &&
-                                        config.isDeveloper(senderKey) == false)
+                                        config.isDeveloper(blockUserKey) == false)
                                     {
                                         if (bIsUser == true)
                                         {
@@ -3980,7 +3980,7 @@ namespace Athena
 
                 if (bIsUser == true && blockUserKey != 0)
                 {
-                    userDirector.removeBlockUser(blockUserKey);
+                    userDirector.addBlockUser(blockUserKey);
 
                     await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[SYSTEM] 아테나 사용 차단되었습니다.", ParseMode.Default, false, false, iMessageID);
                     return;
