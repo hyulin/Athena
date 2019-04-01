@@ -4153,7 +4153,7 @@ namespace Athena
             //========================================================================================
             else if (strCommend == "/전달")
             {
-                if (config.isDeveloper(senderKey))
+                if (config.isDeveloper(senderKey) == false)
                     return;
 
                 await Bot.SendTextMessageAsync(config.getGroupKey(GROUP_TYPE.GROUP_TYPE_CLAN), strContents);
