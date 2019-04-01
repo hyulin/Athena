@@ -198,7 +198,7 @@ namespace Athena
                         if (isReflesh == false)
                             userDirector.addUserInfo(userKey, user);
                         else
-                            userDirector.reflechUserInfo(userKey, user);
+                            userDirector.refleshUserInfo(userKey, user);
                     }
                 }
                 else
@@ -1138,7 +1138,7 @@ namespace Athena
                             }
                             else if (isReflesh == true)
                             {
-                                if (userDirector.reflechUserInfo(user.UserKey, user) == true)
+                                if (userDirector.refleshUserInfo(user.UserKey, user) == true)
                                 {
                                     strPrint += "[SUCCESS] 갱신 완료됐습니다.";
                                 }

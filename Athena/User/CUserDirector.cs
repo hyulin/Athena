@@ -60,7 +60,7 @@ namespace Athena
         }
 
         // 유저 정보 갱신
-        public bool reflechUserInfo(long userKey, CUser user)
+        public bool refleshUserInfo(long userKey, CUser user)
         {
             if (userInfo.ContainsKey(userKey) == false)
                 return false;
