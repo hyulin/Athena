@@ -188,6 +188,13 @@ namespace Athena
                             user.UserType = USER_TYPE.USER_TYPE_ADMIN;
                         }
 
+                        // 개발자일 경우
+                        if (user.UserKey == 23842788)
+                        {
+                            // 유저 타입을 개발자로
+                            user.UserType = USER_TYPE.USER_TYPE_DEVELOPER;
+                        }
+
                         if (isReflesh == false)
                             userDirector.addUserInfo(userKey, user);
                         else
@@ -340,6 +347,12 @@ namespace Athena
             {
                 // 유저 타입을 관리자로
                 user.UserType = USER_TYPE.USER_TYPE_ADMIN;
+            }
+
+            if (user.UserKey == 23842788)
+            {
+                // 유저 타입을 개발자로
+                user.UserType = USER_TYPE.USER_TYPE_DEVELOPER;
             }
 
             return user;
@@ -3902,9 +3915,9 @@ namespace Athena
             else if (strCommend == "/차단")
             {
                 var user = userDirector.getUserInfo(senderKey);
-                if (user.UserType != USER_TYPE.USER_TYPE_ADMIN)
+                if (user.UserType != USER_TYPE.USER_TYPE_ADMIN && config.isDeveloper(senderKey) == false)
                 {
-                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 해당 명렁어는 운영진 권한이 필요합니다.", ParseMode.Default, false, false, iMessageID);
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 해당 명렁어는 관리자 권한이 필요합니다.", ParseMode.Default, false, false, iMessageID);
                     return;
                 }
 
@@ -3934,7 +3947,8 @@ namespace Athena
                                 if (row[0].ToString().Contains(strContents) == true)
                                 {
                                     blockUserKey = Convert.ToInt64(row[17].ToString());
-                                    if (userDirector.getUserInfo(blockUserKey).UserType != USER_TYPE.USER_TYPE_ADMIN)
+                                    if (userDirector.getUserInfo(blockUserKey).UserType != USER_TYPE.USER_TYPE_ADMIN &&
+                                        config.isDeveloper(senderKey) == false)
                                     {
                                         if (bIsUser == true)
                                         {
@@ -3946,7 +3960,7 @@ namespace Athena
                                     }
                                     else
                                     {
-                                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 운영진은 차단할 수 없습니다.", ParseMode.Default, false, false, iMessageID);
+                                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 관리자는 차단할 수 없습니다.", ParseMode.Default, false, false, iMessageID);
                                         return;
                                     }
                                 }
@@ -3983,9 +3997,9 @@ namespace Athena
             else if (strCommend == "/방등록")
             {
                 var user = userDirector.getUserInfo(senderKey);
-                if (user.UserType != USER_TYPE.USER_TYPE_ADMIN)
+                if (user.UserType != USER_TYPE.USER_TYPE_ADMIN && config.isDeveloper(senderKey) == false)
                 {
-                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 해당 명렁어는 운영진 권한이 필요합니다.", ParseMode.Default, false, false, iMessageID);
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 해당 명렁어는 관리자 권한이 필요합니다.", ParseMode.Default, false, false, iMessageID);
                     return;
                 }
 

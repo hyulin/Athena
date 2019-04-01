@@ -10,9 +10,10 @@ namespace Athena
     {
         USER_TYPE_NONE,
 
-        USER_TYPE_NORMAL,   // 일반 유저
-        USER_TYPE_ADMIN,    // 관리자
-        USER_TYPE_BOT,      // 봇
+        USER_TYPE_NORMAL,       // 일반 유저
+        USER_TYPE_ADMIN,        // 관리자
+        USER_TYPE_DEVELOPER,    // 개발자
+        USER_TYPE_BOT,          // 봇
 
         USER_TYPE_MAX
     }
