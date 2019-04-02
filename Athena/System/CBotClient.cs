@@ -1616,7 +1616,7 @@ namespace Athena
                     int yearIdx = 2018;
                     while (yearIdx != 0)
                     {
-                        String range = "경기 URL (" + yearIdx++ + ")!B5:G";
+                        String range = "영상 URL (" + yearIdx++ + ")!B5:G";
                         SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
                         try
                         {
@@ -1673,7 +1673,7 @@ namespace Athena
                             isPass[1] = true;
                         }
 
-                        String range = "경기 URL (" + year + ")!B5:G";
+                        String range = "영상 URL (" + year + ")!B5:G";
                         SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
                         ValueRange response = request.Execute();
                         if (response != null)
@@ -1712,7 +1712,7 @@ namespace Athena
                         string user = "";
                         string date = year + "." + month + "." + day;
 
-                        String range = "경기 URL (" + year + ")!B5:G";
+                        String range = "영상 URL (" + year + ")!B5:G";
                         SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
                         ValueRange response = request.Execute();
                         if (response != null)
