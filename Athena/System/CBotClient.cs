@@ -1617,7 +1617,7 @@ namespace Athena
                     int yearIdx = 2018;
                     while (yearIdx != 0)
                     {
-                        String range = "경기 URL (" + yearIdx++ + ")!B5:G";
+                        String range = "영상 URL (" + yearIdx++ + ")!B5:G";
                         SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
                         try
                         {
@@ -1674,7 +1674,7 @@ namespace Athena
                             isPass[1] = true;
                         }
 
-                        String range = "경기 URL (" + year + ")!B5:G";
+                        String range = "영상 URL (" + year + ")!B5:G";
                         SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
                         ValueRange response = request.Execute();
                         if (response != null)
@@ -1713,7 +1713,7 @@ namespace Athena
                         string user = "";
                         string date = year + "." + month + "." + day;
 
-                        String range = "경기 URL (" + year + ")!B5:G";
+                        String range = "영상 URL (" + year + ")!B5:G";
                         SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
                         ValueRange response = request.Execute();
                         if (response != null)
@@ -3538,11 +3538,29 @@ namespace Athena
                 // Download File
                 var file = await Bot.GetFileAsync(varMessage.Document.FileId);
                 var fileName = nasInfo.CurrentPath + varMessage.Document.FileName;
+                string fileExtention = fileName.Substring(fileName.LastIndexOf('.')).Replace(".", "");
+                string onlyFileName = varMessage.Document.FileName.Substring(0, varMessage.Document.FileName.LastIndexOf('.'));
+                int fileNameIndex = 2;
+                string fileStatue = "";
+               
+                while (true)
+                {
+                    System.IO.FileInfo fileInfo = new System.IO.FileInfo(fileName);
+                    if (fileInfo.Exists == true)
+                    {
+                        fileName = nasInfo.CurrentPath + onlyFileName + " (" + fileNameIndex++ + ")." + fileExtention;
+                        fileStatue = "\n(같은 이름을 가진 파일이 있어서 파일명을 변경합니다.)";
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
 
                 using (var saveStream = new FileStream(fileName, FileMode.CreateNew, FileAccess.Write))
                 {
                     await Bot.DownloadFileAsync(file.FilePath, saveStream);
-                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[SYSTEM] 파일 업로드 완료.\n" + fileName, ParseMode.Default, false, false, iMessageID);
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[SYSTEM] 파일 업로드 완료.\n" + fileName + fileStatue, ParseMode.Default, false, false, iMessageID);
                 }
             }
             //========================================================================================
