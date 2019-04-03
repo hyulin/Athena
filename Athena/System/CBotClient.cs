@@ -3401,13 +3401,19 @@ namespace Athena
             else if (strCommend == "/dir")
             {
                 // 관리자 전용 명령어
-                if (userDirector.getUserInfo(senderKey).UserType != USER_TYPE.USER_TYPE_ADMIN &&
-                    config.isDeveloper(senderKey) == false)
+                if (varMessage.Chat.Id != config.getGroupKey(GROUP_TYPE.GROUP_TYPE_TEST))
                 {
-                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "권한이 없는 유저 또는 대화방입니다.", ParseMode.Default, false, false, iMessageID);
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 사용할 수 없는 대화방입니다.", ParseMode.Default, false, false, iMessageID);
                     return;
                 }
 
+                if (userDirector.getUserInfo(senderKey).UserType != USER_TYPE.USER_TYPE_ADMIN &&
+                    config.isDeveloper(senderKey) == false)
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 권한이 없는 유저 또는 대화방입니다.", ParseMode.Default, false, false, iMessageID);
+                    return;
+                }
+                
                 String FolderName = nasInfo.CurrentPath;
                 System.IO.DirectoryInfo directory = new System.IO.DirectoryInfo(FolderName);
                 if (directory.Exists == true)
@@ -3440,10 +3446,16 @@ namespace Athena
             else if (strCommend == "/cd")
             {
                 // 관리자 전용 명령어
+                if (varMessage.Chat.Id != config.getGroupKey(GROUP_TYPE.GROUP_TYPE_TEST))
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 사용할 수 없는 대화방입니다.", ParseMode.Default, false, false, iMessageID);
+                    return;
+                }
+
                 if (userDirector.getUserInfo(senderKey).UserType != USER_TYPE.USER_TYPE_ADMIN &&
                     config.isDeveloper(senderKey) == false)
                 {
-                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "권한이 없는 유저 또는 대화방입니다.", ParseMode.Default, false, false, iMessageID);
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 권한이 없는 유저 또는 대화방입니다.", ParseMode.Default, false, false, iMessageID);
                     return;
                 }
 
@@ -3495,10 +3507,16 @@ namespace Athena
             else if (strCommend == "/down")
             {
                 // 관리자 전용 명령어
+                if (varMessage.Chat.Id != config.getGroupKey(GROUP_TYPE.GROUP_TYPE_TEST))
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 사용할 수 없는 대화방입니다.", ParseMode.Default, false, false, iMessageID);
+                    return;
+                }
+
                 if (userDirector.getUserInfo(senderKey).UserType != USER_TYPE.USER_TYPE_ADMIN &&
                     config.isDeveloper(senderKey) == false)
                 {
-                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "권한이 없는 유저 또는 대화방입니다.", ParseMode.Default, false, false, iMessageID);
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 권한이 없는 유저 또는 대화방입니다.", ParseMode.Default, false, false, iMessageID);
                     return;
                 }
 
@@ -3528,10 +3546,16 @@ namespace Athena
             else if (strCommend == "/up")
             {
                 // 관리자 전용 명령어
+                if (varMessage.Chat.Id != config.getGroupKey(GROUP_TYPE.GROUP_TYPE_TEST))
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 사용할 수 없는 대화방입니다.", ParseMode.Default, false, false, iMessageID);
+                    return;
+                }
+
                 if (userDirector.getUserInfo(senderKey).UserType != USER_TYPE.USER_TYPE_ADMIN &&
                     config.isDeveloper(senderKey) == false)
                 {
-                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "권한이 없는 유저 또는 대화방입니다.", ParseMode.Default, false, false, iMessageID);
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 권한이 없는 유저 또는 대화방입니다.", ParseMode.Default, false, false, iMessageID);
                     return;
                 }
 
