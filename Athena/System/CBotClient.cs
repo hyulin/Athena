@@ -3887,8 +3887,18 @@ namespace Athena
                     }
                     else if (contents[0] != "제거" && contents[0] != "")
                     {
-                        userDirector.addMemo(senderKey, strContents);
-                        strPrint += "[SYSTEM] 해당 메모가 저장 되었습니다.";
+                        if (userDirector.getUserInfo(senderKey).getMemoList().Count >= 15)
+                        {
+                            userDirector.getUserInfo(senderKey).getMemoList().RemoveAt(0);
+                            userDirector.addMemo(senderKey, strContents);
+
+                            strPrint += "[SYSTEM] 메모 제한 갯수를 초과하여\n가장 오래된 메모가 제거 되었으며,\n해당 메모가 저장 되었습니다.";
+                        }
+                        else
+                        {
+                            userDirector.addMemo(senderKey, strContents);
+                            strPrint += "[SYSTEM] 해당 메모가 저장 되었습니다.";
+                        }
                     }
                 }
 
