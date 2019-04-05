@@ -1612,166 +1612,134 @@ namespace Athena
                 // Define request parameters.
                 String spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
 
-                if (strContents.Contains("20") == false)
+                if (strContents.Length == 4 || strContents.Length == 6)
                 {
-                    int yearIdx = 2018;
-                    while (yearIdx != 0)
-                    {
-                        String range = "영상 URL (" + yearIdx++ + ")!B5:G";
-                        SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
-                        try
-                        {
-                            ValueRange response = request.Execute();
-                            if (response != null)
-                            {
-                                IList<IList<Object>> values = response.Values;
-                                if (values != null && values.Count > 0)
-                                {
-                                    foreach (var row in values)
-                                    {
-                                        if (row.Count() != 6 || row[0].ToString() == "")
-                                            continue;
+                    string year = "";
+                    string month = "";
+                    bool[] isPass = new bool[3];
 
-                                        if (row[1].ToString().Contains(strContents) == true)
+                    if (strContents.Length >= 4)
+                    {
+                        year = strContents.Substring(0, 4);
+                        isPass[0] = false;
+                    }
+                    else
+                    {
+                        isPass[0] = true;
+                    }
+
+                    if (strContents.Length >= 6)
+                    {
+                        month = strContents.Substring(4, 2);
+                        isPass[1] = false;
+                    }
+                    else
+                    {
+                        isPass[1] = true;
+                    }
+
+                    String range = "영상 URL (" + year + ")!B5:G";
+                    SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+                    ValueRange response = request.Execute();
+                    if (response != null)
+                    {
+                        IList<IList<Object>> values = response.Values;
+                        if (values != null && values.Count > 0)
+                        {
+                            foreach (var row in values)
+                            {
+                                if (row.Count() != 6 || row[0].ToString() == "")
+                                    continue;
+
+                                string[] splitDate = row[0].ToString().Split('.');
+
+                                if (isPass[0] == false && splitDate[0] == year)
+                                {
+                                    if (isPass[1] == false && splitDate[1] == month)
+                                        strPrint += "[" + row[0].ToString() + "] " + row[1].ToString() + "\n";
+
+                                    if (isPass[1] == true)
+                                        strPrint += "[" + row[0].ToString() + "] " + row[1].ToString() + "\n";
+                                }
+                            }
+                        }
+                    }
+
+                    strPrint += "\n/영상 날짜로 영상 주소를 조회하실 수 있습니다.\n";
+                    strPrint += "(ex: /영상 20181006)";
+                }
+                else if (strContents.Length == 8)
+                {
+                    string year = strContents.Substring(0, 4);
+                    string month = strContents.Substring(4, 2);
+                    string day = strContents.Substring(6, 2);
+                    bool bContinue = false;
+                    string user = "";
+                    string date = year + "." + month + "." + day;
+
+                    String range = "영상 URL (" + year + ")!B5:G";
+                    SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+                    ValueRange response = request.Execute();
+                    if (response != null)
+                    {
+                        IList<IList<Object>> values = response.Values;
+                        if (values != null && values.Count > 0)
+                        {
+                            foreach (var row in values)
+                            {
+                                if (row.Count >= 6)
+                                {
+                                    if (row[0].ToString() == date)
+                                    {
+                                        bContinue = true;
+                                    }
+                                    else if (row[0].ToString() != "" && bContinue == true)
+                                    {
+                                        bContinue = false;
+                                    }
+
+                                    if (bContinue == true)
+                                    {
+                                        if (row[1].ToString() != "")
                                         {
-                                            strPrint += "[" + row[0].ToString() + "] " + row[1].ToString() + "\n";
+                                            strPrint += "[ " + row[1].ToString() + " ]" + "\n";
+                                        }
+
+                                        if (row[3].ToString() == "")
+                                        {
+                                            if (row[4].ToString() != "")
+                                            {
+                                                strPrint += user + " (" + row[4].ToString() + ")" + " : " + row[5].ToString() + "\n";
+                                            }
+                                            else
+                                            {
+                                                strPrint += user + " : " + row[5].ToString() + "\n";
+                                            }
+
+                                        }
+                                        else
+                                        {
+                                            if (row[4].ToString() != "")
+                                            {
+                                                strPrint += row[3].ToString() + " (" + row[4].ToString() + ")" + " : " + row[5].ToString() + "\n";
+                                            }
+                                            else
+                                            {
+                                                strPrint += row[3].ToString() + " : " + row[5].ToString() + "\n";
+                                            }
+
+                                            user = row[3].ToString();
                                         }
                                     }
                                 }
                             }
-                        }
-                        catch
-                        {
-                            yearIdx = 0;
                         }
                     }
                 }
                 else
                 {
-                    if (strContents.Length == 4 || strContents.Length == 6)
-                    {
-                        string year = "";
-                        string month = "";
-                        bool[] isPass = new bool[3];
-
-                        if (strContents.Length >= 4)
-                        {
-                            year = strContents.Substring(0, 4);
-                            isPass[0] = false;
-                        }
-                        else
-                        {
-                            isPass[0] = true;
-                        }
-
-                        if (strContents.Length >= 6)
-                        {
-                            month = strContents.Substring(4, 2);
-                            isPass[1] = false;
-                        }
-                        else
-                        {
-                            isPass[1] = true;
-                        }
-
-                        String range = "영상 URL (" + year + ")!B5:G";
-                        SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
-                        ValueRange response = request.Execute();
-                        if (response != null)
-                        {
-                            IList<IList<Object>> values = response.Values;
-                            if (values != null && values.Count > 0)
-                            {
-                                foreach (var row in values)
-                                {
-                                    if (row.Count() != 6 || row[0].ToString() == "")
-                                        continue;
-
-                                    string[] splitDate = row[0].ToString().Split('.');
-
-                                    if (isPass[0] == false && splitDate[0] == year)
-                                    {
-                                        if (isPass[1] == false && splitDate[1] == month)
-                                            strPrint += "[" + row[0].ToString() + "] " + row[1].ToString() + "\n";
-
-                                        if (isPass[1] == true)
-                                            strPrint += "[" + row[0].ToString() + "] " + row[1].ToString() + "\n";
-                                    }
-                                }
-                            }
-                        }
-
-                        strPrint += "\n/영상 날짜로 영상 주소를 조회하실 수 있습니다.\n";
-                        strPrint += "(ex: /영상 20181006)";
-                    }
-                    else if (strContents.Length == 8)
-                    {
-                        string year = strContents.Substring(0, 4);
-                        string month = strContents.Substring(4, 2);
-                        string day = strContents.Substring(6, 2);
-                        bool bContinue = false;
-                        string user = "";
-                        string date = year + "." + month + "." + day;
-
-                        String range = "영상 URL (" + year + ")!B5:G";
-                        SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
-                        ValueRange response = request.Execute();
-                        if (response != null)
-                        {
-                            IList<IList<Object>> values = response.Values;
-                            if (values != null && values.Count > 0)
-                            {
-                                foreach (var row in values)
-                                {
-                                    if (row.Count >= 6)
-                                    {
-                                        if (row[0].ToString() == date)
-                                        {
-                                            bContinue = true;
-                                        }
-                                        else if (row[0].ToString() != "" && bContinue == true)
-                                        {
-                                            bContinue = false;
-                                        }
-
-                                        if (bContinue == true)
-                                        {
-                                            if (row[1].ToString() != "")
-                                            {
-                                                strPrint += "[ " + row[1].ToString() + " ]" + "\n";
-                                            }
-
-                                            if (row[3].ToString() == "")
-                                            {
-                                                if (row[4].ToString() != "")
-                                                {
-                                                    strPrint += user + " (" + row[4].ToString() + ")" + " : " + row[5].ToString() + "\n";
-                                                }
-                                                else
-                                                {
-                                                    strPrint += user + " : " + row[5].ToString() + "\n";
-                                                }
-
-                                            }
-                                            else
-                                            {
-                                                if (row[4].ToString() != "")
-                                                {
-                                                    strPrint += row[3].ToString() + " (" + row[4].ToString() + ")" + " : " + row[5].ToString() + "\n";
-                                                }
-                                                else
-                                                {
-                                                    strPrint += row[3].ToString() + " : " + row[5].ToString() + "\n";
-                                                }
-
-                                                user = row[3].ToString();
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 날짜를 잘못 입력했습니다.\n(ex: /영상 201812 , /영상 20181215)", ParseMode.Default, false, false, iMessageID);
+                    return;
                 }
 
                 if (strPrint != "")
@@ -4190,6 +4158,12 @@ namespace Athena
                 }
 
                 await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
+
+                if (DateTime.Now.Hour >= 0 && DateTime.Now.Hour < 8)
+                {
+                    strPrint = "현재 운영진 업무 시간이 종료되었습니다.\n가입절차 안내와 문의사항 답변은 잠시 기다려 주세요.\n\n[운영진 주 업무시간: 18시 ~자정]\n- 18시 이전 문의 가능, 단 답변이 느릴 수 있음\n- 새벽 텔레그램 1:1 문의 자제";
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint);
+                }
             }
             //========================================================================================
             // 전달
