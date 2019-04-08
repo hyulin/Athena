@@ -3775,7 +3775,7 @@ namespace Athena
                     await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
                     return;
                 }
-                else if (strContents.Substring(0, 2) == "제거")
+                else if (strContents.Length >= 2 && strContents.Substring(0, 2) == "제거")
                 {
                     int hour = Convert.ToInt32(strContents.Substring(3, 2));
                     int min = Convert.ToInt32(strContents.Substring(5, 2));
@@ -3796,6 +3796,12 @@ namespace Athena
                 else
                 {
                     int checkNum = 0;
+                    if (strContents.Length < 4)
+                    {
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 시간을 잘못 입력하셨습니다.\n(ex: 오후 7시 30분 : 1930)", ParseMode.Default, false, false, iMessageID);
+                        return;
+                    }
+
                     bool isNumber = int.TryParse(strContents.Substring(0, 4), out checkNum);
                     if (isNumber == false)
                     {
@@ -3806,7 +3812,19 @@ namespace Athena
                     bool isSearch = false;
 
                     string notiTime = strContents.Substring(0, 4);
+
+                    if (strContents.Length < 5)
+                    {
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 내용을 잘못 입력하셨습니다.", ParseMode.Default, false, false, iMessageID);
+                        return;
+                    }
+
                     string notiString = strContents.Substring(5);
+                    if (notiString == "")
+                    {
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 내용을 잘못 입력하셨습니다.", ParseMode.Default, false, false, iMessageID);
+                        return;
+                    }
 
                     int hour = Convert.ToInt32(notiTime.Substring(0, 2));
                     int min = Convert.ToInt32(notiTime.Substring(2, 2));
