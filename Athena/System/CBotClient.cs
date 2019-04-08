@@ -831,7 +831,6 @@ namespace Athena
                     strInfo += "\n";
                     strInfo += "클랜 생활에 불편하신 점이 있으시거나\n";
                     strInfo += "건의사항, 문의사항이 있으실 때는\n";
-                    strInfo += "냉각콜라(@Seungman),\n";
                     strInfo += "(남)AWESOME(@leek603),\n";
                     strInfo += "(여)AWESOME(@AWESOMEYUU),\n";
                     strInfo += "카페인(@sunho29),\n";
