@@ -904,12 +904,22 @@ namespace Athena
             // CDT 관련방 아니면 동작하지 않도록
             if (varMessage.Chat.Id != config.getGroupKey(GROUP_TYPE.GROUP_TYPE_CLAN) &&     // 본방
                 varMessage.Chat.Id != config.getGroupKey(GROUP_TYPE.GROUP_TYPE_TEST) &&     // 테스트방
-                varMessage.Chat.Id != config.getGroupKey(GROUP_TYPE.GROUP_TYPE_GUIDE) &&     // 사전안내방
-                varMessage.Chat.Username != "hyulin")
+                config.isDeveloper(senderKey) == false)
             {
-                await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 사용할 수 없는 대화방입니다.", ParseMode.Default, false, false, iMessageID);
-                CLog.WriteLog(varMessage.Chat.Id, senderKey, "", "[ERROR] 사용할 수 없는 대화방입니다.", "", "");
-                return;
+                if (varMessage.Chat.Id == config.getGroupKey(GROUP_TYPE.GROUP_TYPE_GUIDE))     // 사전안내방
+                {
+                    // 사전안내방에서는 등록, 스크림, 조사, 안내만 가능
+                    if (strCommend != "/등록" && strCommend != "/스크림" && strCommend != "/조사" && strCommend != "/안내")
+                    {
+                        return;
+                    }
+                }
+                else
+                {
+                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 사용할 수 없는 대화방입니다.", ParseMode.Default, false, false, iMessageID);
+                    CLog.WriteLog(varMessage.Chat.Id, senderKey, "", "[ERROR] 사용할 수 없는 대화방입니다.", "", "");
+                    return;
+                }
             }
 
             if (userDirector.getUserInfo(senderKey).UserKey > 0)
