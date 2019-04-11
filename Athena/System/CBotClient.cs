@@ -812,15 +812,15 @@ namespace Athena
             // 입장 메시지 일 경우
             if (varMessage.Type == MessageType.ChatMembersAdded)
             {
-#if !DEBUG
                 if (varMessage.Chat.Id == config.getGroupKey(GROUP_TYPE.GROUP_TYPE_GUIDE))  // 사전안내방
-#else
-                if (varMessage.Chat.Id == config.getGroupKey(GROUP_TYPE.GROUP_TYPE_TEST))   // 테스트방
-#endif
                 {
                     varMessage.Text = "/안내";
                 }
+#if !DEBUG
                 else if (varMessage.Chat.Id == config.getGroupKey(GROUP_TYPE.GROUP_TYPE_CLAN))      // 본방
+#else
+                else if (varMessage.Chat.Id == config.getGroupKey(GROUP_TYPE.GROUP_TYPE_TEST))   // 테스트방
+#endif
                 {
                     string strInfo = "";
 
@@ -856,6 +856,11 @@ namespace Athena
                     var fileName = record.Split(Path.DirectorySeparatorChar).Last();
                     var fileStream = new FileStream(record, FileMode.Open, FileAccess.Read, FileShare.Read);
                     await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream, strInfo);
+
+                    const string strCDTInfo06 = @"CDT_Info/CDT_Info_6.png";
+                    var fileName06 = strCDTInfo06.Split(Path.DirectorySeparatorChar).Last();
+                    var fileStream06 = new FileStream(strCDTInfo06, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream06, "");
 
                     return;
                 }
@@ -4188,7 +4193,7 @@ namespace Athena
                 await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream05, "");
                 await Bot.SendPhotoAsync(varMessage.Chat.Id, fileDiscordStream, "");
 
-                strPrint = "위 가이드는 본방에서 /안내 입력 또는\n디스코드 #readme 와 #guide 채널에서도\n다시 보실 수 있습니다.\n\n";
+                strPrint = "위 가이드는 본방에서\n/안내 입력으로 다시 보실 수 있습니다.\n\n";
                 foreach (var iter in config.admin_ID_)
                 {
                     strPrint += "@" + iter + " ";
