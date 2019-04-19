@@ -153,7 +153,7 @@ namespace Athena
 
             // Define request parameters.
             String spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
-            String range = "클랜원 목록!C8:U";
+            String range = "클랜원 목록!C8:V";
             SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
             ValueRange response = request.Execute();
@@ -167,10 +167,10 @@ namespace Athena
                         bool isReflesh = false;
 
                         // 아테나에 등록되지 않은 유저
-                        if (row[17].ToString() == "")
+                        if (row[18].ToString() == "")
                             continue;
 
-                        long userKey = Convert.ToInt64(row[17].ToString());
+                        long userKey = Convert.ToInt64(row[18].ToString());
                         var userData = userDirector.getUserInfo(userKey);
                         if (userData.UserKey != 0)
                         {
@@ -179,7 +179,7 @@ namespace Athena
                         }
 
                         CUser user = new CUser();
-                        user = setUserInfo(row, Convert.ToInt64(row[17].ToString()));
+                        user = setUserInfo(row, Convert.ToInt64(row[18].ToString()));
 
                         // 운영진일 경우
                         if (config.isAdmin(user.UserKey))
@@ -1060,7 +1060,7 @@ namespace Athena
 
                     // Define request parameters.
                     String spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
-                    String range = "클랜원 목록!C8:U";
+                    String range = "클랜원 목록!C8:V";
                     SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
                     ValueRange response = request.Execute();
@@ -1084,10 +1084,10 @@ namespace Athena
                                     searchCount++;
                                     searchIndex = index;
 
-                                    if (row[17].ToString() != "")
+                                    if (row[18].ToString() != "")
                                     {
                                         // 이미 값이 있으므로 갱신한다.
-                                        userKey = Convert.ToInt64(row[17].ToString());
+                                        userKey = Convert.ToInt64(row[18].ToString());
                                         isReflesh = true;
                                     }
                                     else
@@ -1100,31 +1100,32 @@ namespace Athena
                                     user.MainBattleTag = row[1].ToString();
                                     user.SubBattleTag = row[2].ToString().Trim().Split(',');
 
-                                    if (row[3].ToString() == "플렉스")
+                                    if (row[4].ToString() == "플렉스")
                                         user.Position |= POSITION.POSITION_FLEX;
-                                    if (row[3].ToString().ToUpper().Contains("딜"))
+                                    if (row[4].ToString().ToUpper().Contains("딜"))
                                         user.Position |= POSITION.POSITION_DPS;
-                                    if (row[3].ToString().ToUpper().Contains("탱"))
+                                    if (row[4].ToString().ToUpper().Contains("탱"))
                                         user.Position |= POSITION.POSITION_TANK;
-                                    if (row[3].ToString().ToUpper().Contains("힐"))
+                                    if (row[4].ToString().ToUpper().Contains("힐"))
                                         user.Position |= POSITION.POSITION_SUPP;
 
                                     string[] most = new string[3];
-                                    most[0] = row[4].ToString();
-                                    most[1] = row[5].ToString();
-                                    most[2] = row[6].ToString();
+                                    most[0] = row[5].ToString();
+                                    most[1] = row[6].ToString();
+                                    most[2] = row[7].ToString();
                                     user.MostPick = most;
-                                    user.OtherPick = row[7].ToString();
+                                    user.OtherPick = row[8].ToString();
 
-                                    user.Team = row[8].ToString();
-                                    user.Youtube = row[9].ToString();
-                                    user.Twitch = row[10].ToString();
-                                    user.Info = row[11].ToString();
+                                    user.Team = row[9].ToString();
+                                    user.Youtube = row[10].ToString();
+                                    user.Twitch = row[11].ToString();
+                                    user.Info = row[12].ToString();
                                     
-                                    user.Monitor = row[12].ToString();
-                                    user.HeadSet = row[13].ToString();
-                                    user.Keyboard = row[14].ToString();
-                                    user.Mouse = row[15].ToString();
+                                    user.Monitor = row[13].ToString();
+                                    user.HeadSet = row[14].ToString();
+                                    user.Keyboard = row[15].ToString();
+                                    user.Mouse = row[16].ToString();
+                                    user.eDPI = Convert.ToInt32(row[17].ToString());
                                 }
                                 else
                                 {
@@ -1158,7 +1159,7 @@ namespace Athena
                                 }
                             }
 
-                            range = "클랜원 목록!T" + (8 + searchIndex);
+                            range = "클랜원 목록!U" + (8 + searchIndex);
 
                             // Define request parameters.
                             ValueRange valueRange = new ValueRange();
@@ -1414,7 +1415,7 @@ namespace Athena
                 {
                     // Define request parameters.
                     String spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
-                    String range = "클랜원 목록!C8:U";
+                    String range = "클랜원 목록!C8:V";
                     SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
                     ValueRange response = request.Execute();
@@ -1557,8 +1558,8 @@ namespace Athena
                                 strPrint += "[ " + row[0].ToString() + " ]\n";
                                 strPrint += "- 조회 배틀태그 : " + battleTag + "\n";
 
-                                if (row[8].ToString() != "")
-                                    strPrint += "- 소속팀 : " + row[8].ToString() + "\n";
+                                if (row[9].ToString() != "")
+                                    strPrint += "- 소속팀 : " + row[9].ToString() + "\n";
                                 else
                                     strPrint += "- 소속팀 : 없음\n";
 
@@ -1572,28 +1573,28 @@ namespace Athena
                                 strPrint += "- 포지션 : " + row[3].ToString() + "\n";
 
                                 strPrint += "- 모스트 : ";
-                                if (row[4].ToString() != "")
-                                    strPrint += row[4].ToString();
                                 if (row[5].ToString() != "")
-                                    strPrint += " / " + row[5].ToString();
+                                    strPrint += row[5].ToString();
                                 if (row[6].ToString() != "")
                                     strPrint += " / " + row[6].ToString();
+                                if (row[7].ToString() != "")
+                                    strPrint += " / " + row[7].ToString();
                                 strPrint += "\n";
 
-                                if (row[7].ToString() != "")
-                                    strPrint += "- 이외 가능 픽 : " + row[7].ToString() + "\n";
+                                if (row[8].ToString() != "")
+                                    strPrint += "- 이외 가능 픽 : " + row[8].ToString() + "\n";
 
-                                if (row[11].ToString() != "")
-                                    strPrint += "- 자기소개 : " + row[11].ToString() + "\n";
+                                if (row[12].ToString() != "")
+                                    strPrint += "- 자기소개 : " + row[12].ToString() + "\n";
 
                                 strPrint += "----------------------------------\n";
 
-                                if (row[9].ToString() != "")
-                                    strPrint += "- Youtube : " + row[9].ToString() + "\n";
                                 if (row[10].ToString() != "")
-                                    strPrint += "- Twitch : " + row[10].ToString() + "\n";
+                                    strPrint += "- Youtube : " + row[10].ToString() + "\n";
+                                if (row[11].ToString() != "")
+                                    strPrint += "- Twitch : " + row[11].ToString() + "\n";
 
-                                if (row[9].ToString() != "" || row[10].ToString() != "")
+                                if (row[10].ToString() != "" || row[11].ToString() != "")
                                     strPrint += "----------------------------------\n";
 
                                 bContinue = true;   // 한 명만 출력된다면 이 부분은 무시됨.
@@ -1788,7 +1789,7 @@ namespace Athena
                 {
                     // Define request parameters.
                     String spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
-                    String range = "클랜원 목록!C8:U";
+                    String range = "클랜원 목록!C8:V";
                     SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
                     bool bResult = false;
 
@@ -1804,20 +1805,20 @@ namespace Athena
                             {
                                 if (strContents == "힐" || strContents == "딜" || strContents == "탱" || strContents == "플렉스")
                                 {
-                                    if (row[3].ToString().ToUpper().Contains(strContents.ToUpper()) ||
-                                    row[4].ToString().ToUpper().Contains(strContents.ToUpper()) ||
+                                    if (row[4].ToString().ToUpper().Contains(strContents.ToUpper()) ||
                                     row[5].ToString().ToUpper().Contains(strContents.ToUpper()) ||
                                     row[6].ToString().ToUpper().Contains(strContents.ToUpper()) ||
-                                    row[3].ToString() == "플렉스")
+                                    row[7].ToString().ToUpper().Contains(strContents.ToUpper()) ||
+                                    row[4].ToString() == "플렉스")
                                     {
-                                        strPrint += row[0] + "(" + row[1] + ") : " + row[3].ToString() + " (";
+                                        strPrint += row[0] + "(" + row[1] + ") : " + row[4].ToString() + " (";
 
-                                        if (row[4].ToString() != "")
-                                            strPrint += row[4].ToString();
                                         if (row[5].ToString() != "")
-                                            strPrint += " / " + row[5].ToString();
+                                            strPrint += row[5].ToString();
                                         if (row[6].ToString() != "")
                                             strPrint += " / " + row[6].ToString();
+                                        if (row[7].ToString() != "")
+                                            strPrint += " / " + row[7].ToString();
 
                                         strPrint += ")\n";
 
@@ -1826,19 +1827,19 @@ namespace Athena
                                 }
                                 else
                                 {
-                                    if (row[3].ToString().ToUpper().Contains(strContents.ToUpper()) ||
-                                    row[4].ToString().ToUpper().Contains(strContents.ToUpper()) ||
+                                    if (row[4].ToString().ToUpper().Contains(strContents.ToUpper()) ||
                                     row[5].ToString().ToUpper().Contains(strContents.ToUpper()) ||
-                                    row[6].ToString().ToUpper().Contains(strContents.ToUpper()))
+                                    row[6].ToString().ToUpper().Contains(strContents.ToUpper()) ||
+                                    row[7].ToString().ToUpper().Contains(strContents.ToUpper()))
                                     {
-                                        strPrint += row[0] + "(" + row[1] + ") : " + row[3].ToString() + " (";
+                                        strPrint += row[0] + "(" + row[1] + ") : " + row[4].ToString() + " (";
 
-                                        if (row[4].ToString() != "")
-                                            strPrint += row[4].ToString();
                                         if (row[5].ToString() != "")
-                                            strPrint += " / " + row[5].ToString();
+                                            strPrint += row[5].ToString();
                                         if (row[6].ToString() != "")
                                             strPrint += " / " + row[6].ToString();
+                                        if (row[7].ToString() != "")
+                                            strPrint += " / " + row[7].ToString();
 
                                         strPrint += ")\n";
 
@@ -2926,7 +2927,7 @@ namespace Athena
                     CUser user = new CUser();
 
                     // 클랜원 목록에서 정보 추출
-                    String range = "클랜원 목록!C8:U";
+                    String range = "클랜원 목록!C8:V";
                     SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
                     ValueRange response = request.Execute();
                     if (response != null)
@@ -2936,11 +2937,11 @@ namespace Athena
                         {
                             foreach (var row in values)
                             {
-                                if (row[17] == null || row[17].ToString() == "")
+                                if (row[18] == null || row[18].ToString() == "")
                                     continue;
 
                                 // 유저키 일치
-                                if (Convert.ToInt64(row[17].ToString()) == senderKey)
+                                if (Convert.ToInt64(row[18].ToString()) == senderKey)
                                 {
                                     user = setUserInfo(row, senderKey);
                                     break;
@@ -3988,7 +3989,7 @@ namespace Athena
                 {
                     // Define request parameters.
                     String spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
-                    String range = "클랜원 목록!C8:U";
+                    String range = "클랜원 목록!C8:V";
                     SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
                     ValueRange response = request.Execute();
@@ -4001,7 +4002,7 @@ namespace Athena
                             {
                                 if (row[0].ToString().Contains(strContents) == true)
                                 {
-                                    blockUserKey = Convert.ToInt64(row[17].ToString());
+                                    blockUserKey = Convert.ToInt64(row[18].ToString());
                                     if (userDirector.getUserInfo(blockUserKey).UserType != USER_TYPE.USER_TYPE_ADMIN &&
                                         config.isDeveloper(blockUserKey) == false)
                                     {
