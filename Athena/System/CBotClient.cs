@@ -3150,7 +3150,10 @@ namespace Athena
 
                                 for (int i = 0; i < 7; i++)
                                 {
-                                    strPrint += "- " + day[i].ToString() + " : " + count[i].ToString() + "명\n";
+                                    if (count[i].ToString() != "0")
+                                    {
+                                        strPrint += "- " + day[i].ToString() + " : " + count[i].ToString() + "명\n";
+                                    }
                                 }
                             }
                         }
