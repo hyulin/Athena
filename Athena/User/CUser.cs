@@ -49,7 +49,7 @@ namespace Athena
         public string HeadSet { get; set; }
         public string Keyboard { get; set; }
         public string Mouse { get; set; }
-        public int eDPI { get; set; }
+        public string eDPI { get; set; }
 
         public ulong chattingCount { get; set; }
         

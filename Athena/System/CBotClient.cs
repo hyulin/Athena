@@ -1125,7 +1125,7 @@ namespace Athena
                                     user.HeadSet = row[14].ToString();
                                     user.Keyboard = row[15].ToString();
                                     user.Mouse = row[16].ToString();
-                                    user.eDPI = Convert.ToInt32(row[17].ToString());
+                                    user.eDPI = row[17].ToString();
                                 }
                                 else
                                 {
