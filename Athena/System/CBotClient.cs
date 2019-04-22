@@ -1570,7 +1570,7 @@ namespace Athena
                                 if (row[2].ToString() != "")
                                     strPrint += "- 부 계정 배틀태그 : " + row[2].ToString() + "\n";
 
-                                strPrint += "- 포지션 : " + row[3].ToString() + "\n";
+                                strPrint += "- 포지션 : " + row[4].ToString() + "\n";
 
                                 strPrint += "- 모스트 : ";
                                 if (row[5].ToString() != "")
