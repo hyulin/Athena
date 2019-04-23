@@ -1120,7 +1120,7 @@ namespace Athena
                                     user.Youtube = row[10].ToString();
                                     user.Twitch = row[11].ToString();
                                     user.Info = row[12].ToString();
-                                    
+
                                     user.Monitor = row[13].ToString();
                                     user.HeadSet = row[14].ToString();
                                     user.Keyboard = row[15].ToString();
@@ -1372,7 +1372,7 @@ namespace Athena
                     };
 
                     strPrint += elem.Value.Time.Day + "일(" + getDayOfWeek(elem.Value.Time.DayOfWeek) + ") : ";
-                    
+
                     bool isFirst = true;
                     foreach (var todo in elem.Value.Todo)
                     {
@@ -1865,354 +1865,27 @@ namespace Athena
             //========================================================================================
             else if (strCommend == "/모임")
             {
-                // Define request parameters.
-                String spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
-                String range = "모임!C4:R12";
-                SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+                // 타이틀
+                String title_spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
+                String title_range = "모임_개편!B2";
+                SpreadsheetsResource.ValuesResource.GetRequest title_request = service.Spreadsheets.Values.Get(title_spreadsheetId, title_range);
 
-                ValueRange response = request.Execute();
-                if (response != null)
+                ValueRange title_response = title_request.Execute();
+                if (title_response != null)
                 {
-                    IList<IList<Object>> values = response.Values;
-                    if (values != null && values.Count > 0)
+                    IList<IList<Object>> values = title_response.Values;
+                    if (values == null)
                     {
-                        // 모임이름 ~ 문의
-                        foreach (var row in values)
-                        {
-                            if (row.Count > 0)
-                            {
-                                if (row[0].ToString() == "모임이름" && row[1].ToString() == "")
-                                {
-                                    strPrint = "[SYSTEM] 현재 예정된 모임이 없습니다.";
-                                    const string meeting = @"Function/Meeting.jpg";
-                                    var fileName = meeting.Split(Path.DirectorySeparatorChar).Last();
-                                    var fileStream = new FileStream(meeting, FileMode.Open, FileAccess.Read, FileShare.Read);
-                                    await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream, strPrint, ParseMode.Default, false, iMessageID);
-                                    return;
-                                }
-
-                                if (row[0].ToString() == "프로그램" && row[1].ToString() != "")
-                                {
-                                    strPrint += "* " + row[0].ToString() + "\n";
-                                    strPrint += "          - [" + row[1].ToString() + "] " + row[2].ToString() + " / " + row[3].ToString() + " / " + row[5].ToString() + "\n";
-                                }
-                                else if (row[0].ToString() == "" && row[1].ToString() != "")
-                                {
-                                    strPrint += "          - [" + row[1].ToString() + "] " + row[2].ToString() + " / " + row[3].ToString() + " / " + row[5].ToString() + "\n";
-                                }
-                                else if (row[0].ToString() != "" && row[1].ToString() != "")
-                                {
-                                    strPrint += "* " + row[0].ToString() + " : " + row[1].ToString() + "\n";
-                                }
-                            }
-                        }
-
-                        // 공지, 회비
-                        foreach (var row in values)
-                        {
-                            if (row.Count > 0)
-                            {
-                                if (row[6].ToString() == "공지" && row[7].ToString() != "")
-                                {
-                                    strPrint += "* " + row[6].ToString() + "\n";
-                                    strPrint += row[7].ToString() + "\n";
-                                }
-                                else if (row[6].ToString() == "회비" && row[7].ToString() != "")
-                                {
-                                    strPrint += "* " + row[6].ToString() + "\n";
-                                    strPrint += "          - [" + row[7].ToString() + "] " + row[8].ToString() + "\n";
-                                }
-                                else if (row[6].ToString() == "" && row[7].ToString() != "")
-                                {
-                                    strPrint += "          - [" + row[7].ToString() + "] " + row[8].ToString() + "\n";
-                                }
-                                else if (row[6].ToString() != "" && row[7].ToString() != "")
-                                {
-                                    strPrint += "* " + row[6].ToString() + " : " + row[7].ToString() + "\n";
-                                }
-                            }
-                        }
-                    }
-                }
-
-                List<string> lstConfirm = new List<string>();
-                List<string> lstUndefine = new List<string>();
-
-                // Define request parameters.
-                range = "모임!C16:O";
-                request = service.Spreadsheets.Values.Get(spreadsheetId, range);
-
-                response = request.Execute();
-                if (response != null)
-                {
-                    IList<IList<Object>> values = response.Values;
-                    if (values != null && values.Count > 0)
-                    {
-                        foreach (var row in values)
-                        {
-                            if (row.Count != 0)
-                            {
-                                if (row.Count >= 13)
-                                {
-                                    if (row[12].ToString().ToUpper().Contains('O'))
-                                    {
-                                        string strConfirm = row[0].ToString();
-
-                                        if (strConfirm != "")
-                                        {
-                                            lstConfirm.Add(strConfirm);
-                                        }
-                                    }
-                                    else if (row[12].ToString().ToUpper().Contains('X'))
-                                    {
-                                        continue;
-                                    }
-                                    else
-                                    {
-                                        string strUndefine = row[0].ToString();
-                                        if (strUndefine != "")
-                                        {
-                                            lstUndefine.Add(strUndefine);
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    string strUndefine = row[0].ToString();
-                                    if (strUndefine != "")
-                                    {
-                                        lstUndefine.Add(strUndefine);
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    strPrint += "----------------------------------------\n";
-                    strPrint += "★ 참가자\n";
-                    strPrint += "- 확정 : ";
-                    bool bFirst = true;
-
-                    if (lstConfirm.Count == 0)
-                    {
-                        strPrint += "없음";
-                    }
-                    else
-                    {
-                        foreach (string confirm in lstConfirm)
-                        {
-                            if (bFirst == true)
-                            {
-                                strPrint += confirm;
-                                bFirst = false;
-                            }
-                            else
-                            {
-                                strPrint += " , " + confirm;
-                            }
-                        }
-                    }
-
-                    strPrint += "\n- 미정 : ";
-                    bFirst = true;
-
-                    if (lstUndefine.Count == 0)
-                    {
-                        strPrint += "없음";
-                    }
-                    else
-                    {
-                        foreach (string undefine in lstUndefine)
-                        {
-                            if (bFirst == true)
-                            {
-                                strPrint += undefine;
-                                bFirst = false;
-                            }
-                            else
-                            {
-                                strPrint += " , " + undefine;
-                            }
-                        }
-                    }
-
-                    strPrint += "\n----------------------------------------\n";
-                    strPrint += "- 확정 : " + lstConfirm.Count + "명 / 미정 : " + lstUndefine.Count + "명 / 총 " + (lstConfirm.Count + lstUndefine.Count) + "명\n";
-                    strPrint += "----------------------------------------";
-                }
-
-                if (strPrint != "")
-                {
-                    const string meeting = @"Function/Meeting.jpg";
-                    var fileName = meeting.Split(Path.DirectorySeparatorChar).Last();
-                    var fileStream = new FileStream(meeting, FileMode.Open, FileAccess.Read, FileShare.Read);
-                    await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream, strPrint, ParseMode.Default, false, iMessageID);
-                }
-                else
-                {
-                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 모임이 등록되지 않았습니다.", ParseMode.Default, false, false, iMessageID);
-                }
-            }
-            else if (strCommend == "/참가")
-            {
-                String spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
-                String range = "모임!D4:D";
-                SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
-
-                ValueRange response = request.Execute();
-                if (response != null)
-                {
-                    IList<IList<Object>> values = response.Values;
-                    if (values != null && values.Count > 0)
-                    {
-                        var row = values[0];
-                        if (row.Count == 0)
-                        {
-                            await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 모임이 등록되지 않았습니다.", ParseMode.Default, false, false, iMessageID);
-                            return;
-                        }
-                    }
-                }
-
-                string strNickName = strFirstName + strLastName;
-                int iCellIndex = 16;
-                int iTempCount = 0;
-                int iRealCount = 0;
-                int iBlankCell = 0;
-                bool isConfirm = false;
-                bool isJoin = false;
-
-                // Define request parameters.
-                spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
-                range = "모임!C" + iCellIndex + ":C";
-                request = service.Spreadsheets.Values.Get(spreadsheetId, range);
-
-                response = request.Execute();
-                if (response != null)
-                {
-                    IList<IList<Object>> values = response.Values;
-                    if (values != null && values.Count > 0)
-                    {
-                        foreach (var row in values)
-                        {
-                            if (row.Count == 0)
-                            {
-                                if (iBlankCell == 0)
-                                {
-                                    iBlankCell = iTempCount;
-                                }
-
-                                iTempCount++;
-
-                                continue;
-                            }
-                            else
-                            {
-                                if (row[0].ToString() == strNickName)
-                                {
-                                    iRealCount = iTempCount;
-                                    isJoin = true;
-
-                                    if (strContents == "확정")
-                                    {
-                                        isConfirm = true;
-                                    }
-                                }
-
-                                iTempCount++;
-                            }
-                        }
-                    }
-
-                    if (isJoin == true && isConfirm == false)
-                    {
-                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 이미 모임에 참가신청을 했습니다.", ParseMode.Default, false, false, iMessageID);
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 현재 예정된 모임이 없습니다.", ParseMode.Default, false, false, iMessageID);
                         return;
                     }
 
-                    if (isConfirm == false)
-                    {
-                        if (iBlankCell == 0)
-                        {
-                            range = "모임!C" + (iCellIndex + iRealCount) + ":C";
-                        }
-                        else
-                        {
-                            range = "모임!C" + (iCellIndex + iBlankCell) + ":C";
-                        }
-
-                        // Define request parameters.
-                        ValueRange valueRange = new ValueRange();
-                        valueRange.MajorDimension = "COLUMNS"; //"ROWS";//COLUMNS 
-
-                        var oblist = new List<object>() { strNickName };
-                        valueRange.Values = new List<IList<object>> { oblist };
-
-                        SpreadsheetsResource.ValuesResource.UpdateRequest updateRequest = service.Spreadsheets.Values.Update(valueRange, spreadsheetId, range);
-
-                        updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.RAW;
-                        UpdateValuesResponse updateResponse = updateRequest.Execute();
-
-                        if (updateResponse == null)
-                        {
-                            strPrint += "[ERROR] 시트를 업데이트 할 수 없습니다.";
-                        }
-                        else
-                        {
-                            if (strContents != "확정")
-                            {
-                                strPrint += "[SUCCESS] 참가 신청을 완료 했습니다.";
-                            }
-                        }
-                    }
-
-                    if (strContents == "확정")
-                    {
-                        if (iBlankCell == 0)
-                        {
-                            range = "모임!O" + (iCellIndex + iRealCount) + ":O";
-                        }
-                        else
-                        {
-                            range = "모임!O" + (iCellIndex + iBlankCell) + ":O";
-                        }
-
-                        // Define request parameters.
-                        ValueRange valueRange = new ValueRange();
-                        valueRange.MajorDimension = "COLUMNS"; //"ROWS";//COLUMNS 
-
-                        var oblist = new List<object>() { "O" };
-                        valueRange.Values = new List<IList<object>> { oblist };
-
-                        SpreadsheetsResource.ValuesResource.UpdateRequest updateRequest = service.Spreadsheets.Values.Update(valueRange, spreadsheetId, range);
-
-                        updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.RAW;
-                        UpdateValuesResponse updateResponse = updateRequest.Execute();
-
-                        if (updateResponse == null)
-                        {
-                            strPrint += "\n[ERROR] 참가 확정을 할 수 없습니다.";
-                        }
-                        else
-                        {
-                            strPrint += "\n[SUCCESS] 참가 확정을 완료 했습니다.";
-                        }
-                    }
+                    strPrint += "[ " + values[0][0] + " ]\n\n";
                 }
 
-                if (strPrint != "")
-                {
-                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
-                }
-                else
-                {
-                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 시트를 업데이트 할 수 없습니다.", ParseMode.Default, false, false, iMessageID);
-                }
-            }
-            else if (strCommend == "/불참")
-            {
+                // Define request parameters.
                 String spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
-                String range = "모임!D4:D";
+                String range = "모임_개편!P7:Q28";
                 SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
 
                 ValueRange response = request.Execute();
@@ -2221,84 +1894,66 @@ namespace Athena
                     IList<IList<Object>> values = response.Values;
                     if (values != null && values.Count > 0)
                     {
-                        var row = values[0];
-                        if (row.Count == 0)
+                        strPrint += values[0][0] + " : " + values[0][1] + "\n";
+                        strPrint += values[1][0] + " : " + values[1][1] + "\n";
+                        strPrint += values[2][0] + " : " + values[2][1] + "\n\n";
+
+                        if (values[4][0] != null && values[5][0] != null)
                         {
-                            await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 모임이 등록되지 않았습니다.", ParseMode.Default, false, false, iMessageID);
-                            return;
+                            strPrint += "[ " + values[4][0] + " ]\n";
+                            strPrint += values[5][0] + "\n\n";
+                        }
+
+                        if (values[12][0] != null && values[13][0] != null)
+                        {
+                            strPrint += "[ " + values[12][0] + " ]\n";
+                            strPrint += values[13][0] + "\n\n";
+                        }
+
+                        if (values[20][0] != null && values[21][0] != null)
+                        {
+                            strPrint += "[ " + values[20][0] + " ]\n";
+                            strPrint += values[21][0] + "\n\n";
                         }
                     }
                 }
-
-                string strNickName = strFirstName + strLastName;
-                int iCellIndex = 16;
-                int iTempCount = 0;
-                bool isJoin = false;
 
                 // Define request parameters.
-                spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
-                range = "모임!C" + iCellIndex + ":C";
-                request = service.Spreadsheets.Values.Get(spreadsheetId, range);
+                String user_spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
+                String user_range = "모임_개편!C6:O";
+                SpreadsheetsResource.ValuesResource.GetRequest user_request = service.Spreadsheets.Values.Get(user_spreadsheetId, user_range);
 
-                response = request.Execute();
-                if (response != null)
+                ValueRange user_response = user_request.Execute();
+                if (user_response != null)
                 {
-                    IList<IList<Object>> values = response.Values;
+                    IList<IList<Object>> values = user_response.Values;
                     if (values != null && values.Count > 0)
                     {
+                        strPrint += "----------------------------------------\n";
+                        strPrint += "* 참석 확정 : ";
+
+                        bool isFirst = true;
                         foreach (var row in values)
                         {
-                            if (row.Count != 0)
+                            if (row[0] != null && row[0].ToString() != "")
                             {
-                                if (row[0].ToString() == strNickName)
+                                if (row[10].ToString() == "O")
                                 {
-                                    isJoin = true;
-                                    break;
+                                    if (isFirst != true)
+                                        strPrint += " , ";
+                                    else
+                                        isFirst = false;
+
+                                    strPrint += row[0].ToString();
                                 }
                             }
-
-                            iTempCount++;
                         }
-                    }
 
-                    if (isJoin == true)
-                    {
-                        range = "모임!C" + (iCellIndex + iTempCount);
-
-                        // Define request parameters.
-                        ValueRange valueRange = new ValueRange();
-                        valueRange.MajorDimension = "ROWS"; //"ROWS";//COLUMNS 
-
-                        var oblist = new List<object>() { "", "", "", "", "", "", "", "", "", "", "", "", "", "" };
-                        valueRange.Values = new List<IList<object>> { oblist };
-
-                        SpreadsheetsResource.ValuesResource.UpdateRequest updateRequest = service.Spreadsheets.Values.Update(valueRange, spreadsheetId, range);
-
-                        updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.RAW;
-                        UpdateValuesResponse updateResponse = updateRequest.Execute();
-                        if (updateResponse == null)
-                        {
-                            strPrint += "[ERROR] 시트를 업데이트 할 수 없습니다.";
-                        }
-                        else
-                        {
-                            strPrint += "[SUCCESS] 참가 신청을 취소 했습니다.";
-                        }
-                    }
-                    else
-                    {
-                        strPrint += "[ERROR] 참가 신청을 하지 않았습니다.";
+                        strPrint += "\n----------------------------------------\n";
                     }
                 }
 
-                if (strPrint != "")
-                {
-                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
-                }
-                else
-                {
-                    await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 시트를 업데이트 할 수 없습니다.", ParseMode.Default, false, false, iMessageID);
-                }
+                await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
             }
             //========================================================================================
             // 투표
@@ -3398,7 +3053,7 @@ namespace Athena
                     await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 권한이 없는 유저 또는 대화방입니다.", ParseMode.Default, false, false, iMessageID);
                     return;
                 }
-                
+
                 String FolderName = nasInfo.CurrentPath;
                 System.IO.DirectoryInfo directory = new System.IO.DirectoryInfo(FolderName);
                 if (directory.Exists == true)
@@ -3551,7 +3206,7 @@ namespace Athena
                 string onlyFileName = varMessage.Document.FileName.Substring(0, varMessage.Document.FileName.LastIndexOf('.'));
                 int fileNameIndex = 2;
                 string fileStatue = "";
-               
+
                 while (true)
                 {
                     System.IO.FileInfo fileInfo = new System.IO.FileInfo(fileName);
@@ -4134,7 +3789,7 @@ namespace Athena
 
                     if (item.Value == 0)
                         break;
-                    
+
                     var user = userDirector.getUserInfo(item.Key);
                     double value = Convert.ToDouble(item.Value);
                     double count = Convert.ToDouble(totalCount);
@@ -4155,7 +3810,7 @@ namespace Athena
                         rank++;
                         afterRank = rank;
                     }
-                    
+
                     afterValue = item.Value;
                 }
 
@@ -4167,7 +3822,7 @@ namespace Athena
             else if (strCommend == "/안내")
             {
                 await Bot.SendChatActionAsync(varMessage.Chat.Id, ChatAction.UploadPhoto);
-                
+
                 const string strCDTInfo01 = @"CDT_Info/CDT_Info_1.png";
                 const string strCDTInfo02 = @"CDT_Info/CDT_Info_2.png";
                 const string strCDTInfo03 = @"CDT_Info/CDT_Info_3.png";
