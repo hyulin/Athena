@@ -1866,6 +1866,8 @@ namespace Athena
             //========================================================================================
             else if (strCommend == "/모임")
             {
+                string title = "";
+
                 // 타이틀
                 String title_spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
                 String title_range = "모임!B2";
@@ -1881,7 +1883,7 @@ namespace Athena
                         return;
                     }
 
-                    strPrint += "[ " + values[0][0] + " ]\n\n";
+                    title = "[ " + values[0][0] + " ]\n\n";
                 }
 
                 // 모임 공지 출력
@@ -1898,6 +1900,7 @@ namespace Athena
                         IList<IList<Object>> values = response.Values;
                         if (values != null && values.Count > 0)
                         {
+                            strPrint += title;
                             strPrint += values[0][0] + " : " + values[0][1] + "\n";
                             strPrint += values[1][0] + " : " + values[1][1] + "\n";
                             strPrint += values[2][0] + " : " + values[2][1] + "\n\n";
@@ -1972,6 +1975,8 @@ namespace Athena
                         IList<IList<Object>> values = vote_response.Values;
                         if (values != null && values.Count > 0)
                         {
+                            strPrint += title;
+
                             var row = values[0];
                             if (row.Count <= 4)
                             {
@@ -2046,6 +2051,9 @@ namespace Athena
 
                                 index++;
                             }
+
+                            if (blankIndex == 0)
+                                blankIndex = index;
                         }
                     }
 
@@ -2136,8 +2144,8 @@ namespace Athena
                     placeVote -= (Convert.ToInt32(place[2]) * 10);
                     place[3] = placeVote.ToString();
 
-                    string[] dateInput = new string[4];
-                    string[] placeInput = new string[4];
+                    string[] dateInput = { "", "", "", "" }; //new string[4];
+                    string[] placeInput = { "", "", "", "" }; //new string[4];
 
                     for (int i = 0; i < 4; i++)
                     {
@@ -2157,6 +2165,9 @@ namespace Athena
                             case "4":
                                 dateInput[3] = "O";
                                 break;
+                            default:
+                                await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 보기 선택이 잘못 됐습니다.", ParseMode.Default, false, false, iMessageID);
+                                return;
                         }
 
                         switch (place[i])
@@ -2175,6 +2186,9 @@ namespace Athena
                             case "4":
                                 placeInput[3] = "O";
                                 break;
+                            default:
+                                await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 보기 선택이 잘못 됐습니다.", ParseMode.Default, false, false, iMessageID);
+                                return;
                         }
                     }
 
@@ -2216,6 +2230,9 @@ namespace Athena
 
                                 index++;
                             }
+
+                            if (blankIndex == 0)
+                                blankIndex = index;
                         }
                     }
 
