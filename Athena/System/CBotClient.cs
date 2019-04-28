@@ -2015,6 +2015,7 @@ namespace Athena
                     int index = 0;
                     int blankIndex = 0;
                     string[] vote = new string[8];
+                    bool isVote = false;
 
                     // Define request parameters.
                     String vote_spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
@@ -2045,6 +2046,7 @@ namespace Athena
                                 {
                                     if (row[0].ToString() == strUserName)
                                     {
+                                        isVote = true;
                                         blankIndex = index;
                                     }
                                 }
@@ -2052,7 +2054,7 @@ namespace Athena
                                 index++;
                             }
 
-                            if (blankIndex == 0)
+                            if (isVote == false && blankIndex == 0)
                                 blankIndex = index;
                         }
                     }
@@ -2194,6 +2196,7 @@ namespace Athena
 
                     int index = 0;
                     int blankIndex = 0;
+                    bool isVote = false;
 
                     // Define request parameters.
                     String scan_spreadsheetId = config.getTokenKey(TOKEN_TYPE.TOKEN_TYPE_SHEET);
@@ -2224,6 +2227,7 @@ namespace Athena
                                 {
                                     if (row[0].ToString() == strUserName)
                                     {
+                                        isVote = true;
                                         blankIndex = index;
                                     }
                                 }
@@ -2231,7 +2235,7 @@ namespace Athena
                                 index++;
                             }
 
-                            if (blankIndex == 0)
+                            if (isVote == false && blankIndex == 0)
                                 blankIndex = index;
                         }
                     }
