@@ -1831,10 +1831,13 @@ namespace Athena
                                     if (row[4].ToString().ToUpper().Contains(strContents.ToUpper()) ||
                                     row[5].ToString().ToUpper().Contains(strContents.ToUpper()) ||
                                     row[6].ToString().ToUpper().Contains(strContents.ToUpper()) ||
-                                    row[7].ToString().ToUpper().Contains(strContents.ToUpper()))
+                                    row[7].ToString().ToUpper().Contains(strContents.ToUpper()) ||
+                                    row[9].ToString().ToUpper().Contains(strContents.ToUpper()))
                                     {
                                         strPrint += row[0] + "(" + row[1] + ") : " + row[4].ToString() + " (";
 
+                                        if (row[9].ToString() != "")
+                                            strPrint += "소속:" + row[9].ToString() + ") (";
                                         if (row[5].ToString() != "")
                                             strPrint += row[5].ToString();
                                         if (row[6].ToString() != "")
