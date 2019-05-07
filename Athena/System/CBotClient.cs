@@ -1967,6 +1967,15 @@ namespace Athena
                         }
                     }
 
+                    if (strPrint != "")
+                    {
+                        const string meeting = @"Function/Meeting.jpg";
+                        var fileName = meeting.Split(Path.DirectorySeparatorChar).Last();
+                        var fileStream = new FileStream(meeting, FileMode.Open, FileAccess.Read, FileShare.Read);
+                        await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream, strPrint, ParseMode.Default, false, iMessageID);
+
+                        return;
+                    }
                 }
                 // 모임 투표 출력
                 else if (strContents == "투표")
@@ -2014,6 +2023,16 @@ namespace Athena
 
                             strPrint += "\n- 투표 방법\n/모임 1 3 , /모임 12 3 , /모임 12 123 등";
                         }
+                    }
+
+                    if (strPrint != "")
+                    {
+                        const string meeting = @"Function/Meeting.jpg";
+                        var fileName = meeting.Split(Path.DirectorySeparatorChar).Last();
+                        var fileStream = new FileStream(meeting, FileMode.Open, FileAccess.Read, FileShare.Read);
+                        await Bot.SendPhotoAsync(varMessage.Chat.Id, fileStream, strPrint, ParseMode.Default, false, iMessageID);
+
+                        return;
                     }
                 }
                 // 모임 참가 신청
