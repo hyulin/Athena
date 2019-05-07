@@ -1942,6 +1942,7 @@ namespace Athena
                             strPrint += "----------------------------------------\n";
                             strPrint += "* 참석 확정 : ";
 
+                            int joinCount = 0;
                             bool isFirst = true;
                             foreach (var row in values)
                             {
@@ -1955,11 +1956,14 @@ namespace Athena
                                             isFirst = false;
 
                                         strPrint += row[0].ToString();
+                                        joinCount++;
                                     }
                                 }
                             }
 
                             strPrint += "\n----------------------------------------\n";
+                            strPrint += "* 현재 " + joinCount + "명\n";
+                            strPrint += "----------------------------------------\n";
                         }
                     }
 
