@@ -834,7 +834,8 @@ namespace Athena
                     strInfo += "(남)AWESOME(@leek603),\n";
                     strInfo += "(여)AWESOME(@AWESOMEYUU),\n";
                     strInfo += "청포도(@leetk321),\n";
-                    strInfo += "봄의캐롤(@rsmini) 에게\n";
+                    strInfo += "봄의캐롤(@rsmini),\n";
+                    strInfo += "네이티브(@nativehyun) 에게\n";
                     strInfo += "문의해주세요.\n\n";
                     strInfo += "클랜원들의 편의를 위한\n";
                     strInfo += "저, 아테나의 기능을 확인하시려면\n";
