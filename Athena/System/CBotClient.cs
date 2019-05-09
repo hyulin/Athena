@@ -1654,6 +1654,12 @@ namespace Athena
                         isPass[1] = true;
                     }
 
+                    if (year != "2018" && year != "2019")
+                    {
+                        await Bot.SendTextMessageAsync(varMessage.Chat.Id, "[ERROR] 날짜를 잘못 입력했습니다.\n(ex: /영상 201812 , /영상 20181215)", ParseMode.Default, false, false, iMessageID);
+                        return;
+                    }
+
                     String range = "영상 URL (" + year + ")!B5:G";
                     SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, range);
                     ValueRange response = request.Execute();
