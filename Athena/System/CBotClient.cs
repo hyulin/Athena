@@ -320,27 +320,28 @@ namespace Athena
             user.Name = row[0].ToString();
             user.MainBattleTag = row[1].ToString();
             user.SubBattleTag = row[2].ToString().Trim().Split(',');
+            user.Tier = row[3].ToString();
 
-            if (row[3].ToString() == "플렉스")
+            if (row[4].ToString() == "플렉스")
                 user.Position |= POSITION.POSITION_FLEX;
-            if (row[3].ToString().ToUpper().Contains("딜"))
+            if (row[4].ToString().ToUpper().Contains("딜"))
                 user.Position |= POSITION.POSITION_DPS;
-            if (row[3].ToString().ToUpper().Contains("탱"))
+            if (row[4].ToString().ToUpper().Contains("탱"))
                 user.Position |= POSITION.POSITION_TANK;
-            if (row[3].ToString().ToUpper().Contains("힐"))
+            if (row[4].ToString().ToUpper().Contains("힐"))
                 user.Position |= POSITION.POSITION_SUPP;
 
             string[] most = new string[3];
-            most[0] = row[4].ToString();
-            most[1] = row[5].ToString();
-            most[2] = row[6].ToString();
+            most[0] = row[5].ToString();
+            most[1] = row[6].ToString();
+            most[2] = row[7].ToString();
             user.MostPick = most;
 
-            user.OtherPick = row[7].ToString();
-            user.Team = row[8].ToString();
-            user.Youtube = row[9].ToString();
-            user.Twitch = row[10].ToString();
-            user.Info = row[11].ToString();
+            user.OtherPick = row[8].ToString();
+            user.Team = row[9].ToString();
+            user.Youtube = row[10].ToString();
+            user.Twitch = row[11].ToString();
+            user.Info = row[12].ToString();
 
             // 운영진일 경우
             if (config.isAdmin(user.UserKey))
@@ -3934,6 +3935,7 @@ namespace Athena
                         if (userDirector.getUserInfo(senderKey).getMemoList().Count >= 15)
                         {
                             userDirector.getUserInfo(senderKey).getMemoList().RemoveAt(0);
+                            //userDirector.RemoveMemo(senderKey, 0);
                             userDirector.addMemo(senderKey, strContents);
 
                             strPrint += "[SYSTEM] 메모 제한 갯수를 초과하여\n가장 오래된 메모가 제거 되었으며,\n해당 메모가 저장 되었습니다.";

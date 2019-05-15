@@ -36,6 +36,7 @@ namespace Athena
         public USER_TYPE UserType { get; set; }
         public string MainBattleTag { get; set; }
         public string[] SubBattleTag { get; set; }
+        public string Tier { get; set; }
         public POSITION Position { get; set; }
         public string[] MostPick { get; set; }
         public string OtherPick { get; set; }
