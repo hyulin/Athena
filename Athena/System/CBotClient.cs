@@ -448,7 +448,7 @@ namespace Athena
                     int afterRank = 1;
                     ulong afterValue = 0;
                     bool isContinue = false;
-                    strPrint += "[ 금주의 루팡 Top 10 ]\n============================\n";
+                    strPrint += "[ 금주의 채팅 순위 Top 10 ]\n============================\n";
                     foreach (KeyValuePair<long, ulong> item in dicChattingCount.OrderByDescending(key => key.Value))
                     {
                         if (rank > 10)
