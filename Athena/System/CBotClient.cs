@@ -4125,11 +4125,21 @@ namespace Athena
                 var allUserInfo = userDirector.getAllUserInfo();
                 Dictionary<long, ulong> dicChattingCount = new Dictionary<long, ulong>();
                 ulong totalCount = 0;
+                int senderRank = 0;
+                ulong senderChattingCount = 0;
+                string senderName = "";
 
                 foreach (var iter in allUserInfo)
                 {
                     dicChattingCount.Add(iter.Value.UserKey, iter.Value.chattingCount);
                     totalCount += iter.Value.chattingCount;
+
+                    if (iter.Value.UserKey == senderKey)
+                    {
+                        CUser senderInfo = userDirector.getUserInfo(iter.Value.UserKey);
+                        senderName = senderInfo.Name;
+                        senderChattingCount = iter.Value.chattingCount;
+                    }
                 }
 
                 int rank = 1;
@@ -4139,9 +4149,6 @@ namespace Athena
                 strPrint += "[ 대화량 순위 Top 10 ]\n============================\n";
                 foreach (KeyValuePair<long, ulong> item in dicChattingCount.OrderByDescending(key => key.Value))
                 {
-                    if (rank > 10)
-                        break;
-
                     if (item.Value == 0)
                         break;
 
@@ -4154,20 +4161,32 @@ namespace Athena
                         if (isContinue == false)
                             afterRank--;
 
+                        if (item.Key == senderKey)
+                            senderRank = afterRank;
+
                         isContinue = true;
-                        strPrint += afterRank.ToString() + ". " + user.Name + " - " + item.Value + "건 (" + Math.Round(value / count * 100.0, 2) + "%)\n";
+                        if (rank <= 10)
+                            strPrint += afterRank.ToString() + ". " + user.Name + " - " + item.Value + "건 (" + Math.Round(value / count * 100.0, 2) + "%)\n";
                         rank++;
                     }
                     else
                     {
+                        if (item.Key == senderKey)
+                            senderRank = rank;
+
                         isContinue = false;
-                        strPrint += rank.ToString() + ". " + user.Name + " - " + item.Value + "건 (" + Math.Round(value / count * 100.0, 2) + "%)\n";
+                        if (rank <= 10)
+                            strPrint += rank.ToString() + ". " + user.Name + " - " + item.Value + "건 (" + Math.Round(value / count * 100.0, 2) + "%)\n";
                         rank++;
                         afterRank = rank;
                     }
 
                     afterValue = item.Value;
                 }
+
+                double countDouble = Convert.ToDouble(totalCount);
+                strPrint += "============================\n";
+                strPrint += "* 내 순위\n" + senderRank.ToString() + ". " + senderName + " - " + senderChattingCount.ToString() + "건 (" + Math.Round(senderChattingCount / countDouble * 100.0, 2) + "%)\n";
 
                 await Bot.SendTextMessageAsync(varMessage.Chat.Id, strPrint, ParseMode.Default, false, false, iMessageID);
             }
